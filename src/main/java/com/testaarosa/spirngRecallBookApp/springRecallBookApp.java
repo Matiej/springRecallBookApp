@@ -24,6 +24,6 @@ public class springRecallBookApp implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<Book> bookList = catalogService.findByTitle("Pan");
         System.out.println("Amount of books: " + bookList.size());
-        bookList.forEach(book -> System.out.println("Amount of books: " + book.s"Books: " + book));
+        bookList.forEach(book -> System.out.println("Books: " + book));
     }
 }
