@@ -1,8 +1,8 @@
-package com.testaarosa.spirngRecallBookApp;
+package com.testaarosa.spirngRecallBookApp.catalog.domain;
 
 import java.util.StringJoiner;
 
-class Book {
+public class Book {
 
     private Long id;
     private String title;
