@@ -7,15 +7,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.List;
 
 @SpringBootApplication
-public class springRecallBookApp implements CommandLineRunner {
+public class SpringRecallBookApp implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(springRecallBookApp.class, args);
+        SpringApplication.run(SpringRecallBookApp.class, args);
     }
 
     private final CatalogService catalogService;
 
-    public springRecallBookApp(CatalogService catalogService) {
+    public SpringRecallBookApp(CatalogService catalogService) {
         this.catalogService = catalogService;
     }
 
@@ -24,6 +24,6 @@ public class springRecallBookApp implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<Book> bookList = catalogService.findByTitle("Pan");
         System.out.println("Amount of books: " + bookList.size());
-        bookList.forEach(book -> System.out.println("Amount of books: " + book.s"Books: " + book));
+        bookList.forEach(book -> System.out.println("Books: " + book));
     }
 }
