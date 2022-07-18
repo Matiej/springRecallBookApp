@@ -7,15 +7,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.List;
 
 @SpringBootApplication
-public class springRecallBookApp implements CommandLineRunner {
+public class SpringRecallBookApp implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(springRecallBookApp.class, args);
+        SpringApplication.run(SpringRecallBookApp.class, args);
     }
 
     private final CatalogService catalogService;
 
-    public springRecallBookApp(CatalogService catalogService) {
+    public SpringRecallBookApp(CatalogService catalogService) {
         this.catalogService = catalogService;
     }
 
