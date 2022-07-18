@@ -2,18 +2,16 @@ package com.testaarosa.spirngRecallBookApp;
 
 import com.testaarosa.spirngRecallBookApp.catalog.application.CatalogController;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class AppStartUp implements CommandLineRunner {
     private final CatalogController catalogController;
-
-    public AppStartUp(CatalogController catalogController) {
-        this.catalogController = catalogController;
-    }
 
     @Override
     public void run(String... args) throws Exception {
