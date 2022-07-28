@@ -8,21 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-class MemorySchoolCatalogRepository implements CatalogRepository {
+class MemoryCatalogRepository implements CatalogRepository {
     private final Map<Long, Book> tmpStorage = new ConcurrentHashMap<>();
-
-    public MemorySchoolCatalogRepository() {
-        tmpStorage.put(1L, new Book(1L, "Pan Tadeusz", "Adam Mickiewicz", 1834));
-        tmpStorage.put(2L, new Book(2L, "Dziady", "Adam Mickiewicz", 1835));
-        tmpStorage.put(3L, new Book(3L, "Potop", "Heryk Sienkiewicz", 1834));
-        tmpStorage.put(4L, new Book(4L, "Chłopi", "Władysław Reymont", 1811));
-        tmpStorage.put(5L, new Book(5L, "Pan Samochodzik", "Krol Julian", 1911));
-    }
+    private final AtomicLong ID_NEXT_VALUE = new AtomicLong(0);
 
     @Override
     public List<Book> findAll() {
         return new ArrayList<>(tmpStorage.values());
+    }
+
+    @Override
+    public void save(Book book) {
+        book.setId(getNextId());
+        tmpStorage.put(book.getId(), book);
+    }
+
+    private long getNextId() {
+        return ID_NEXT_VALUE.getAndIncrement();
     }
 }

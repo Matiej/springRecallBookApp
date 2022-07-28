@@ -1,6 +1,7 @@
 package com.testaarosa.spirngRecallBookApp.catalog.application;
 
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.CatalogUseCase;
+import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCommand;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.CatalogRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,12 +12,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-
 class CatalogService implements CatalogUseCase {
-
     private final CatalogRepository catalogRepository;
 
-    public CatalogService(@Qualifier("memorySchoolCatalogRepository") CatalogRepository catalogRepository) {
+    // qualifier left to remember this kind of solution, if. Maybe will delete later
+    public CatalogService(@Qualifier("memoryCatalogRepository") CatalogRepository catalogRepository) {
         this.catalogRepository = catalogRepository;
     }
 
@@ -24,7 +24,7 @@ class CatalogService implements CatalogUseCase {
     public List<Book> findByTitle(String title) {
         return catalogRepository.findAll()
                 .stream()
-                .filter(book -> book.getTitle().startsWith(title))
+                .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
@@ -39,8 +39,8 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    public void addBook(){
-
+    public void addBook(CreateBookCommand command) {
+        catalogRepository.save(new Book(command.getTitle(), command.getAuthor(), command.getYear()));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.testaarosa.spirngRecallBookApp;
 
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.CatalogUseCase;
+import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCommand;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -25,6 +26,18 @@ public class AppStartUp implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        addBooks();
+        findbyTitle();
+    }
+
+    private void addBooks() {
+        catalogUseCase.addBook(new CreateBookCommand("Harry Potter", "Joanna Herwing ", 2022));
+        catalogUseCase.addBook(new CreateBookCommand("Black Out", "Wienia Karkowska", 2010));
+        catalogUseCase.addBook(new CreateBookCommand("Sezon Burz", "Stefan Burczymucha", 2005));
+        catalogUseCase.addBook(new CreateBookCommand("Black Knight", "Jowi Kielosi", 2015));
+    }
+
+    private void findbyTitle() {
         List<Book> bookList = catalogUseCase.findByTitle(schoolCatalogQuery)
                 .stream()
                 .limit(limit)
