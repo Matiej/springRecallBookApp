@@ -2,12 +2,15 @@ package com.testaarosa.spirngRecallBookApp;
 
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCommand;
+import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookCommand;
+import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookResponse;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -26,11 +29,21 @@ public class AppStartUp implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        addBooks();
-        findbyTitle();
+        initData();
+        findAll();
+        //findbyTitle();
+        findByTitleAndAuthor("black", "wienia");
+        findAndUpdate();
+        findByTitleAndAuthor("black", "wienia");
+        findAll();
     }
 
-    private void addBooks() {
+    private void findAll() {
+        System.out.println("Find all books in storage..........");
+        catalogUseCase.findAll().forEach(System.out::println);
+    }
+
+    private void initData() {
         catalogUseCase.addBook(new CreateBookCommand("Harry Potter", "Joanna Herwing ", 2022));
         catalogUseCase.addBook(new CreateBookCommand("Black Out", "Wienia Karkowska", 2010));
         catalogUseCase.addBook(new CreateBookCommand("Sezon Burz", "Stefan Burczymucha", 2005));
@@ -44,5 +57,32 @@ public class AppStartUp implements CommandLineRunner {
                 .collect(Collectors.toList());
         System.out.println("Number of books found: " + bookList.size());
         bookList.forEach(book -> System.out.println("Books: " + book));
+    }
+
+    private void findByTitleAndAuthor(String title, String author) {
+        Optional<Book> oneByTitleAndAuthor = catalogUseCase.findOneByTitleAndAuthor(title, author);
+        if (oneByTitleAndAuthor.isPresent()) {
+            List<Book> foundBookList = oneByTitleAndAuthor
+                    .stream()
+                    .collect(Collectors.toList());
+            System.out.println(foundBookList);
+        } else {
+            System.out.printf("No results for title: %s and author: %s", title, author);
+        }
+    }
+
+    private void findAndUpdate() {
+        System.out.println("Book updating....");
+        catalogUseCase.findOneByTitleAndAuthor("black", "wienia")
+                        .ifPresent(book -> {
+                            System.out.printf("Trying to update book ID: %d%n", book.getId());
+                            UpdateBookCommand updateBookCommand = new UpdateBookCommand(
+                                    book.getId(),
+                                    "Total Black Out Disaster",
+                                    book.getAuthor(),
+                                    book.getYear());
+                            UpdateBookResponse updateBookResponse = catalogUseCase.updateBook(updateBookCommand);
+                            System.out.printf("Book ID: %d updated with success: %s%n",book.getId(), updateBookResponse.isSuccess());
+                        });
     }
 }
