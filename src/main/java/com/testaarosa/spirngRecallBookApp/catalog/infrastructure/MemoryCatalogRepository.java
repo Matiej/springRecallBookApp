@@ -34,12 +34,12 @@ class MemoryCatalogRepository implements CatalogRepository {
         return Optional.ofNullable(tmpStorage.get(id));
     }
 
-    private long getNextId() {
-        return ID_NEXT_VALUE.incrementAndGet();
-    }
-
     @Override
     public void removeBookById(Long id) {
         Book removedBook = tmpStorage.remove(id);
+    }
+
+    private long getNextId() {
+        return ID_NEXT_VALUE.incrementAndGet();
     }
 }
