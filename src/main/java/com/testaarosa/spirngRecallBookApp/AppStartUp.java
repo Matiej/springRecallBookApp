@@ -74,15 +74,14 @@ public class AppStartUp implements CommandLineRunner {
     private void findAndUpdate() {
         System.out.println("Book updating....");
         catalogUseCase.findOneByTitleAndAuthor("black", "wienia")
-                        .ifPresent(book -> {
-                            System.out.printf("Trying to update book ID: %d%n", book.getId());
-                            UpdateBookCommand updateBookCommand = new UpdateBookCommand(
-                                    book.getId(),
-                                    "Total Black Out Disaster",
-                                    book.getAuthor(),
-                                    book.getYear());
-                            UpdateBookResponse updateBookResponse = catalogUseCase.updateBook(updateBookCommand);
-                            System.out.printf("Book ID: %d updated with success: %s%n",book.getId(), updateBookResponse.isSuccess());
-                        });
+                .ifPresent(book -> {
+                    Long bookId = book.getId();
+                    System.out.printf("Trying to update book ID: %d%n", bookId);
+                    UpdateBookCommand bookCommand = UpdateBookCommand.builder(bookId)
+                            .title("Total Black Out Disaster")
+                            .build();
+                    UpdateBookResponse updateBookResponse = catalogUseCase.updateBook(bookCommand);
+                    System.out.printf("Book ID: %d updated with success: %s%n", bookId, updateBookResponse.isSuccess());
+                });
     }
 }
