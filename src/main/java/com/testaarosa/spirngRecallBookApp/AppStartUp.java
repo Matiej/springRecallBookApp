@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,10 +45,10 @@ public class AppStartUp implements CommandLineRunner {
     }
 
     private void initData() {
-        catalogUseCase.addBook(new CreateBookCommand("Harry Potter", "Joanna Herwing ", 2022));
-        catalogUseCase.addBook(new CreateBookCommand("Black Out", "Wienia Karkowska", 2010));
-        catalogUseCase.addBook(new CreateBookCommand("Sezon Burz", "Stefan Burczymucha", 2005));
-        catalogUseCase.addBook(new CreateBookCommand("Black Knight", "Jowi Kielosi", 2015));
+        catalogUseCase.addBook(new CreateBookCommand("Harry Potter", "Joanna Herwing ", 2022, new BigDecimal(112)));
+        catalogUseCase.addBook(new CreateBookCommand("Black Out", "Wienia Karkowska", 2010, new BigDecimal(240)));
+        catalogUseCase.addBook(new CreateBookCommand("Sezon Burz", "Stefan Burczymucha", 2005, new BigDecimal(281)));
+        catalogUseCase.addBook(new CreateBookCommand("Black Knight", "Jowi Kielosi", 2015, new BigDecimal(110)));
     }
 
     private void findbyTitle() {
