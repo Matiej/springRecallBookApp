@@ -1,7 +1,6 @@
 package com.testaarosa.spirngRecallBookApp.catalog.application.port;
 
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
-import lombok.Value;
 
 import java.util.List;
 import java.util.Optional;
