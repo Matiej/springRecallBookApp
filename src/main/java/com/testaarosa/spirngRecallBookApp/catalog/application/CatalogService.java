@@ -6,6 +6,8 @@ import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookCom
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookResponse;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.CatalogRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -54,19 +56,8 @@ class CatalogService implements CatalogUseCase {
     public UpdateBookResponse updateBook(UpdateBookCommand command) {
         return catalogRepository.findById(command.getId())
                 .map(bookToUpdate -> {
-                    String title = command.getTitle();
-                    if (!title.isBlank()) {
-                        bookToUpdate.setTitle(title);
-                    }
-                    String author = command.getAuthor();
-                    if (!author.isBlank()) {
-                        bookToUpdate.setAuthor(author);
-                    }
-                    Integer year = command.getYear();
-                    if (year > 0) {
-                        bookToUpdate.setYear(year);
-                    }
-                    catalogRepository.save(bookToUpdate);
+                    Book updatedBook = command.updateBookFields(bookToUpdate);
+                    catalogRepository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
                 }).orElseGet(() -> errorResponse(command.getId()));
     }
