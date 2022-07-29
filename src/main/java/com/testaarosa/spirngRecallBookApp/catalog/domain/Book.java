@@ -1,6 +1,5 @@
 package com.testaarosa.spirngRecallBookApp.catalog.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

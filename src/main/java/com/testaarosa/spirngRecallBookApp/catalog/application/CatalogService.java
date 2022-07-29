@@ -26,16 +26,16 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    public List<Book> findAll() {
+        return catalogRepository.findAll();
+    }
+
+    @Override
     public List<Book> findByTitle(String title) {
         return catalogRepository.findAll()
                 .stream()
                 .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Book> findAll() {
-        return catalogRepository.findAll();
     }
 
     @Override
@@ -71,7 +71,7 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public void removeById(Long id) {
-
+        catalogRepository.removeBookById(id);
     }
 
 }
