@@ -1,6 +1,7 @@
 package com.testaarosa.spirngRecallBookApp.catalog.application.port;
 
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
+import lombok.Value;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public interface CatalogUseCase {
 
     void addBook(CreateBookCommand command);
 
-    void removeById(Long id);
+    UpdateBookResponse updateBook(UpdateBookCommand command);
 
-    void updateBook();
+    void removeById(Long id);
 }
