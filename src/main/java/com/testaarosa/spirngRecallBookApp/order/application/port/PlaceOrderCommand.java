@@ -3,16 +3,18 @@ package com.testaarosa.spirngRecallBookApp.order.application.port;
 import com.testaarosa.spirngRecallBookApp.order.domain.OrderItem;
 import com.testaarosa.spirngRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.spirngRecallBookApp.order.domain.Recipient;
+import lombok.Builder;
+import lombok.Singular;
 import lombok.Value;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+@Builder
 @Value
-public class CreateOrderCommand {
-    Long id;
+public
+class PlaceOrderCommand {
+    @Singular("itemList")
     List<OrderItem> itemList;
     Recipient recipient;
     OrderStatus orderStatus;
-    LocalDateTime createdAt;
 }
