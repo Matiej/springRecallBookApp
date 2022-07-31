@@ -13,7 +13,7 @@ import java.util.List;
 @Value
 public
 class PlaceOrderCommand {
-    @Singular("itemList")
+    @Singular("item")
     List<OrderItem> itemList;
     Recipient recipient;
     OrderStatus orderStatus;
