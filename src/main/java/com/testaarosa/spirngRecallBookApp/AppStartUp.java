@@ -10,6 +10,7 @@ import com.testaarosa.spirngRecallBookApp.order.application.port.PlaceOrderRespo
 import com.testaarosa.spirngRecallBookApp.order.application.port.PlaceOrderUseCase;
 import com.testaarosa.spirngRecallBookApp.order.application.port.QueryOrderUseCase;
 import com.testaarosa.spirngRecallBookApp.order.domain.OrderItem;
+import com.testaarosa.spirngRecallBookApp.order.domain.Recipient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -62,12 +63,19 @@ public class AppStartUp implements CommandLineRunner {
         Book harryPotterBook = catalogUseCase.findOneByTitle(harry_potter)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("Cannot find a book: %s", harry_potter)));
 
-
+        Recipient recipient = Recipient.builder()
+                .name("Ksawery Nowak")
+                .phone("661555777")
+                .street("Starej Drogi 11")
+                .city("Warszawa")
+                .zipCode("01-001")
+                .email("ksawer@gmail.com")
+                .build();
         // create recipient
 
         PlaceOrderCommand orderCommand = PlaceOrderCommand
                 .builder()
-                .recipient(null)
+                .recipient(recipient)
                 .item(new OrderItem(blackOutBook, 11))
                 .item(new OrderItem(harryPotterBook, 7))
                 .build();
