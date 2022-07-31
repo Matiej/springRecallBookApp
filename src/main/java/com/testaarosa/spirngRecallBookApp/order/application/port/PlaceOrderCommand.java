@@ -11,8 +11,7 @@ import java.util.List;
 
 @Builder
 @Value
-public
-class PlaceOrderCommand {
+public class PlaceOrderCommand {
     @Singular("item")
     List<OrderItem> itemList;
     Recipient recipient;
