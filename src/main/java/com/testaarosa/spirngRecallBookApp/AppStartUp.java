@@ -5,8 +5,12 @@ import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCom
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookCommand;
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookResponse;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
+import com.testaarosa.spirngRecallBookApp.order.application.port.PlaceOrderCommand;
+import com.testaarosa.spirngRecallBookApp.order.application.port.PlaceOrderResponse;
 import com.testaarosa.spirngRecallBookApp.order.application.port.PlaceOrderUseCase;
 import com.testaarosa.spirngRecallBookApp.order.application.port.QueryOrderUseCase;
+import com.testaarosa.spirngRecallBookApp.order.domain.OrderItem;
+import com.testaarosa.spirngRecallBookApp.order.domain.Recipient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -24,8 +28,7 @@ public class AppStartUp implements CommandLineRunner {
     private final String catalogQuery;
     private final Long limit;
 
-    public AppStartUp(CatalogUseCase catalogUseCase,
-                      PlaceOrderUseCase placeOrderUseCase, QueryOrderUseCase queryOrderUseCase,
+    public AppStartUp(CatalogUseCase catalogUseCase, PlaceOrderUseCase placeOrderUseCase, QueryOrderUseCase queryOrderUseCase,
                       @Value("${recallBookApp.schoolCatalog.query}") String catalogQuery,
                       @Value("${recallBookApp.schoolCatalog.limit:5}") Long limit) {
         this.catalogUseCase = catalogUseCase;
@@ -44,14 +47,44 @@ public class AppStartUp implements CommandLineRunner {
 //        findByTitleAndAuthor("black", "wienia");
 //        findAll();
         searchCatalog();
-        searchOrder();
+        searchAnOrder();
         placeAnOrder();
     }
 
-    private void searchOrder() {
+    private void searchAnOrder() {
     }
 
     private void placeAnOrder() {
+        System.out.println("trying to create an order....");
+        String black_out = "Black Out";
+        Book blackOutBook = catalogUseCase.findOneByTitle(black_out)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Cannot find a book: %s", black_out)));
+        String harry_potter = "Harry Potter";
+        Book harryPotterBook = catalogUseCase.findOneByTitle(harry_potter)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("Cannot find a book: %s", harry_potter)));
+
+        Recipient recipient = Recipient.builder()
+                .name("Ksawery Nowak")
+                .phone("661555777")
+                .street("Starej Drogi 11")
+                .city("Warszawa")
+                .zipCode("01-001")
+                .email("ksawer@gmail.com")
+                .build();
+        // create recipient
+
+        PlaceOrderCommand orderCommand = PlaceOrderCommand
+                .builder()
+                .recipient(recipient)
+                .item(new OrderItem(blackOutBook, 11))
+                .item(new OrderItem(harryPotterBook, 7))
+                .build();
+        PlaceOrderResponse placeOrderResponse = placeOrderUseCase.placeOrder(orderCommand);
+        System.out.println("Created an order with ID: " + placeOrderResponse.getOrderId());
+
+        queryOrderUseCase.findAll()
+                .forEach(order -> System.out.printf("GOT Order with total price: " + order.totalPrice()
+                        + "\n DETAILS: " + order));
 
     }
 

@@ -37,6 +37,14 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    public Optional<Book> findOneByTitle(String title) {
+        return findAll()
+                .stream()
+                .filter(book-> book.getTitle().equals(title))
+                .findAny();
+    }
+
+    @Override
     public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
         return catalogRepository.findAll()
                 .stream()
