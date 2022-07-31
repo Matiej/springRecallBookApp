@@ -9,8 +9,7 @@ import java.util.List;
 
 @Value
 @Builder
-public
-class PlaceOrderResponse {
+public class PlaceOrderResponse {
     boolean success;
     Long orderId;
     List<String> errorList;
