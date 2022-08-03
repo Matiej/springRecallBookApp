@@ -23,24 +23,21 @@ public class CatalogController {
     private final CatalogUseCase catalogUseCase;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getAll() {
+    public ResponseEntity<?> getAll() {
         return ResponseEntity.ok()
                 .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
                 .body(catalogUseCase.findAll());
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getBookById(@PathVariable Long id) {
-        String xx = "";
-        Optional<Book> optionalBook = catalogUseCase.findById(id);
-        return optionalBook
-                .<ResponseEntity<Object>>map(book -> ResponseEntity.ok()
+    public ResponseEntity<?> getBookById(@PathVariable Long id) {
+        return catalogUseCase.findById(id)
+                .map(book -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
                         .body(book))
-                .orElseGet(() -> ResponseEntity.notFound().
-                        headers(getSuccessfulHeaders(HttpStatus.NOT_FOUND, HttpMethod.GET)).build());
-
-
+                .orElse(ResponseEntity.notFound()
+                        .headers(getSuccessfulHeaders(HttpStatus.NOT_FOUND, HttpMethod.GET))
+                        .build());
     }
 
 }
