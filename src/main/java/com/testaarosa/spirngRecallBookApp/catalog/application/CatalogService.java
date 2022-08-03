@@ -29,6 +29,11 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    public Optional<Book> findById(Long id) {
+        return catalogRepository.findById(id);
+    }
+
+    @Override
     public List<Book> findByTitle(String title) {
         return catalogRepository.findAll()
                 .stream()
