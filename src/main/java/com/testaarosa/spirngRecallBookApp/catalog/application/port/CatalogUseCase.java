@@ -13,6 +13,10 @@ public interface CatalogUseCase {
 
     List<Book> findByTitle(String title);
 
+    List<Book> findByAuthor(String author);
+
+    List<Book> findByTitleAndAuthor(String title, String author);
+
     Optional<Book> findOneByTitle(String title);
 
     Optional<Book> findOneByTitleAndAuthor(String title, String author);
