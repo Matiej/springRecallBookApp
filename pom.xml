@@ -18,6 +18,7 @@
 		<java.version>18</java.version>
 		<lombok.version>1.18.24</lombok.version>
 		<apache.commons>3.12.0</apache.commons>
+		<hibernate.validator>6.2.4.Final</hibernate.validator>
 	</properties>
 
 	<dependencies>
@@ -44,6 +45,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>${apache.commons}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate.validator}</version>
 		</dependency>
 	</dependencies>
 

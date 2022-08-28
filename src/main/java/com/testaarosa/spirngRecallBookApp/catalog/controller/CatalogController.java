@@ -4,7 +4,6 @@ import com.testaarosa.spirngRecallBookApp.catalog.application.port.CatalogUseCas
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCommand;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class CatalogController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> addBook(@RequestBody CreateBookCommand command) {
+    public ResponseEntity<Void> addBook(@Valid @RequestBody CreateBookCommand command) {
         Book createdBook = catalogUseCase.addBook(command);
         URI savedUri = ServletUriComponentsBuilder
                 .fromCurrentServletMapping()
