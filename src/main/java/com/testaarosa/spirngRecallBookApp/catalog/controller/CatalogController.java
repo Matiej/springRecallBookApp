@@ -73,4 +73,10 @@ public class CatalogController {
                 .headers(getSuccessfulHeaders(HttpStatus.CREATED, HttpMethod.POST))
                 .build();
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) {
+        catalogUseCase.removeById(id);
+    }
 }
