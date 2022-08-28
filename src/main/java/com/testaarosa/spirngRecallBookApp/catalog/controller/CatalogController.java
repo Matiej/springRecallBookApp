@@ -26,7 +26,7 @@ public class CatalogController {
     public ResponseEntity<?> getAll(
             @RequestParam Optional<String> title,
             @RequestParam Optional<String> author,
-            @DefaultValue(value = "3") int limit) {
+            @RequestParam (value = "limit", defaultValue = "3",required = false) int limit) {
         if (title.isPresent() && author.isPresent()) {
             return prepareResponseForGetAll(catalogUseCase.findByTitleAndAuthor(title.get(), author.get()));
         } else if (title.isPresent()) {
