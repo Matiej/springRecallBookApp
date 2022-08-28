@@ -22,11 +22,12 @@ class MemoryCatalogRepository implements CatalogRepository {
     }
 
     @Override
-    public void save(Book book) {
+    public Book save(Book book) {
         if(book.getId() == null) {
             book.setId(getNextId());
         }
         tmpStorage.put(book.getId(), book);
+        return book;
     }
 
     @Override

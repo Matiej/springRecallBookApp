@@ -1,6 +1,7 @@
 package com.testaarosa.spirngRecallBookApp.catalog.controller;
 
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.CatalogUseCase;
+import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCommand;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -9,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,7 +29,7 @@ public class CatalogController {
     public ResponseEntity<?> getAll(
             @RequestParam Optional<String> title,
             @RequestParam Optional<String> author,
-            @RequestParam (value = "limit", defaultValue = "3",required = false) int limit) {
+            @RequestParam(value = "limit", defaultValue = "3", required = false) int limit) {
         if (title.isPresent() && author.isPresent()) {
             return prepareResponseForGetAll(catalogUseCase.findByTitleAndAuthor(title.get(), author.get()));
         } else if (title.isPresent()) {
@@ -55,5 +58,19 @@ public class CatalogController {
                 .orElse(ResponseEntity.notFound()
                         .headers(getSuccessfulHeaders(HttpStatus.NOT_FOUND, HttpMethod.GET))
                         .build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> addBook(@RequestBody CreateBookCommand command) {
+        Book createdBook = catalogUseCase.addBook(command);
+        URI savedUri = ServletUriComponentsBuilder
+                .fromCurrentServletMapping()
+                .path("/catalog")
+                .path("/{id}")
+                .buildAndExpand(createdBook.getId())
+                .toUri();
+        return ResponseEntity.created(savedUri)
+                .headers(getSuccessfulHeaders(HttpStatus.CREATED, HttpMethod.POST))
+                .build();
     }
 }

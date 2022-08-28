@@ -1,10 +1,14 @@
 package com.testaarosa.spirngRecallBookApp.catalog.application.port;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CreateBookCommand {
     String title;
     String author;
