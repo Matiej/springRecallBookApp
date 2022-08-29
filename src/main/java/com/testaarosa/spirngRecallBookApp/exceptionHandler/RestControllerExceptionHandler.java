@@ -1,25 +1,17 @@
 package com.testaarosa.spirngRecallBookApp.exceptionHandler;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -49,17 +41,27 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     }
 
     private ExceptionHandlerResponse getExceptionHandlerResponse(Exception ex, String message, HttpStatus httpStatus) {
-        String details = ex.getMessage();
+
+        ExceptionHandlerResponse.ExceptionHandlerResponseBuilder exceptionHandlerResponseBuilder = ExceptionHandlerResponse.builder();
+
         if (ex instanceof MethodArgumentNotValidException) {
-            List<MethodArgumentErrorDetailMessage> allErrors = ((MethodArgumentNotValidException) ex).getAllErrors()
+            exceptionHandlerResponseBuilder.details(((MethodArgumentNotValidException) ex).getBindingResult().getAllErrors()
                     .stream()
-                    .map(err -> new MethodArgumentErrorDetailMessage(((FieldError) err).getField(),
+                    .map(err -> new MethodArgumentErrorDetailMessage(
+                            ((FieldError) err).getField(),
                             ((FieldError) err).getRejectedValue(),
                             err.getDefaultMessage()))
-                    .toList();
-            details = allErrors.toString();
+                    .toList());
+        } else {
+            exceptionHandlerResponseBuilder.detail(new ErrorDetailMessage(ex.getMessage()));
         }
-        return new ExceptionHandlerResponse(LocalDateTime.now().withNano(0), message, details, String.valueOf(httpStatus.value()), httpStatus.name());
+
+        return exceptionHandlerResponseBuilder
+                .errorTimeStamp(LocalDateTime.now())
+                .message(message)
+                .statusCode(String.valueOf(httpStatus.value()))
+                .status(httpStatus.name())
+                .build();
     }
 
     private HttpHeaders getExceptionHeaders(String status, String message) {
@@ -69,21 +71,4 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         return httpHeaders;
     }
 
-}
-
-@Data
-@AllArgsConstructor
-class MethodArgumentErrorDetailMessage {
-    private String fieldName;
-    private Object rejectedValue;
-    private String filedErrorMessage;
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", MethodArgumentErrorDetailMessage.class.getSimpleName() + "[", "]")
-                .add("fieldName='" + fieldName + "'")
-                .add("rejectedValue='" + rejectedValue + "'")
-                .add("filedErrorMessage='" + filedErrorMessage + "'")
-                .toString();
-    }
 }
