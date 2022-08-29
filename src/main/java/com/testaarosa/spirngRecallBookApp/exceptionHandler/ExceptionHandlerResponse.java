@@ -1,16 +1,17 @@
 package com.testaarosa.spirngRecallBookApp.exceptionHandler;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Getter
-@AllArgsConstructor
+@Builder
+@Value
 public class ExceptionHandlerResponse {
-    private LocalDateTime errorTimeStamp;
-    private String message;
-    private String details;
-    private String statusCode;
-    private String status;
+    LocalDateTime errorTimeStamp;
+    String message;
+    @Singular("detail")
+    List<ErrorDetailMessage> details;
+    String statusCode;
+    String status;
 }
