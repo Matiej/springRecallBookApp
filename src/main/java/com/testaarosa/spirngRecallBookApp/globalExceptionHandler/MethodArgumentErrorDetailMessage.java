@@ -1,4 +1,4 @@
-package com.testaarosa.spirngRecallBookApp.exceptionHandler;
+package com.testaarosa.spirngRecallBookApp.globalExceptionHandler;
 
 import lombok.Getter;
 

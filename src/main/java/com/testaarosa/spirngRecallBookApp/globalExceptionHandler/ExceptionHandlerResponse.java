@@ -1,6 +1,8 @@
-package com.testaarosa.spirngRecallBookApp.exceptionHandler;
+package com.testaarosa.spirngRecallBookApp.globalExceptionHandler;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Singular;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.List;
