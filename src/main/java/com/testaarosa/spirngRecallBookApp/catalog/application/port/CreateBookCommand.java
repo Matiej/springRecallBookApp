@@ -23,7 +23,7 @@ public class CreateBookCommand {
     @NotNull(message = "Filed can't be null")
     private Integer year;
 
-    @NotNull
+    @NotNull(message = "Filed can't be null")
     @DecimalMin(value = "0.00", message = "Price value can't be negative, min price value is 0.00")
     private BigDecimal price;
 }
