@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+
 @Value
 @Builder(builderMethodName = "hiddenBuilder")
 public class UpdateBookCommand {
@@ -12,16 +14,20 @@ public class UpdateBookCommand {
     String title;
     String author;
     Integer year;
+    BigDecimal price;
 
     public Book updateBookFields(Book book) {
-        if (!StringUtils.isBlank(title)) {
+        if (StringUtils.isNoneBlank(title)) {
             book.setTitle(title);
         }
-        if (!StringUtils.isBlank(author)) {
+        if (StringUtils.isNoneBlank(author)) {
             book.setAuthor(author);
         }
         if (year != null && year > 0) {
             book.setYear(year);
+        }
+        if (price != null && price.compareTo(BigDecimal.ZERO) > -1) {
+            book.setPrice(price);
         }
         return book;
     }

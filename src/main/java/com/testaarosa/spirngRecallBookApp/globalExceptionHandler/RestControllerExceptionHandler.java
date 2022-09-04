@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -17,15 +19,16 @@ import java.time.LocalDateTime;
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     //todo every exception handle like below
-//    @ExceptionHandler({Exception.class})
-//    public final ResponseEntity<Object> handleConstraintViolationException(Exception ex, WebRequest request) {
-//        String message = "Validation error ==> ";
-//        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
-//        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
-//        return ResponseEntity.status(badRequest)
-//                .headers(getExceptionHeaders(badRequest.name(), message))
-//                .body(exceptionResponse);
-//    }
+    @ExceptionHandler({Exception.class})
+    public final ResponseEntity<Object> handleConstraintViolationException(Exception ex, WebRequest request) {
+        String message = "Validation error ==> ";
+        log.error(message, ex);
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
+        return ResponseEntity.status(badRequest)
+                .headers(getExceptionHeaders(badRequest.name(), message))
+                .body(exceptionResponse);
+    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -35,6 +38,18 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
         return ResponseEntity.status(badRequest)
                 .headers(getExceptionHeaders(badRequest.name(), message))
+                .body(exceptionHandlerResponse);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+                                                                          HttpHeaders headers, HttpStatus status, WebRequest request) {
+        String message = "error servlet params ";
+        log.error(message, ex);
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
+        return ResponseEntity.status(badRequest)
+                .headers(getExceptionHeaders(HttpStatus.BAD_REQUEST.name(), message))
                 .body(exceptionHandlerResponse);
     }
 
@@ -50,7 +65,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                             ((FieldError) err).getRejectedValue(),
                             err.getDefaultMessage()))
                     .toList());
-        } else {
+        }else {
             exceptionHandlerResponseBuilder.detail(new ErrorDetailMessage(ex.getMessage()));
         }
 
