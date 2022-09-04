@@ -1,11 +1,9 @@
 package com.testaarosa.spirngRecallBookApp.catalog.application;
 
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.CatalogUseCase;
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCommand;
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookCommand;
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookResponse;
+import com.testaarosa.spirngRecallBookApp.catalog.application.port.*;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.CatalogRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 class CatalogService implements CatalogUseCase {
     private final CatalogRepository catalogRepository;
@@ -100,6 +99,17 @@ class CatalogService implements CatalogUseCase {
     @Override
     public void removeById(Long id) {
         catalogRepository.removeBookById(id);
+    }
+
+    @Override
+    public void updateBookCover(UpdateBookCoverCommand command) {
+        log.info("Received cover command: " + command.getFileName()
+                + ", bytes: " + command.getFile().length);
+        catalogRepository.findById(command.getId())
+                .ifPresent(book -> {
+                    log.info("Book, id: " + book.getId() + " has been found");
+
+                });
     }
 
 }

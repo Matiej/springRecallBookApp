@@ -26,4 +26,6 @@ public interface CatalogUseCase {
     UpdateBookResponse updateBook(UpdateBookCommand command);
 
     void removeById(Long id);
+
+    void updateBookCover(UpdateBookCoverCommand command);
 }
