@@ -1,19 +1,19 @@
 package com.testaarosa.spirngRecallBookApp.catalog.controller;
 
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.CatalogUseCase;
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.CreateBookCommandGroup;
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookCommandGroup;
-import com.testaarosa.spirngRecallBookApp.catalog.application.port.UpdateBookResponse;
+import com.testaarosa.spirngRecallBookApp.catalog.application.port.*;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import static com.testaarosa.spirngRecallBookApp.catalog.controller.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+@Slf4j
 @RestController
 @RequestMapping("/catalog")
 @RequiredArgsConstructor
@@ -88,6 +89,23 @@ public class CatalogController {
                 .location(getUri(id))
                 .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PUT))
                 .build();
+    }
+
+    @PutMapping(value = "/{id}/cover")
+    public ResponseEntity<Void> addBookCover(@PathVariable Long id,
+                                             @RequestParam(value = "cover") MultipartFile cover) throws IOException {
+        log.info("Received request with file: " + cover.getOriginalFilename());
+        catalogUseCase.updateBookCover(UpdateBookCoverCommand
+                .builder()
+                .id(id)
+                .file(cover.getBytes())
+                .fileName(cover.getOriginalFilename())
+                .fileContentType(cover.getContentType())
+                .build());
+        return ResponseEntity.accepted()
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PUT.name())
+                .build();
+
     }
 
     @DeleteMapping("/{id}")

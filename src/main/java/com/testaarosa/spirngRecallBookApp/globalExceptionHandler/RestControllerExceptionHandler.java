@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -22,6 +23,17 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     @ExceptionHandler({Exception.class})
     public final ResponseEntity<Object> handleConstraintViolationException(Exception ex, WebRequest request) {
         String message = "Validation error ==> ";
+        log.error(message, ex);
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
+        return ResponseEntity.status(badRequest)
+                .headers(getExceptionHeaders(badRequest.name(), message))
+                .body(exceptionResponse);
+    }
+
+    @ExceptionHandler({IOException.class})
+    public final ResponseEntity<Object> handleIOExceptionException(Exception ex, WebRequest request) {
+        String message = "IOException error ==> ";
         log.error(message, ex);
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
@@ -65,7 +77,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                             ((FieldError) err).getRejectedValue(),
                             err.getDefaultMessage()))
                     .toList());
-        }else {
+        } else {
             exceptionHandlerResponseBuilder.detail(new ErrorDetailMessage(ex.getMessage()));
         }
 
