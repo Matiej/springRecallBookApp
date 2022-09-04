@@ -94,10 +94,10 @@ public class AppStartUp implements CommandLineRunner {
     }
 
     private void initData() {
-        catalogUseCase.addBook(new CreateBookCommand("Harry Potter", "Joanna Herwing ", 2022, new BigDecimal(112.00)));
-        catalogUseCase.addBook(new CreateBookCommand("Black Out", "Wienia Karkowska", 2010, new BigDecimal(240.11)));
-        catalogUseCase.addBook(new CreateBookCommand("Sezon Burz", "Stefan Burczymucha", 2005, new BigDecimal(281.00)));
-        catalogUseCase.addBook(new CreateBookCommand("Black Knight", "Jowi Kielosi", 2015, new BigDecimal(110.00)));
+        catalogUseCase.addBook(CreateBookCommand.builder().title("Harry Potter").author("Joanna Herwing").year(2022).price(new BigDecimal("112.00")).build());
+        catalogUseCase.addBook(CreateBookCommand.builder().title("Black Out").author("Wienia Karkowska").year(2010).price(new BigDecimal("240.10")).build());
+        catalogUseCase.addBook(CreateBookCommand.builder().title("Sezon Burz").author("Stefan Burczymucha").year(2005).price(new BigDecimal("281.01")).build());
+        catalogUseCase.addBook(CreateBookCommand.builder().title("Black Knight").author("Jowi Kielosi").year(2014).price(new BigDecimal("90.89")).build());
     }
 
     private void findbyTitle() {
