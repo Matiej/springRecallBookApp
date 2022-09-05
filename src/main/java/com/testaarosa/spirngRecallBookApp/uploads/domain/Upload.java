@@ -1,14 +1,21 @@
 package com.testaarosa.spirngRecallBookApp.uploads.domain;
 
-import lombok.Value;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Value
+@Builder()
+@Getter
 public class Upload {
-    String id;
-    String fileName;
-    String content;
-    byte[] file;
-    LocalDateTime createdAt;
+    @Setter
+    private String id;
+    private String fileName;
+    private String content;
+    private byte[] file;
+    private LocalDateTime createdAt;
+    @Setter
+    private String path;
+
 }
