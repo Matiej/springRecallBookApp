@@ -120,7 +120,9 @@ class CatalogService implements CatalogUseCase {
                             .contentType(command.getFileContentType())
                             .build());
                     book.setBookCoverId(upload.getId());
+                    book.setBookCoverPath(upload.getPath());
                     Book savedBook = catalogRepository.save(book);
+                    log.info("Book id " +  savedBook.getId() + " has been updated. Cover path added: " + upload.getPath());
                 });
     }
 
