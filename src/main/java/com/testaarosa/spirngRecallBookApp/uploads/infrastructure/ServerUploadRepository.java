@@ -1,7 +1,7 @@
 package com.testaarosa.spirngRecallBookApp.uploads.infrastructure;
 
-import com.testaarosa.spirngRecallBookApp.uploads.domain.Upload;
-import com.testaarosa.spirngRecallBookApp.uploads.domain.UploadRepository;
+import com.testaarosa.spirngRecallBookApp.uploads.application.port.SaveUploadCommand;
+import com.testaarosa.spirngRecallBookApp.uploads.application.port.UploadResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -17,35 +17,37 @@ import java.util.StringJoiner;
 
 @Slf4j
 @Repository
-public class ServerUploadRepository implements UploadRepository {
+class ServerUploadRepository {
     @Value("${cover.picture.path}")
     private String UPLOAD_PATH;
     @Value("${cover.user.app.dir}")
     private String USER_DIR;
 
-    @Override
-    public Upload saveUploadOnServer(Upload upload) {
-        Path coverPath = createCoverPath();
+    UploadResponse save(SaveUploadCommand command) {
+        Path coverPath = createCoverDirectory();
         String uploadFileAbsolutePath = new StringJoiner(File.separator)
                 .add(coverPath.toString())
-                .add(createFileNameToSave(upload.getFileName()))
+                .add(createFileNameToSave(command.getFileName()))
                 .toString();
         File coverFile = new File(uploadFileAbsolutePath);
         try (FileOutputStream os = new FileOutputStream(coverFile)) {
-            os.write(upload.getFile());
-            log.info("File has been saved: " + upload.getPath());
+            os.write(command.getFile());
+            log.info("File has been saved: " + uploadFileAbsolutePath);
         } catch (IOException e) {
-            log.error("Can't upload file to path: " + uploadFileAbsolutePath);
+            log.error("Can't command file to path: " + uploadFileAbsolutePath);
         }
-        upload.setPath(coverFile.getPath());
-        upload.setId(coverFile.getName());
-        return upload;
+        return UploadResponse.builder()
+                .originFileName(command.getFileName())
+                .serverFileName(coverFile.getName())
+                .contentType(command.getContentType())
+                .file(command.getFile())
+                .createdAt(LocalDateTime.now())
+                .path(coverFile.getAbsolutePath())
+                .build();
     }
 
-    private Path createCoverPath() {
-        String coversPath = new StringJoiner(File.separator)
-                .add(System.getProperty(USER_DIR))
-                .add(UPLOAD_PATH)
+    private Path createCoverDirectory() {
+        String coversPath = getUpladsPath()
                 .toString();
         Path pathToCreate = Paths.get(coversPath);
         if (!Files.exists(pathToCreate)) {
@@ -65,5 +67,25 @@ public class ServerUploadRepository implements UploadRepository {
                 .add(LocalDateTime.now().withNano(0).toString().replaceAll(":", "-"))
                 .add(uploadedFileName)
                 .toString();
+    }
+
+    byte[] getFileByPath(String path) {
+        Path coverPath = Path.of(path);
+        byte[] file = null;
+        if(coverPath.isAbsolute()){
+            try {
+                file = Files.readAllBytes(coverPath);
+            } catch (IOException e) {
+                log.error("File not found in path: " + path);
+            }
+
+        };
+        return file;
+    }
+
+    private StringJoiner getUpladsPath() {
+        return new StringJoiner(File.separator)
+                .add(System.getProperty(USER_DIR))
+                .add(UPLOAD_PATH);
     }
 }

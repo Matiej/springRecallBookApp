@@ -2,7 +2,11 @@ package com.testaarosa.spirngRecallBookApp.uploads.application.port;
 
 import com.testaarosa.spirngRecallBookApp.uploads.domain.Upload;
 
+import java.util.Optional;
+
 public interface UploadUseCase {
-    Upload save(SaveUploadCommand command);
+    UploadResponse save(SaveUploadCommand command);
+    Optional<UploadResponse> getCoverUploadById(String id);
+
 
 }
