@@ -4,8 +4,8 @@ import com.testaarosa.spirngRecallBookApp.catalog.application.port.*;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.CatalogRepository;
 import com.testaarosa.spirngRecallBookApp.uploads.application.port.SaveUploadCommand;
+import com.testaarosa.spirngRecallBookApp.uploads.application.port.UploadResponse;
 import com.testaarosa.spirngRecallBookApp.uploads.application.port.UploadUseCase;
-import com.testaarosa.spirngRecallBookApp.uploads.domain.Upload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -114,15 +114,14 @@ class CatalogService implements CatalogUseCase {
         catalogRepository.findById(command.getId())
                 .ifPresent(book -> {
                     log.info("Book, id: " + book.getId() + " has been found");
-                    Upload upload = uploadUseCase.save(SaveUploadCommand.builder()
+                    UploadResponse uploadResponse = uploadUseCase.save(SaveUploadCommand.builder()
                             .fileName(command.getFileName())
                             .file(command.getFile())
                             .contentType(command.getFileContentType())
                             .build());
-                    book.setBookCoverId(upload.getId());
-                    book.setBookCoverPath(upload.getPath());
+                    book.setBookCoverId(uploadResponse.getId());
                     Book savedBook = catalogRepository.save(book);
-                    log.info("Book id " +  savedBook.getId() + " has been updated. Cover path added: " + upload.getPath());
+                    log.info("Book id " +  savedBook.getId() + " has been updated. Cover path added: " + uploadResponse.getPath());
                 });
     }
 
