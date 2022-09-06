@@ -12,10 +12,9 @@ public class Upload {
     @Setter
     private String id;
     private String fileName;
-    private String content;
-    private byte[] file;
+    private String serverFileName;
+    private String contentType;
     private LocalDateTime createdAt;
-    @Setter
     private String path;
 
 }

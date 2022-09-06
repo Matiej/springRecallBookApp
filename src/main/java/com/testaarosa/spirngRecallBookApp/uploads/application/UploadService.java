@@ -1,27 +1,27 @@
 package com.testaarosa.spirngRecallBookApp.uploads.application;
 
 import com.testaarosa.spirngRecallBookApp.uploads.application.port.SaveUploadCommand;
+import com.testaarosa.spirngRecallBookApp.uploads.application.port.UploadResponse;
 import com.testaarosa.spirngRecallBookApp.uploads.application.port.UploadUseCase;
 import com.testaarosa.spirngRecallBookApp.uploads.domain.Upload;
-import com.testaarosa.spirngRecallBookApp.uploads.infrastructure.ServerUploadRepository;
+import com.testaarosa.spirngRecallBookApp.uploads.domain.UploadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 class UploadService implements UploadUseCase {
-    private final ServerUploadRepository repository;
-
+    private final UploadRepository uploadRepository;
 
     @Override
-    public Upload save(SaveUploadCommand command) {
-        return repository.saveUploadOnServer(Upload.builder()
-                .fileName(command.getFileName())
-                .content(command.getContentType())
-                .file(command.getFile())
-                .createdAt(LocalDateTime.now())
-                .build());
+    public UploadResponse save(SaveUploadCommand command) {
+        return uploadRepository.saveUpload(command);
+    }
+
+    @Override
+    public Optional<UploadResponse> getCoverUploadById(String id) {
+        return uploadRepository.getUploadById(id);
     }
 }
