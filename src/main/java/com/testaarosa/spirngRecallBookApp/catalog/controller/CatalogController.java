@@ -109,6 +109,12 @@ public class CatalogController {
 
     }
 
+    @DeleteMapping(value = "/{id}/cover")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCoverByBookId(@PathVariable Long id) {
+        catalogUseCase.removeCoverByBookId(id);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) {

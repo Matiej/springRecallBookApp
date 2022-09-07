@@ -49,4 +49,13 @@ public class UploadRepositoryFacade implements UploadRepository {
                 });
     }
 
+    @Override
+    public void removeCoverById(String bookCoverId) {
+        memoryUploadRepository.getUploadById(bookCoverId)
+                .ifPresent(upload -> {
+                    serverUploadRepository.removeFileByPath(upload.getPath());
+                    memoryUploadRepository.removeUploadById(bookCoverId);
+                });
+    }
+
 }

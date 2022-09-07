@@ -121,8 +121,20 @@ class CatalogService implements CatalogUseCase {
                             .build());
                     book.setBookCoverId(uploadResponse.getId());
                     Book savedBook = catalogRepository.save(book);
-                    log.info("Book id " +  savedBook.getId() + " has been updated. Cover path added: " + uploadResponse.getPath());
+                    log.info("Book id " + savedBook.getId() + " has been updated. Cover path added: " + uploadResponse.getPath());
                 });
+    }
+
+    @Override
+    public void removeCoverByBookId(Long id) {
+        log.info("Trying to delete book cover");
+        catalogRepository.findById(id).ifPresent(book -> {
+            if (book.getBookCoverId() != null) {
+                uploadUseCase.removeCoverById(book.getBookCoverId());
+                book.setBookCoverId(null);
+                catalogRepository.save(book);
+            }
+        });
     }
 
 }

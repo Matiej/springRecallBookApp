@@ -9,4 +9,5 @@ public interface UploadUseCase {
     Optional<UploadResponse> getCoverUploadById(String id);
 
 
+    void removeCoverById(String bookCoverId);
 }

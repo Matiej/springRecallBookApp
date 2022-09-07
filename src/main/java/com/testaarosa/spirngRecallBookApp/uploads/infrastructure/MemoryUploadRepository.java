@@ -22,4 +22,8 @@ class MemoryUploadRepository {
     Optional<Upload> getUploadById(String id) {
         return Optional.ofNullable(tmpStorage.get(id));
     }
+
+    public void removeUploadById(String bookCoverId) {
+        tmpStorage.remove(bookCoverId);
+    }
 }

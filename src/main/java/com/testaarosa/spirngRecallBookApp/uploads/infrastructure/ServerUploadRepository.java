@@ -72,14 +72,15 @@ class ServerUploadRepository {
     byte[] getFileByPath(String path) {
         Path coverPath = Path.of(path);
         byte[] file = null;
-        if(coverPath.isAbsolute()){
+        if (coverPath.isAbsolute()) {
             try {
                 file = Files.readAllBytes(coverPath);
             } catch (IOException e) {
                 log.error("File not found in path: " + path);
             }
 
-        };
+        }
+        ;
         return file;
     }
 
@@ -87,5 +88,17 @@ class ServerUploadRepository {
         return new StringJoiner(File.separator)
                 .add(System.getProperty(USER_DIR))
                 .add(UPLOAD_PATH);
+    }
+
+    public void removeFileByPath(String path) {
+        Path coverPath = Path.of(path);
+        if(coverPath.isAbsolute()){
+            try {
+                Files.delete(coverPath);
+                log.info("File has been deleted: " + coverPath.getFileName());
+            } catch (IOException e) {
+                log.error("Can't delete file in path: " + path);
+            }
+        }
     }
 }
