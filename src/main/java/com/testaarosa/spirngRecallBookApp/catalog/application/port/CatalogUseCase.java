@@ -28,4 +28,6 @@ public interface CatalogUseCase {
     void removeById(Long id);
 
     void updateBookCover(UpdateBookCoverCommand command);
+
+    void removeCoverByBookId(Long id);
 }

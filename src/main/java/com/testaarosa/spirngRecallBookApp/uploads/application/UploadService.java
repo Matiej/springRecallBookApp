@@ -24,4 +24,9 @@ class UploadService implements UploadUseCase {
     public Optional<UploadResponse> getCoverUploadById(String id) {
         return uploadRepository.getUploadById(id);
     }
+
+    @Override
+    public void removeCoverById(String bookCoverId) {
+        uploadRepository.removeCoverById(bookCoverId);
+    }
 }

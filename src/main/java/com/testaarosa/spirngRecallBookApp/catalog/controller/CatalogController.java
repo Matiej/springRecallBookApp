@@ -2,6 +2,7 @@ package com.testaarosa.spirngRecallBookApp.catalog.controller;
 
 import com.testaarosa.spirngRecallBookApp.catalog.application.port.*;
 import com.testaarosa.spirngRecallBookApp.catalog.domain.Book;
+import com.testaarosa.spirngRecallBookApp.globalHeaderFactory.HeaderKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.testaarosa.spirngRecallBookApp.catalog.controller.HttpHeaderFactory.getSuccessfulHeaders;
+import static com.testaarosa.spirngRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -81,8 +82,8 @@ public class CatalogController {
         if (!updateBookResponse.isSuccess()) {
             return ResponseEntity.noContent()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PUT.name())
-                    .header("Status", HttpStatus.NO_CONTENT.name())
-                    .header("Message", updateBookResponse.getErrorList().toString())
+                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NO_CONTENT.name())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), updateBookResponse.getErrorList().toString())
                     .build();
         }
         return ResponseEntity.accepted()
@@ -106,6 +107,12 @@ public class CatalogController {
                 .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PUT.name())
                 .build();
 
+    }
+
+    @DeleteMapping(value = "/{id}/cover")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCoverByBookId(@PathVariable Long id) {
+        catalogUseCase.removeCoverByBookId(id);
     }
 
     @DeleteMapping("/{id}")

@@ -10,4 +10,6 @@ public interface UploadRepository {
     UploadResponse saveUpload(SaveUploadCommand command);
 
     Optional<UploadResponse> getUploadById(String id);
+
+    void removeCoverById(String bookCoverId);
 }

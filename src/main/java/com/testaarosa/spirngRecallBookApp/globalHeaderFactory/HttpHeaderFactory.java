@@ -1,4 +1,4 @@
-package com.testaarosa.spirngRecallBookApp.catalog.controller;
+package com.testaarosa.spirngRecallBookApp.globalHeaderFactory;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,21 +16,6 @@ public class HttpHeaderFactory {
         httpHeaders.add(HeaderKey.STATUS.getHeaderKeyLabel(), String.valueOf(status));
         httpHeaders.add(HeaderKey.MESSAGE.getHeaderKeyLabel(), SUCCESSFUL);
         return httpHeaders;
-    }
-}
-
-enum HeaderKey {
-    STATUS("Status"),
-    MESSAGE("Message");
-
-    private String headerKeyLabel;
-
-    HeaderKey(String headerKeyLabel) {
-        this.headerKeyLabel = headerKeyLabel;
-    }
-
-    public String getHeaderKeyLabel() {
-        return headerKeyLabel;
     }
 }
 
