@@ -16,7 +16,7 @@ public class SwaggerConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("springRecallBookApp-public")
-                .pathsToMatch("/catalog/**", "/uploads/**")
+                .pathsToMatch("/catalog/**", "/uploads/**", "/orders/**")
                 .build();
     }
 

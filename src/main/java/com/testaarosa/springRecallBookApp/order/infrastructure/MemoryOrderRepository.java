@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.order.infrastructure;
 
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderRepository;
+import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Repository
 public class MemoryOrderRepository implements OrderRepository {
@@ -29,6 +31,14 @@ public class MemoryOrderRepository implements OrderRepository {
     @Override
     public List<Order> findAll() {
         return new ArrayList<>(tmpOrderStorage.values());
+    }
+
+    @Override
+    public List<Order> findAllByOrderStatus(OrderStatus orderStatus) {
+        return tmpOrderStorage.values()
+                .stream()
+                .filter(order -> order.getOrderStatus().equals(orderStatus))
+                .collect(Collectors.toList());
     }
 
     private long getNextId() {

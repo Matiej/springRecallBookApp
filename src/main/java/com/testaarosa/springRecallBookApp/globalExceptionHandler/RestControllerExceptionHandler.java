@@ -19,15 +19,24 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
-    //todo every exception handle like below
     @ExceptionHandler({Exception.class})
-    public final ResponseEntity<Object> handleConstraintViolationException(Exception ex, WebRequest request) {
-        String message = "Validation error ==> ";
-        log.error(message, ex);
-        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
-        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
-        return ResponseEntity.status(badRequest)
-                .headers(getExceptionHeaders(badRequest.name(), message))
+    public final ResponseEntity<Object> handleHibernateException(RuntimeException rex, WebRequest request) {
+        //todo prepared for database, uncoment code to
+        String message = "";
+//        if (rex instanceof FeignException) {
+//            message = "Gov resource server error. Can not send and receive any report";
+//            log.error(message, rex);
+//        } else if (rex instanceof HibernateException) {
+//            message = "Data Base server error. Can not get or save any report.";
+//            log.error(message, rex);
+//        } else {
+        message = "External server error. ";
+        log.error(message, rex);
+//        }
+        HttpStatus serviceUnavailable = HttpStatus.SERVICE_UNAVAILABLE;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
+        return ResponseEntity.status(serviceUnavailable)
+                .headers(getExceptionHeaders(serviceUnavailable.name(), message))
                 .body(exceptionResponse);
     }
 
