@@ -3,6 +3,13 @@ package com.testaarosa.springRecallBookApp.catalog.controller;
 import com.testaarosa.springRecallBookApp.catalog.application.port.*;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperties;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -24,10 +31,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/catalog")
 @RequiredArgsConstructor
+@Tag(name = "CatalogController", description = "API designed to manipulate the object book ")
 public class CatalogController {
     private final CatalogUseCase catalogUseCase;
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get all books from data base",
+            description = "Filtering by title or/and author. Is not case sensitive. Limit default 3 nor required")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Search successful"),
+            @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
+    })
     public ResponseEntity<List<Book>> getAll(
             @RequestParam Optional<String> title,
             @RequestParam Optional<String> author,
@@ -52,6 +66,11 @@ public class CatalogController {
     }
 
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get book by id from data base", description = "Search for one book by data base unique ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Search successful"),
+            @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
+    })
     public ResponseEntity<Book> getBookById(@PathVariable Long id) {
         return catalogUseCase.findById(id)
                 .map(book -> ResponseEntity.ok()
@@ -63,6 +82,11 @@ public class CatalogController {
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add new book, uses restBookCommand", description = "Add new book using restBookCommand. All fields are validated")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Book object created successful"),
+            @ApiResponse(responseCode = "404", description = "Validation failed. Some fields are wrong. Response contains all details."),
+    })
     public ResponseEntity<Void> addBook(@Validated({CreateBookCommandGroup.class}) @RequestBody RestBookCommand command) {
         Book createdBook = catalogUseCase.addBook(command.toCreateBookCommand());
         URI savedUri = getUri(createdBook.getId());
@@ -72,7 +96,11 @@ public class CatalogController {
     }
 
     @PatchMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-//    @ResponseStatus(HttpStatus.ACCEPTED)
+    @Operation(summary = "Update book object", description = "Update existing book using ID. All fields are validated")
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Book object updated successful"),
+            @ApiResponse(responseCode = "404", description = "Validation failed. Some fields are wrong. Response contains all details."),
+    })
     public ResponseEntity<Object> updateBook(@PathVariable Long id,
                                              @Validated({UpdateBookCommandGroup.class}) @RequestBody RestBookCommand command) {
         UpdateBookResponse updateBookResponse = catalogUseCase.updateBook(command.toUpdateBookCommand(id));
@@ -90,6 +118,11 @@ public class CatalogController {
     }
 
     @PutMapping(value = "/{id}/cover", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "Update book object - add cover picture", description = "Update existing book using book ID. Needed jpg picture attached")
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Book object updated with cover successful"),
+            @ApiResponse(responseCode = "404", description = "Validation failed. Some fields are wrong. Response contains all details."),
+    })
     public ResponseEntity<Void> addBookCover(@PathVariable Long id,
                                              @RequestParam(value = "cover") MultipartFile cover) throws IOException {
         log.info("Received request with file: " + cover.getOriginalFilename());
@@ -108,12 +141,20 @@ public class CatalogController {
 
     @DeleteMapping(value = "/{id}/cover")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Remove cover book picture", description = "Remove book cover picture by book ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Removed successful"),
+    })
     public void deleteCoverByBookId(@PathVariable Long id) {
         catalogUseCase.removeCoverByBookId(id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Remove book object by ID", description = "Remove book by data base ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Removed successful"),
+    })
     public void deleteById(@PathVariable Long id) {
         catalogUseCase.removeById(id);
     }

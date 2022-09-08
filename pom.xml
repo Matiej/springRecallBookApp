@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.testaarosa</groupId>
-	<artifactId>spirngRecallBookApp</artifactId>
+	<artifactId>springRecallBookApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Spring recall course, BookApp</name>
 	<description>Back to Java</description>
