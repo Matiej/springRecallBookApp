@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.testaarosa</groupId>
-	<artifactId>spirngRecallBookApp</artifactId>
+	<artifactId>springRecallBookApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Spring recall course, BookApp</name>
 	<description>Back to Java</description>
@@ -19,6 +19,7 @@
 		<lombok.version>1.18.24</lombok.version>
 		<apache.commons>3.12.0</apache.commons>
 		<hibernate.validator>6.2.4.Final</hibernate.validator>
+        <springdoc.version>1.6.11</springdoc.version>
 	</properties>
 
 	<dependencies>
@@ -35,7 +36,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+        <dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
