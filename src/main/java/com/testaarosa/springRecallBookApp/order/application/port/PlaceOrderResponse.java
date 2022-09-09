@@ -18,7 +18,7 @@ public class PlaceOrderResponse {
         return new PlaceOrderResponse(true, orderId, Collections.emptyList());
     }
 
-    public static PlaceOrderResponse failure(String... errors) {
-        return new PlaceOrderResponse(false, null, Arrays.asList(errors));
+    public static PlaceOrderResponse failure(List<String> errors) {
+        return new PlaceOrderResponse(false, null, errors);
     }
 }

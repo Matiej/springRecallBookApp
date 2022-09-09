@@ -24,4 +24,9 @@ public class QueryOrderService implements QueryOrderUseCase {
     public List<Order> findAllByOrderStatus(OrderStatus orderStatus) {
         return repository.findAllByOrderStatus(orderStatus);
     }
+
+    @Override
+    public Optional<Order> findOrderById(Long id) {
+        return repository.findOrderById(id);
+    }
 }

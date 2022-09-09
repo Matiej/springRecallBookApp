@@ -1,5 +1,6 @@
 package com.testaarosa.springRecallBookApp.order.application.port;
 
+import com.testaarosa.springRecallBookApp.catalog.application.port.PlaceOrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.order.domain.Recipient;
@@ -13,7 +14,7 @@ import java.util.List;
 @Value
 public class PlaceOrderCommand {
     @Singular("item")
-    List<OrderItem> itemList;
-    Recipient recipient;
+    List<PlaceOrderItem> itemList;
+    Long recipientId;
     OrderStatus orderStatus;
 }

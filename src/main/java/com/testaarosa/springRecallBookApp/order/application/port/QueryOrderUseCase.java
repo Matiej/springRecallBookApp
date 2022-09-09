@@ -13,4 +13,7 @@ public interface QueryOrderUseCase {
 
 
     List<Order> findAllByOrderStatus(OrderStatus orderStatus);
+
+    Optional<Order> findOrderById(Long id);
+
 }

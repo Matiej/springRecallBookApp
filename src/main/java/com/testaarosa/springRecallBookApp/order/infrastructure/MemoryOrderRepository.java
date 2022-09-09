@@ -9,12 +9,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Repository
-public class MemoryOrderRepository implements OrderRepository {
+class MemoryOrderRepository implements OrderRepository {
     private final Map<Long, Order> tmpOrderStorage = new ConcurrentHashMap<>();
     private final AtomicLong ID_NEXT_VALUE = new AtomicLong(0);
 
@@ -39,6 +40,11 @@ public class MemoryOrderRepository implements OrderRepository {
                 .stream()
                 .filter(order -> order.getOrderStatus().equals(orderStatus))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Order> findOrderById(Long id) {
+        return Optional.ofNullable(tmpOrderStorage.get(id));
     }
 
     private long getNextId() {
