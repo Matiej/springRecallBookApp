@@ -19,7 +19,7 @@ import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderF
 @RestController
 @RequestMapping("/uploads")
 @RequiredArgsConstructor
-public class UploadsController {
+class UploadsController {
     private final UploadUseCase uploadUseCase;
 
 

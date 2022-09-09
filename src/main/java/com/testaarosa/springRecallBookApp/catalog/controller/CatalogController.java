@@ -4,9 +4,6 @@ import com.testaarosa.springRecallBookApp.catalog.application.port.*;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperties;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,7 +74,8 @@ public class CatalogController {
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
                         .body(book))
                 .orElse(ResponseEntity.notFound()
-                        .headers(getSuccessfulHeaders(HttpStatus.NOT_FOUND, HttpMethod.GET))
+                        .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
+                        .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), "Book with ID: " + id + " not found!")
                         .build());
     }
 
@@ -85,7 +83,7 @@ public class CatalogController {
     @Operation(summary = "Add new book, uses restBookCommand", description = "Add new book using restBookCommand. All fields are validated")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Book object created successful"),
-            @ApiResponse(responseCode = "404", description = "Validation failed. Some fields are wrong. Response contains all details."),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Void> addBook(@Validated({CreateBookCommandGroup.class}) @RequestBody RestBookCommand command) {
         Book createdBook = catalogUseCase.addBook(command.toCreateBookCommand());
@@ -99,7 +97,7 @@ public class CatalogController {
     @Operation(summary = "Update book object", description = "Update existing book using ID. All fields are validated")
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "Book object updated successful"),
-            @ApiResponse(responseCode = "404", description = "Validation failed. Some fields are wrong. Response contains all details."),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Object> updateBook(@PathVariable Long id,
                                              @Validated({UpdateBookCommandGroup.class}) @RequestBody RestBookCommand command) {
@@ -121,7 +119,7 @@ public class CatalogController {
     @Operation(summary = "Update book object - add cover picture", description = "Update existing book using book ID. Needed jpg picture attached")
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "Book object updated with cover successful"),
-            @ApiResponse(responseCode = "404", description = "Validation failed. Some fields are wrong. Response contains all details."),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Void> addBookCover(@PathVariable Long id,
                                              @RequestParam(value = "cover") MultipartFile cover) throws IOException {
