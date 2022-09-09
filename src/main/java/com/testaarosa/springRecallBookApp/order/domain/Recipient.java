@@ -1,16 +1,18 @@
 package com.testaarosa.springRecallBookApp.order.domain;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
 
-@Value
+@Getter
 @Builder
 public class Recipient {
-    String name;
-    String phone;
-    String street;
-    String city;
-    String zipCode;
-    String email;
-
+    @Setter
+    private Long id;
+    private String name;
+    private String phone;
+    private String street;
+    private String city;
+    private String zipCode;
+    private String email;
 }
