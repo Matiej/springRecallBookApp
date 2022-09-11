@@ -15,6 +15,7 @@ public class Order {
     private Recipient recipient;
     private OrderStatus orderStatus;
     private LocalDateTime createdAt;
+    private LocalDateTime lastUpdatedAt;
 
     public BigDecimal totalPrice() {
         return itemList.stream()

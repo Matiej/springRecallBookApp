@@ -3,21 +3,28 @@ package com.testaarosa.springRecallBookApp.uploads.controller;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
 
 @RestController
 @RequestMapping("/uploads")
+@Validated
 @RequiredArgsConstructor
 class UploadsController {
     private final UploadUseCase uploadUseCase;
@@ -26,12 +33,13 @@ class UploadsController {
     @GetMapping(value = "/{id}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE,
             MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @Operation(summary = "Get book cover by ID", description = "Get book cover by cover ID")
+    @Parameter(name = "id", required = true, description = "Searching cover ID")
     @Schema(example = "picture file")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No cover found!"),
     })
-    public ResponseEntity<?> getUploadCoverById(@PathVariable String id) {
+    public ResponseEntity<?> getUploadCoverById(@PathVariable("id") @NotEmpty(message = "CoverId filed can't be empty or null") String id) {
         return uploadUseCase.getCoverUploadById(id)
                 .map(file -> ResponseEntity
                         .ok()

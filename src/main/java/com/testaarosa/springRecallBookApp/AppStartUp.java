@@ -5,9 +5,10 @@ import com.testaarosa.springRecallBookApp.catalog.application.port.CreateBookCom
 import com.testaarosa.springRecallBookApp.catalog.application.port.UpdateBookCommand;
 import com.testaarosa.springRecallBookApp.catalog.application.port.UpdateBookResponse;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
-import com.testaarosa.springRecallBookApp.order.application.port.*;
-import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
-import com.testaarosa.springRecallBookApp.order.domain.Recipient;
+import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
+import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;
+import com.testaarosa.springRecallBookApp.order.application.port.RecipientUseCase;
+import com.testaarosa.springRecallBookApp.order.application.port.SaveRecipientCommand;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -20,17 +21,17 @@ import java.util.stream.Collectors;
 @Component
 public class AppStartUp implements CommandLineRunner {
     private final CatalogUseCase catalogUseCase;
-    private final PlaceOrderUseCase placeOrderUseCase;
+    private final OrderUseCase orderUseCase;
     private final QueryOrderUseCase queryOrderUseCase;
     private final String catalogQuery;
     private final Long limit;
     private final RecipientUseCase recipientUseCase;
 
-    public AppStartUp(CatalogUseCase catalogUseCase, PlaceOrderUseCase placeOrderUseCase, QueryOrderUseCase queryOrderUseCase,
+    public AppStartUp(CatalogUseCase catalogUseCase, OrderUseCase orderUseCase, QueryOrderUseCase queryOrderUseCase,
                       @Value("${recallBookApp.schoolCatalog.query}") String catalogQuery,
                       @Value("${recallBookApp.schoolCatalog.limit:5}") Long limit, RecipientUseCase recipientUseCase) {
         this.catalogUseCase = catalogUseCase;
-        this.placeOrderUseCase = placeOrderUseCase;
+        this.orderUseCase = orderUseCase;
         this.queryOrderUseCase = queryOrderUseCase;
         this.catalogQuery = catalogQuery;
         this.limit = limit;

@@ -5,7 +5,6 @@ import com.testaarosa.springRecallBookApp.order.domain.OrderRepository;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ class MemoryOrderRepository implements OrderRepository {
         if (order.getId() == null) {
             order.setId(getNextId());
         }
-        order.setCreatedAt(LocalDateTime.now());
         tmpOrderStorage.put(order.getId(), order);
         return order;
     }
