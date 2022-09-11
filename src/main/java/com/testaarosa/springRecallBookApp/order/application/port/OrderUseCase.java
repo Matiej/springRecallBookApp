@@ -4,4 +4,6 @@ public interface OrderUseCase {
 
     OrderResponse placeOrder(PlaceOrderCommand command);
     OrderResponse updateOrder(UpdateOrderCommand command);
+
+    void removeOrderById(Long id);
 }

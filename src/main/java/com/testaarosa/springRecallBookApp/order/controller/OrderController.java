@@ -125,6 +125,18 @@ class OrderController {
                 .build();
     }
 
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    @Operation(summary = "Remove order", description = "Remove order by ID")
+    @Parameter(name = "id", required = true, description = "Remove order by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Order removed successful"),
+    })
+    public void removeOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                @Min(value = 1, message = "BookId field value must be more than 0") Long id) {
+        orderUseCase.removeOrderById(id);
+    }
+
     private static URI getUri(Long id) {
         return ServletUriComponentsBuilder
                 .fromCurrentServletMapping()

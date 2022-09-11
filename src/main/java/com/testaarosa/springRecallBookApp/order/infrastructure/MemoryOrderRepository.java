@@ -45,6 +45,11 @@ class MemoryOrderRepository implements OrderRepository {
         return Optional.ofNullable(tmpOrderStorage.get(id));
     }
 
+    @Override
+    public void removeOrderById(Long id) {
+        tmpOrderStorage.remove(id);
+    }
+
     private long getNextId() {
         return ID_NEXT_VALUE.incrementAndGet();
     }

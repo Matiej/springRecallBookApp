@@ -6,7 +6,12 @@ import java.util.Optional;
 public interface OrderRepository {
 
     Order save(Order order);
+
     List<Order> findAll();
+
     List<Order> findAllByOrderStatus(OrderStatus orderStatus);
+
     Optional<Order> findOrderById(Long id);
+
+    void removeOrderById(Long id);
 }

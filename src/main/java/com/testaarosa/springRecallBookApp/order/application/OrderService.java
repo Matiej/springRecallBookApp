@@ -72,6 +72,11 @@ public class OrderService implements OrderUseCase {
         return OrderResponse.failure(errorList);
     }
 
+    @Override
+    public void removeOrderById(Long id) {
+        repository.removeOrderById(id);
+    }
+
     private List<OrderItem> getOrderItemList(List<PlaceOrderItem> command) {
         List<OrderItem> orderItemList = command
                 .stream()
