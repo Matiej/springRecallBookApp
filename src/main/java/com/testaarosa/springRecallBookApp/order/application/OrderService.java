@@ -4,6 +4,8 @@ import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCas
 import com.testaarosa.springRecallBookApp.catalog.application.port.PlaceOrderItem;
 import com.testaarosa.springRecallBookApp.order.application.port.*;
 import com.testaarosa.springRecallBookApp.order.domain.*;
+import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
+import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

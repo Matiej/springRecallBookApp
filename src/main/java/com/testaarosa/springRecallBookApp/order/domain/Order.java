@@ -1,5 +1,6 @@
 package com.testaarosa.springRecallBookApp.order.domain;
 
+import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.Builder;
 import lombok.Data;
 
