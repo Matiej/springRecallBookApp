@@ -2,8 +2,14 @@ package com.testaarosa.springRecallBookApp.order.application;
 
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.application.port.PlaceOrderItem;
-import com.testaarosa.springRecallBookApp.order.application.port.*;
-import com.testaarosa.springRecallBookApp.order.domain.*;
+import com.testaarosa.springRecallBookApp.order.application.port.OrderResponse;
+import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
+import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderCommand;
+import com.testaarosa.springRecallBookApp.order.application.port.UpdateOrderCommand;
+import com.testaarosa.springRecallBookApp.order.domain.Order;
+import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
+import com.testaarosa.springRecallBookApp.order.domain.OrderRepository;
+import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.AllArgsConstructor;

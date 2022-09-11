@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.catalog.application.port;
+package com.testaarosa.springRecallBookApp.catalog.controller;
 
 public interface CreateBookCommandGroup {
 }
