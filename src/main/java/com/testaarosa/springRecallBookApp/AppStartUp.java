@@ -5,12 +5,10 @@ import com.testaarosa.springRecallBookApp.catalog.application.port.CreateBookCom
 import com.testaarosa.springRecallBookApp.catalog.application.port.UpdateBookCommand;
 import com.testaarosa.springRecallBookApp.catalog.application.port.UpdateBookResponse;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
-import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderCommand;
-import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderResponse;
-import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderUseCase;
+import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;
-import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
-import com.testaarosa.springRecallBookApp.order.domain.Recipient;
+import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
+import com.testaarosa.springRecallBookApp.recipient.application.port.SaveRecipientCommand;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -23,19 +21,21 @@ import java.util.stream.Collectors;
 @Component
 public class AppStartUp implements CommandLineRunner {
     private final CatalogUseCase catalogUseCase;
-    private final PlaceOrderUseCase placeOrderUseCase;
+    private final OrderUseCase orderUseCase;
     private final QueryOrderUseCase queryOrderUseCase;
     private final String catalogQuery;
     private final Long limit;
+    private final RecipientUseCase recipientUseCase;
 
-    public AppStartUp(CatalogUseCase catalogUseCase, PlaceOrderUseCase placeOrderUseCase, QueryOrderUseCase queryOrderUseCase,
+    public AppStartUp(CatalogUseCase catalogUseCase, OrderUseCase orderUseCase, QueryOrderUseCase queryOrderUseCase,
                       @Value("${recallBookApp.schoolCatalog.query}") String catalogQuery,
-                      @Value("${recallBookApp.schoolCatalog.limit:5}") Long limit) {
+                      @Value("${recallBookApp.schoolCatalog.limit:5}") Long limit, RecipientUseCase recipientUseCase) {
         this.catalogUseCase = catalogUseCase;
-        this.placeOrderUseCase = placeOrderUseCase;
+        this.orderUseCase = orderUseCase;
         this.queryOrderUseCase = queryOrderUseCase;
         this.catalogQuery = catalogQuery;
         this.limit = limit;
+        this.recipientUseCase = recipientUseCase;
     }
 
     @Override
@@ -55,15 +55,15 @@ public class AppStartUp implements CommandLineRunner {
     }
 
     private void placeAnOrder() {
-        System.out.println("trying to create an order....");
-        String black_out = "Black Out";
-        Book blackOutBook = catalogUseCase.findOneByTitle(black_out)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Cannot find a book: %s", black_out)));
-        String harry_potter = "Harry Potter";
-        Book harryPotterBook = catalogUseCase.findOneByTitle(harry_potter)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Cannot find a book: %s", harry_potter)));
+//        System.out.println("trying to create an order....");
+//        String black_out = "Black Out";
+//        Book blackOutBook = catalogUseCase.findOneByTitle(black_out)
+//                .orElseThrow(() -> new IllegalArgumentException(String.format("Cannot find a book: %s", black_out)));
+//        String harry_potter = "Harry Potter";
+//        Book harryPotterBook = catalogUseCase.findOneByTitle(harry_potter)
+//                .orElseThrow(() -> new IllegalArgumentException(String.format("Cannot find a book: %s", harry_potter)));
 
-        Recipient recipient = Recipient.builder()
+        SaveRecipientCommand recipient = SaveRecipientCommand.builder()
                 .name("Ksawery Nowak")
                 .phone("661555777")
                 .street("Starej Drogi 11")
@@ -71,16 +71,17 @@ public class AppStartUp implements CommandLineRunner {
                 .zipCode("01-001")
                 .email("ksawer@gmail.com")
                 .build();
+        recipientUseCase.addRecipient(recipient);
         // create recipient
 
-        PlaceOrderCommand orderCommand = PlaceOrderCommand
-                .builder()
-                .recipient(recipient)
-                .item(new OrderItem(blackOutBook, 11))
-                .item(new OrderItem(harryPotterBook, 7))
-                .build();
-        PlaceOrderResponse placeOrderResponse = placeOrderUseCase.placeOrder(orderCommand);
-        System.out.println("Created an order with ID: " + placeOrderResponse.getOrderId());
+//        PlaceOrderCommand orderCommand = PlaceOrderCommand
+//                .builder()
+//                .recipient(recipient)
+//                .item(new OrderItem(1, 11))
+//                .item(new OrderItem(harryPotterBook.getId(), 7))
+//                .build();
+//        PlaceOrderResponse placeOrderResponse = placeOrderUseCase.placeOrder(orderCommand);
+//        System.out.println("Created an order with ID: " + placeOrderResponse.getOrderId());
 
         queryOrderUseCase.findAll()
                 .forEach(order -> System.out.printf("GOT Order with total price: " + order.totalPrice()

@@ -11,12 +11,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
+    private static final String[] PATH_TO_MACH = {"/catalog/**", "/uploads/**", "/orders/**", "/recipients/**"};
 
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("springRecallBookApp-public")
-                .pathsToMatch("/catalog/**", "/uploads/**")
+                .pathsToMatch(PATH_TO_MACH)
                 .build();
     }
 

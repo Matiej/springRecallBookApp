@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -19,15 +20,45 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
-    //todo every exception handle like below
     @ExceptionHandler({Exception.class})
-    public final ResponseEntity<Object> handleConstraintViolationException(Exception ex, WebRequest request) {
-        String message = "Validation error ==> ";
-        log.error(message, ex);
-        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
-        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
-        return ResponseEntity.status(badRequest)
-                .headers(getExceptionHeaders(badRequest.name(), message))
+    public final ResponseEntity<Object> handleHibernateException(RuntimeException rex, WebRequest request) {
+        //todo prepared for database, uncoment code to
+        String message = "";
+//        if (rex instanceof FeignException) {
+//            message = "Gov resource server error. Can not send and receive any report";
+//            log.error(message, rex);
+//        } else if (rex instanceof HibernateException) {
+//            message = "Data Base server error. Can not get or save any report.";
+//            log.error(message, rex);
+//        } else {
+        message = "External server error. ";
+        log.error(message, rex);
+//        }
+        HttpStatus serviceUnavailable = HttpStatus.SERVICE_UNAVAILABLE;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
+        return ResponseEntity.status(serviceUnavailable)
+                .headers(getExceptionHeaders(serviceUnavailable.name(), message))
+                .body(exceptionResponse);
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    public final ResponseEntity<Object> handleConstraintViolationException(RuntimeException rex, WebRequest request) {
+        //todo prepared for database, uncoment code to
+        String message = "";
+//        if (rex instanceof FeignException) {
+//            message = "Gov resource server error. Can not send and receive any report";
+//            log.error(message, rex);
+//        } else if (rex instanceof HibernateException) {
+//            message = "Data Base server error. Can not get or save any report.";
+//            log.error(message, rex);
+//        } else {
+        message = "Path parameter error. ";
+        log.error(message, rex);
+//        }
+        HttpStatus serviceUnavailable = HttpStatus.BAD_REQUEST;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
+        return ResponseEntity.status(serviceUnavailable)
+                .headers(getExceptionHeaders(serviceUnavailable.name(), message))
                 .body(exceptionResponse);
     }
 
@@ -64,6 +95,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .headers(getExceptionHeaders(HttpStatus.BAD_REQUEST.name(), message))
                 .body(exceptionHandlerResponse);
     }
+
+
 
     private ExceptionHandlerResponse getExceptionHandlerResponse(Exception ex, String message, HttpStatus httpStatus) {
 
