@@ -150,10 +150,12 @@ public class CatalogController {
     @DeleteMapping(value = "/{id}/cover")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove cover book picture", description = "Remove book cover picture by book ID")
+    @Parameter(name = "id", required = true, description = "Removing book ID")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Removed successful"),
     })
-    public void deleteCoverByBookId(@PathVariable Long id) {
+    public void deleteCoverByBookId(@NotNull(message = "BookId filed can't be null")
+                                    @Min(value = 1, message = "BookId field value must be more than 0") Long id) {
         catalogUseCase.removeCoverByBookId(id);
     }
 
