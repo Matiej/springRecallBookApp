@@ -7,8 +7,8 @@ import com.testaarosa.springRecallBookApp.catalog.application.port.UpdateBookRes
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;
-import com.testaarosa.springRecallBookApp.order.application.port.RecipientUseCase;
-import com.testaarosa.springRecallBookApp.order.application.port.SaveRecipientCommand;
+import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
+import com.testaarosa.springRecallBookApp.recipient.application.port.SaveRecipientCommand;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

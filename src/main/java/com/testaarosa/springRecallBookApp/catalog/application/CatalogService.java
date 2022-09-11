@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -92,15 +91,8 @@ class CatalogService implements CatalogUseCase {
                     Book updatedBook = command.updateBookFields(bookToUpdate);
                     catalogRepository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
-                }).orElseGet(() -> errorResponse(command.getId()));
+                }).orElseGet(() -> UpdateBookResponse.FAILURE(List.of("No book for update found for ID: " + command.getId())));
     }
-
-    private UpdateBookResponse errorResponse(Long id) {
-        List<String> errorList = new ArrayList<>();
-        errorList.add("No book for update found for ID: " + id);
-        return new UpdateBookResponse(false, errorList);
-    }
-
 
     @Override
     public void removeById(Long id) {

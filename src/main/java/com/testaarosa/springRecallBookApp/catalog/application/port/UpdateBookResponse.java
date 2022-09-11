@@ -11,4 +11,8 @@ public class UpdateBookResponse {
     List<String> errorList;
 
     public static UpdateBookResponse SUCCESS = new UpdateBookResponse(true, Collections.emptyList());
+
+    public static UpdateBookResponse FAILURE(List<String> errorList) {
+        return new UpdateBookResponse(false, errorList);
+    }
 }

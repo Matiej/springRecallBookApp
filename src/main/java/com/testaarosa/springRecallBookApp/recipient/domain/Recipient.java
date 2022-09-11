@@ -1,10 +1,10 @@
-package com.testaarosa.springRecallBookApp.order.domain;
+package com.testaarosa.springRecallBookApp.recipient.domain;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.Setter;
 
-@Getter
+@Data
 @Builder
 public class Recipient {
     @Setter
@@ -15,4 +15,6 @@ public class Recipient {
     private String city;
     private String zipCode;
     private String email;
+
+
 }

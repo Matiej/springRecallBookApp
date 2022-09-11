@@ -65,11 +65,13 @@ class OrderController {
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get order by ID from data base",
             description = "Find order by ID in data base")
+    @Parameter(name = "id", required = true, description = "Get recipient by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No orders found!"),
     })
-    public ResponseEntity<Order> getOrderById(@PathVariable("id") Long id) {
+    public ResponseEntity<Order> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                              @Min(value = 1, message = "OrderId field value must be more than 0") Long id) {
         return queryOrder.findOrderById(id)
                 .map(order -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
