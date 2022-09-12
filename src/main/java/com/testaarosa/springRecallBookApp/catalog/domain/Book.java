@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Entity
 public class Book {
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     @Column(name = "title")
     private String title;
