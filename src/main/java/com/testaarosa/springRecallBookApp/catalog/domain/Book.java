@@ -3,12 +3,17 @@ package com.testaarosa.springRecallBookApp.catalog.domain;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Data
 @RequiredArgsConstructor
+@Entity
 public class Book {
+    @Id
+    @Column(nullable = false)
     private Long id;
+    @Column(name = "title")
     private String title;
     private String author;
     private Integer year;
