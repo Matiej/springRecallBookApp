@@ -20,12 +20,12 @@ class UploadService implements UploadUseCase {
     }
 
     @Override
-    public Optional<UploadResponse> getCoverUploadById(String id) {
+    public Optional<UploadResponse> getCoverUploadById(Long id) {
         return uploadRepository.getUploadById(id);
     }
 
     @Override
-    public void removeCoverById(String bookCoverId) {
+    public void removeCoverById(Long bookCoverId) {
         uploadRepository.removeCoverById(bookCoverId);
     }
 }

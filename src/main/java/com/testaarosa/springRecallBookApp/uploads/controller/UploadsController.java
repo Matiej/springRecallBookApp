@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
 
@@ -37,7 +38,8 @@ class UploadsController {
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No cover found!"),
     })
-    public ResponseEntity<?> getUploadCoverById(@PathVariable("id") @NotEmpty(message = "CoverId filed can't be empty or null") String id) {
+    public ResponseEntity<?> getUploadCoverById(@PathVariable("id") @NotNull(message = "CoverId filed can't be empty or null")
+                                                @Min(value = 1, message = "CoverId field must be greater then 0") Long id) {
         return uploadUseCase.getCoverUploadById(id)
                 .map(file -> ResponseEntity
                         .ok()

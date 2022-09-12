@@ -46,7 +46,7 @@ public class RecipientController {
                                                   @RequestParam(value = "limit", defaultValue = "3", required = false) int limit) {
         return email
                 .map(s -> prepareResponseForGetAll(recipientUseCase.getAllRecipientsByEmail(s)))
-                .orElseGet(() -> prepareResponseForGetAll(recipientUseCase.getAll()
+                .orElseGet(() -> prepareResponseForGetAll(recipientUseCase.findAll()
                         .stream()
                         .limit(limit)
                         .collect(Collectors.toList())));
@@ -59,7 +59,7 @@ public class RecipientController {
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No recipient found!"),
     })
     public ResponseEntity<Recipient> getRecipientById(@PathVariable("id") @NotNull(message = "Recipient ID filed can't be null")
-                                                      @Min(value = 1, message = "Recipient ID field value must be more than 0") Long id) {
+                                                      @Min(value = 1, message = "Recipient ID field value must be greater than 0") Long id) {
         return recipientUseCase.findById(id)
                 .map(recipient -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
@@ -93,7 +93,7 @@ public class RecipientController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<?> updateRecipient(@PathVariable("id") @NotNull(message = "RecipientID filed can't be null")
-                                             @Min(value = 1, message = "RecipientId field value must be more then 0") Long id,
+                                             @Min(value = 1, message = "RecipientId field value must be greater then 0") Long id,
                                              @RequestBody @Validated(UpdateRecipientGroup.class) RestRecipientCommand command) {
         RecipientResponse recipientResponse = recipientUseCase.updateRecipient(command.toUpdateRecipientCommand(id));
         if (!recipientResponse.isSuccess()) {
@@ -117,7 +117,7 @@ public class RecipientController {
             @ApiResponse(responseCode = "204", description = "Recipiet removed successful"),
     })
     public void removeRecipientById(@PathVariable("id") @NotNull(message = "RecipientId filed can't be null")
-                                    @Min(value = 1, message = "RecipientId field value must be more than 0") Long id) {
+                                    @Min(value = 1, message = "RecipientId field value must be greater than 0") Long id) {
         recipientUseCase.removeRecipientById(id);
 
     }

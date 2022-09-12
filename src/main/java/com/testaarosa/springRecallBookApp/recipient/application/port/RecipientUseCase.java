@@ -15,7 +15,7 @@ public interface RecipientUseCase {
 
     List<Recipient> getAllRecipientsByEmail(String email);
 
-    List<Recipient> getAll();
+    List<Recipient> findAll();
 
     void removeRecipientById(Long id);
 }

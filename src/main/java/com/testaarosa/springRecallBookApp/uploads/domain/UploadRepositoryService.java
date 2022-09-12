@@ -1,20 +1,19 @@
-package com.testaarosa.springRecallBookApp.uploads.infrastructure;
+package com.testaarosa.springRecallBookApp.uploads.domain;
 
 import com.testaarosa.springRecallBookApp.uploads.application.port.SaveUploadCommand;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadResponse;
-import com.testaarosa.springRecallBookApp.uploads.domain.Upload;
-import com.testaarosa.springRecallBookApp.uploads.domain.UploadRepository;
+import com.testaarosa.springRecallBookApp.uploads.dataBase.UploadJpaRepository;
+import com.testaarosa.springRecallBookApp.uploads.infrastructure.ServerUploadRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class UploadRepositoryFacade implements UploadRepository {
-    private final MemoryUploadRepository memoryUploadRepository;
+public class UploadRepositoryService implements UploadRepository{
+    private final UploadJpaRepository uploadJpaRepository;
     private final ServerUploadRepository serverUploadRepository;
-
     @Override
     public UploadResponse saveUpload(SaveUploadCommand command) {
         UploadResponse uploadResponse = serverUploadRepository.save(command);
@@ -25,14 +24,14 @@ public class UploadRepositoryFacade implements UploadRepository {
                 .createdAt(uploadResponse.getCreatedAt())
                 .path(uploadResponse.getPath())
                 .build();
-        Upload savedUpload = memoryUploadRepository.save(upload);
+        Upload savedUpload = uploadJpaRepository.save(upload);
         uploadResponse.setId(savedUpload.getId());
         return uploadResponse;
     }
 
     //todo konwerter w klasie uplaad i uploadResponse <=>
-    public Optional<UploadResponse> getUploadById(String id) {
-        Optional<Upload> uploadById = memoryUploadRepository.getUploadById(id);
+    public Optional<UploadResponse> getUploadById(Long id) {
+        Optional<Upload> uploadById = uploadJpaRepository.findById(id);
         return uploadById
                 .map(upload -> {
                     byte[] fileByPath = serverUploadRepository.getFileByPath(upload.getPath());
@@ -50,12 +49,11 @@ public class UploadRepositoryFacade implements UploadRepository {
     }
 
     @Override
-    public void removeCoverById(String bookCoverId) {
-        memoryUploadRepository.getUploadById(bookCoverId)
+    public void removeCoverById(Long bookCoverId) {
+        uploadJpaRepository.findById(bookCoverId)
                 .ifPresent(upload -> {
                     serverUploadRepository.removeFileByPath(upload.getPath());
-                    memoryUploadRepository.removeUploadById(bookCoverId);
+                    uploadJpaRepository.deleteById(bookCoverId);
                 });
     }
-
 }

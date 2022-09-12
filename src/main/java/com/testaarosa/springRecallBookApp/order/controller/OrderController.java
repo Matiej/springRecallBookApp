@@ -71,7 +71,7 @@ class OrderController {
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No orders found!"),
     })
     public ResponseEntity<Order> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                              @Min(value = 1, message = "OrderId field value must be more than 0") Long id) {
+                                              @Min(value = 1, message = "OrderId field value must be greater than 0") Long id) {
         return queryOrder.findOrderById(id)
                 .map(order -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
@@ -112,7 +112,7 @@ class OrderController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<?> updateOrder(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                         @Min(value = 1, message = "OrderId field value must be more than 0") Long id,
+                                         @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
                                          @Valid @RequestBody RestUpdateOrderCommand command) {
         OrderResponse updateOrderResponse = orderUseCase.updateOrder(command.toUpdateOrderCommand(id));
         if (!updateOrderResponse.isSuccess()) {
@@ -135,7 +135,7 @@ class OrderController {
             @ApiResponse(responseCode = "204", description = "Order removed successful"),
     })
     public void removeOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                @Min(value = 1, message = "BookId field value must be more than 0") Long id) {
+                                @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
         orderUseCase.removeOrderById(id);
     }
 

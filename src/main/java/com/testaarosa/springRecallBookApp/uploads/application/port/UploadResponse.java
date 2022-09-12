@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UploadResponse {
     @Setter
-    private String id;
+    private Long id;
     private String originFileName;
     private String serverFileName;
     private String contentType;

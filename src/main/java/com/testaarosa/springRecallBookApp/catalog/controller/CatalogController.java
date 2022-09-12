@@ -76,7 +76,7 @@ public class CatalogController {
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
     })
     public ResponseEntity<Book> getBookById(@PathVariable("id") @NotNull(message = "BookId filed can't be null")
-                                            @Min(value = 1, message = "BookId field value must be more than 0") Long id) {
+                                            @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
         return catalogUseCase.findById(id)
                 .map(book -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
@@ -109,7 +109,7 @@ public class CatalogController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Object> updateBook(@PathVariable("id") @NotNull(message = "BookId filed can't be null")
-                                             @Min(value = 1, message = "BookId field value must be more than 0") Long id,
+                                             @Min(value = 1, message = "BookId field value must be greater than 0") Long id,
                                              @Validated({UpdateBookCommandGroup.class}) @RequestBody RestBookCommand command) {
         UpdateBookResponse updateBookResponse = catalogUseCase.updateBook(command.toUpdateBookCommand(id));
         if (!updateBookResponse.isSuccess()) {
@@ -133,7 +133,7 @@ public class CatalogController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Void> addBookCover(@PathVariable("id") @NotNull(message = "BookId filed can't be null")
-                                             @Min(value = 1, message = "BookId field value must be more than 0") Long id,
+                                             @Min(value = 1, message = "BookId field value must be greater than 0") Long id,
                                              @RequestParam(value = "cover") MultipartFile cover) throws IOException {
         log.info("Received request with file: " + cover.getOriginalFilename());
         catalogUseCase.updateBookCover(UpdateBookCoverCommand
@@ -157,7 +157,7 @@ public class CatalogController {
             @ApiResponse(responseCode = "204", description = "Removed successful"),
     })
     public void deleteCoverByBookId(@NotNull(message = "BookId filed can't be null")
-                                    @Min(value = 1, message = "BookId field value must be more than 0") Long id) {
+                                    @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
         catalogUseCase.removeCoverByBookId(id);
     }
 
