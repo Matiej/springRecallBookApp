@@ -4,8 +4,8 @@ import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientRe
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.application.port.SaveRecipientCommand;
 import com.testaarosa.springRecallBookApp.recipient.application.port.UpdateRecipientCommand;
+import com.testaarosa.springRecallBookApp.recipient.dataBase.RecipientJpaRepository;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
-import com.testaarosa.springRecallBookApp.recipient.domain.RecipientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 class RecipientService implements RecipientUseCase {
-    private final RecipientRepository repository;
+    private final RecipientJpaRepository repository;
 
     @Override
     public Recipient addRecipient(SaveRecipientCommand command) {
@@ -42,12 +42,12 @@ class RecipientService implements RecipientUseCase {
     }
 
     @Override
-    public List<Recipient> getAll() {
-        return repository.getAll();
+    public List<Recipient> findAll() {
+        return repository.findAll();
     }
 
     @Override
     public void removeRecipientById(Long id) {
-        repository.delete(id);
+        repository.deleteById(id);
     }
 }
