@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: springrecallbookdb
+    image: postgres:14.5
+    restart: always
+    environment:
+      POSTGRES_DB: springrecallbook
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: pass123
+    ports:
+      - 7432:5432
+#5432 default port that postgres starts in container
+#7432 port that we will connect it from outside

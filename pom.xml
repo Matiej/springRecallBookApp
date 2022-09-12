@@ -20,12 +20,22 @@
 		<apache.commons>3.12.0</apache.commons>
 		<hibernate.validator>6.2.4.Final</hibernate.validator>
         <springdoc.version>1.6.11</springdoc.version>
+		<postgresql.version>42.5.0</postgresql.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${postgresql.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
