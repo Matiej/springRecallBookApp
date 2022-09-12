@@ -6,9 +6,9 @@ import com.testaarosa.springRecallBookApp.order.application.port.OrderResponse;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderCommand;
 import com.testaarosa.springRecallBookApp.order.application.port.UpdateOrderCommand;
+import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
-import com.testaarosa.springRecallBookApp.order.domain.OrderRepository;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class OrderService implements OrderUseCase {
-    private final OrderRepository repository;
+    private final OrderJpaRepository repository;
     private final RecipientUseCase recipientUseCase;
     private final CatalogUseCase catalogUseCase;
 
@@ -61,7 +61,7 @@ public class OrderService implements OrderUseCase {
         List<String> errorList = new ArrayList<>();
 
         List<OrderItem> orderItemList = getOrderItemList(command.getItemList());
-        Optional<Order> optionalOrder = repository.findOrderById(command.getOrderId());
+        Optional<Order> optionalOrder = repository.findById(command.getOrderId());
 
         if (orderItemList.isEmpty()) {
             errorList.add("No books found for Id's: " + command.getItemList().stream().map(item -> String.valueOf(item.getBookId())).collect(Collectors.joining(", ")));
@@ -82,16 +82,18 @@ public class OrderService implements OrderUseCase {
 
     @Override
     public void removeOrderById(Long id) {
-        repository.removeOrderById(id);
+        repository.deleteById(id);
     }
 
     private List<OrderItem> getOrderItemList(List<PlaceOrderItem> command) {
-        List<OrderItem> orderItemList = command
+        return command
                 .stream()
                 .filter(p -> catalogUseCase.findById(p.getBookId()).isPresent())
-                .map(placeOrderItem -> new OrderItem(catalogUseCase.findById(placeOrderItem.getBookId()).get(), placeOrderItem.getQuantity()))
+                .map(placeOrderItem -> OrderItem.builder()
+                        .book(catalogUseCase.findById(placeOrderItem.getBookId()).get())
+                        .quantity(placeOrderItem.getQuantity())
+                        .build())
                 .toList();
-        return orderItemList;
     }
 
 }
