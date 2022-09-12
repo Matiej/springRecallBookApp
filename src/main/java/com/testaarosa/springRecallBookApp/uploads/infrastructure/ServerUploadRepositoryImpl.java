@@ -17,13 +17,13 @@ import java.util.StringJoiner;
 
 @Slf4j
 @Repository
-class ServerUploadRepository {
+class ServerUploadRepositoryImpl implements ServerUploadRepository {
     @Value("${cover.picture.path}")
     private String UPLOAD_PATH;
     @Value("${cover.user.app.dir}")
     private String USER_DIR;
 
-    UploadResponse save(SaveUploadCommand command) {
+    public UploadResponse save(SaveUploadCommand command) {
         Path coverPath = createCoverDirectory();
         String uploadFileAbsolutePath = new StringJoiner(File.separator)
                 .add(coverPath.toString())
@@ -69,7 +69,7 @@ class ServerUploadRepository {
                 .toString();
     }
 
-    byte[] getFileByPath(String path) {
+    public byte[] getFileByPath(String path) {
         Path coverPath = Path.of(path);
         byte[] file = null;
         if (coverPath.isAbsolute()) {
@@ -80,7 +80,6 @@ class ServerUploadRepository {
             }
 
         }
-        ;
         return file;
     }
 
@@ -92,7 +91,7 @@ class ServerUploadRepository {
 
     public void removeFileByPath(String path) {
         Path coverPath = Path.of(path);
-        if(coverPath.isAbsolute()){
+        if (coverPath.isAbsolute()) {
             try {
                 Files.delete(coverPath);
                 log.info("File has been deleted: " + coverPath.getFileName());

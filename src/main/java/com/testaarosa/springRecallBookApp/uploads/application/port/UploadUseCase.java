@@ -4,8 +4,8 @@ import java.util.Optional;
 
 public interface UploadUseCase {
     UploadResponse save(SaveUploadCommand command);
-    Optional<UploadResponse> getCoverUploadById(String id);
+    Optional<UploadResponse> getCoverUploadById(Long id);
 
 
-    void removeCoverById(String bookCoverId);
+    void removeCoverById(Long bookCoverId);
 }

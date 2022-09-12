@@ -9,7 +9,7 @@ public interface UploadRepository {
 
     UploadResponse saveUpload(SaveUploadCommand command);
 
-    Optional<UploadResponse> getUploadById(String id);
+    Optional<UploadResponse> getUploadById(Long id);
 
-    void removeCoverById(String bookCoverId);
+    void removeCoverById(Long bookCoverId);
 }
