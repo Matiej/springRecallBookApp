@@ -50,7 +50,6 @@ public class OrderService implements OrderUseCase {
                     .orderStatus(OrderStatus.NEW)
                     .recipient(recipient)
                     .itemList(orderItemList)
-                    .createdAt(LocalDateTime.now())
                     .build();
             recipient.addOrder(order);
             Order savedOrder = repository.save(order);
@@ -75,8 +74,8 @@ public class OrderService implements OrderUseCase {
 
         if (errorList.isEmpty()) {
             Order order = optionalOrder.get();
+            order.replaceOrderItems(orderItemList);
             order.setLastUpdatedAt(LocalDateTime.now());
-            order.setItemList(orderItemList);
             Order savedOrder = repository.save(order);
             return OrderResponse.success(savedOrder.getId());
         }
