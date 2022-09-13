@@ -13,7 +13,8 @@ import java.util.Objects;
 @Setter
 @ToString
 @Builder
-@Entity(name = "orders")
+@Entity(name = "Orders")
+@Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order {

@@ -15,6 +15,7 @@ import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class OrderService implements OrderUseCase {
     private final CatalogUseCase catalogUseCase;
 
     @Override
+    @Transactional
     public OrderResponse placeOrder(PlaceOrderCommand command) {
         List<String> errorList = new ArrayList<>();
 
@@ -50,6 +52,7 @@ public class OrderService implements OrderUseCase {
                     .itemList(orderItemList)
                     .createdAt(LocalDateTime.now())
                     .build();
+            recipient.addOrder(order);
             Order savedOrder = repository.save(order);
             return OrderResponse.success(savedOrder.getId());
         }

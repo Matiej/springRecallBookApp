@@ -1,11 +1,11 @@
 package com.testaarosa.springRecallBookApp.recipient.domain;
 
+import com.testaarosa.springRecallBookApp.order.domain.Order;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -26,6 +26,9 @@ public class Recipient {
     private String city;
     private String zipCode;
     private String email;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "recipient_id")
+    private List<Order> orderList;
 
     @Override
     public boolean equals(Object o) {
@@ -38,5 +41,12 @@ public class Recipient {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, phone, street, city, zipCode, email);
+    }
+
+    public boolean addOrder(Order order) {
+        if(orderList == null) {
+            orderList = new ArrayList<>();
+        }
+        return orderList.add(order);
     }
 }
