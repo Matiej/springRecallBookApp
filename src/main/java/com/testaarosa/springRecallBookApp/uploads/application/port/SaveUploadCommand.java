@@ -1,12 +1,14 @@
 package com.testaarosa.springRecallBookApp.uploads.application.port;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 
-@Value
 @Builder
+@Getter
 public class SaveUploadCommand {
-    String fileName;
-    byte[] file;
-    String contentType;
+    private String fileName;
+    private byte[] file;
+    private String contentType;
+
 }

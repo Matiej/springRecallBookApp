@@ -34,7 +34,7 @@ class ServerUploadRepositoryImpl implements ServerUploadRepository {
             os.write(command.getFile());
             log.info("File has been saved: " + uploadFileAbsolutePath);
         } catch (IOException e) {
-            log.error("Can't command file to path: " + uploadFileAbsolutePath);
+            log.error("Can't save file to path: " + uploadFileAbsolutePath);
         }
         return UploadResponse.builder()
                 .originFileName(command.getFileName())
