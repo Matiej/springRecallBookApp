@@ -30,6 +30,10 @@ public class Upload {
     private String path;
 
     public void updateFields(UploadResponse uploadResponse) {
+        setFileName(uploadResponse.getOriginFileName());
+        setServerFileName(uploadResponse.getServerFileName());
+        setContentType(uploadResponse.getContentType());
+        setPath(uploadResponse.getPath());
     }
 
 }
