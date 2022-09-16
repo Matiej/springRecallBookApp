@@ -1,12 +1,16 @@
 package com.testaarosa.springRecallBookApp.uploads.domain;
 
+import com.testaarosa.springRecallBookApp.uploads.application.port.UpdateUploadResponse;
 import com.testaarosa.springRecallBookApp.uploads.application.port.SaveUploadCommand;
+import com.testaarosa.springRecallBookApp.uploads.application.port.UpdateUploadCommand;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadResponse;
 import com.testaarosa.springRecallBookApp.uploads.dataBase.UploadJpaRepository;
 import com.testaarosa.springRecallBookApp.uploads.infrastructure.ServerUploadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,7 +25,6 @@ public class UploadRepositoryService implements UploadRepository{
                 .fileName(uploadResponse.getOriginFileName())
                 .serverFileName(uploadResponse.getServerFileName())
                 .contentType(uploadResponse.getContentType())
-                .createdAt(uploadResponse.getCreatedAt())
                 .path(uploadResponse.getPath())
                 .build();
         Upload savedUpload = uploadJpaRepository.save(upload);
@@ -29,7 +32,6 @@ public class UploadRepositoryService implements UploadRepository{
         return uploadResponse;
     }
 
-    //todo konwerter w klasie uplaad i uploadResponse <=>
     public Optional<UploadResponse> getUploadById(Long id) {
         Optional<Upload> uploadById = uploadJpaRepository.findById(id);
         return uploadById
@@ -55,5 +57,42 @@ public class UploadRepositoryService implements UploadRepository{
                     serverUploadRepository.removeFileByPath(upload.getPath());
                     uploadJpaRepository.deleteById(bookCoverId);
                 });
+    }
+
+    @Override
+    public UpdateUploadResponse updateUpload(UpdateUploadCommand command) {
+        List<String> errorList = new ArrayList<>();
+        Optional<Upload> optionalUpload = uploadJpaRepository.findById(command.getUploadId());
+        byte[] file = null;
+        if (optionalUpload.isEmpty()) {
+            errorList.add("Can't find upload with ID: " + command.getUploadId());
+        } else {
+            String filePath = optionalUpload.get().getPath();
+            file = serverUploadRepository.getFileByPath(filePath);
+            if(file == null) {
+                errorList.add("Can't find file in path: " + filePath);
+            }
+        }
+        if(errorList.isEmpty()) {
+            UploadResponse serverResponse = serverUploadRepository.save(command.toSaveCommand());
+            Upload upload = optionalUpload.get();
+            upload.updateFields(serverResponse);
+            uploadJpaRepository.save(upload);
+            return UpdateUploadResponse.UpdateUploadResponseBuilder()
+                    .id(upload.getId())
+                    .originFileName(serverResponse.getOriginFileName())
+                    .serverFileName(serverResponse.getServerFileName())
+                    .contentType(serverResponse.getContentType())
+                    .file(serverResponse.getFile())
+                    .createdAt(upload.getCreatedAt())
+                    .success(true)
+                    .lastUpdateAt(upload.getLastUpdatedAt())
+                    .build();
+
+        }
+        return UpdateUploadResponse.UpdateUploadResponseBuilder()
+                .success(false)
+                .errorList(errorList)
+                .build();
     }
 }

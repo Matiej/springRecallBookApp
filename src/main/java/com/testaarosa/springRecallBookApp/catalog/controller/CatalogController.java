@@ -106,6 +106,7 @@ public class CatalogController {
     @Parameter(name = "id", required = true, description = "Updating book ID")
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "Book object updated successful"),
+            @ApiResponse(responseCode = "204", description = "Can't update, no book found"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Object> updateBook(@PathVariable("id") @NotNull(message = "BookId filed can't be null")

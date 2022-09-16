@@ -8,4 +8,6 @@ public interface UploadUseCase {
 
 
     void removeCoverById(Long bookCoverId);
+
+    UpdateUploadResponse updateById(UpdateUploadCommand updateUploadCommand);
 }
