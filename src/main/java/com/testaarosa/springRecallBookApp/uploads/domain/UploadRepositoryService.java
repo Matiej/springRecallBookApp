@@ -88,7 +88,6 @@ public class UploadRepositoryService implements UploadRepository{
                     .success(true)
                     .lastUpdateAt(upload.getLastUpdatedAt())
                     .build();
-
         }
         return UpdateUploadResponse.UpdateUploadResponseBuilder()
                 .success(false)
