@@ -27,11 +27,10 @@ public class Recipient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String lastName;
     private String phone;
-    private String street;
-    private String city;
-    private String zipCode;
     private String email;
+    private RecipientAddress recipientAddress;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
@@ -41,18 +40,7 @@ public class Recipient {
     @JsonIgnore
     private List<Order> orderList;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Recipient recipient = (Recipient) o;
-        return Objects.equals(id, recipient.id) && Objects.equals(name, recipient.name) && Objects.equals(phone, recipient.phone) && Objects.equals(street, recipient.street) && Objects.equals(city, recipient.city) && Objects.equals(zipCode, recipient.zipCode) && Objects.equals(email, recipient.email) && Objects.equals(createdAt, recipient.createdAt) && Objects.equals(lastUpdatedAt, recipient.lastUpdatedAt) && Objects.equals(orderList, recipient.orderList);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, phone, street, city, zipCode, email, createdAt, lastUpdatedAt, orderList);
-    }
 
     public boolean addOrder(Order order) {
         if(orderList == null) {

@@ -1,6 +1,7 @@
 package com.testaarosa.springRecallBookApp.recipient.application.port;
 
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
+import com.testaarosa.springRecallBookApp.recipient.domain.RecipientAddress;
 import lombok.Builder;
 import lombok.Value;
 
@@ -8,20 +9,30 @@ import lombok.Value;
 @Value
 public class SaveRecipientCommand {
     String name;
+    String lastName;
     String phone;
+    String email;
     String street;
+    String buildingNumber;
+    String apartmentNumber;
+    String district;
     String city;
     String zipCode;
-    String email;
 
     public Recipient toRecipient() {
         return Recipient.builder()
                 .name(name)
+                .lastName(lastName)
                 .phone(phone)
-                .street(street)
-                .city(city)
-                .zipCode(zipCode)
                 .email(email)
+                .recipientAddress(RecipientAddress.builder()
+                        .street(street)
+                        .buildingNumber(buildingNumber)
+                        .apartmentNumber(apartmentNumber)
+                        .district(district)
+                        .city(city)
+                        .zipCode(zipCode)
+                        .build())
                 .build();
     }
 }
