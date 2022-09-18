@@ -1,6 +1,7 @@
 package com.testaarosa.springRecallBookApp.recipient.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -39,7 +40,7 @@ public class Recipient {
             orphanRemoval = true,
             mappedBy = "recipient")
     @ToString.Exclude
-    @JsonIgnore
+    @JsonIgnoreProperties(value = "recipient")
     private Set<Order> orders;
 
 

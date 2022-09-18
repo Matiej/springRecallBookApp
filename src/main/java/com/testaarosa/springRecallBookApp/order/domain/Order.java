@@ -1,5 +1,6 @@
 package com.testaarosa.springRecallBookApp.order.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,6 +34,7 @@ public class Order {
     @ManyToOne()
     @ToString.Exclude
     @JoinColumn(name = "recipient_id")
+    @JsonIgnoreProperties(value = "orders")
     private Recipient recipient;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
