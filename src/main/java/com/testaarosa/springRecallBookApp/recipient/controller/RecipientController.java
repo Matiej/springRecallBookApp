@@ -32,7 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/recipients")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "Recipients controller", description = "API designed to manipulate recipient object")
+@Tag(name = "Recipients API", description = "API designed to manipulate recipient object")
 public class RecipientController {
     private final RecipientUseCase recipientUseCase;
 

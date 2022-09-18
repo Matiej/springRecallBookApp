@@ -11,7 +11,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-    private static final String[] PATH_TO_MACH = {"/catalog/**", "/uploads/**", "/orders/**", "/recipients/**"};
+    private static final String[] PATH_TO_MACH = {"/catalog/**",
+            "/uploads/**",
+            "/orders/**",
+            "/recipients/**",
+            "/authors/**"
+    };
 
     @Bean
     public GroupedOpenApi publicApi() {

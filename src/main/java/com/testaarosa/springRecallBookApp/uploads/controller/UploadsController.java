@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -30,6 +31,7 @@ import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderF
 @RequestMapping("/uploads")
 @Validated
 @RequiredArgsConstructor
+@Tag(name = "Uploads API", description = "API designed to manipulate the upload object and file")
 class UploadsController {
     private final UploadUseCase uploadUseCase;
 

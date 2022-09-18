@@ -1,6 +1,6 @@
 package com.testaarosa.springRecallBookApp.recipient.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -9,9 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -35,17 +34,18 @@ public class Recipient {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime lastUpdatedAt;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            mappedBy = "recipient")
     @ToString.Exclude
-    @JsonIgnore
-    private List<Order> orderList;
-
+    @JsonIgnoreProperties(value = "recipient")
+    private Set<Order> orders;
 
 
     public boolean addOrder(Order order) {
-        if(orderList == null) {
-            orderList = new ArrayList<>();
+        if (orders == null) {
+            orders = new HashSet<>();
         }
-        return orderList.add(order);
+        return orders.add(order);
     }
 }

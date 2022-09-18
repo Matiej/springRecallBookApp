@@ -1,8 +1,8 @@
 package com.testaarosa.springRecallBookApp.uploads.domain;
 
-import com.testaarosa.springRecallBookApp.uploads.application.port.UpdateUploadResponse;
 import com.testaarosa.springRecallBookApp.uploads.application.port.SaveUploadCommand;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UpdateUploadCommand;
+import com.testaarosa.springRecallBookApp.uploads.application.port.UpdateUploadResponse;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadResponse;
 import com.testaarosa.springRecallBookApp.uploads.dataBase.UploadJpaRepository;
 import com.testaarosa.springRecallBookApp.uploads.infrastructure.ServerUploadRepository;

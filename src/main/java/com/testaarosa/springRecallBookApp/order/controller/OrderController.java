@@ -34,7 +34,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "Orders controller ", description = "API designed to manipulate the order object")
+@Tag(name = "Orders API ", description = "API designed to manipulate the order object")
 class OrderController {
     private final QueryOrderUseCase queryOrder;
     private final OrderUseCase orderUseCase;
