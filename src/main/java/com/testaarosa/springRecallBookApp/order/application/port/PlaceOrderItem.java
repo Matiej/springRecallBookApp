@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.catalog.application.port;
+package com.testaarosa.springRecallBookApp.order.application.port;
 
 import lombok.Value;
 

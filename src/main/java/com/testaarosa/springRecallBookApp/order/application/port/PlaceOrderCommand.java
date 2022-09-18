@@ -1,6 +1,5 @@
 package com.testaarosa.springRecallBookApp.order.application.port;
 
-import com.testaarosa.springRecallBookApp.catalog.application.port.PlaceOrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import lombok.Builder;
 import lombok.Singular;

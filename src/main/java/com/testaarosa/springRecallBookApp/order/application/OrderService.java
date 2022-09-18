@@ -1,7 +1,7 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
-import com.testaarosa.springRecallBookApp.catalog.application.port.PlaceOrderItem;
+import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderItem;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderResponse;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderCommand;
