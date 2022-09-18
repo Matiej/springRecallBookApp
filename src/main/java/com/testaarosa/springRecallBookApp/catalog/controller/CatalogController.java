@@ -34,8 +34,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/catalog")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "CatalogController", description = "API designed to manipulate the object book ")
-public class CatalogController {
+@Tag(name = "Catalog API", description = "API designed to manipulate the object book ")
+class CatalogController {
     private final CatalogUseCase catalogUseCase;
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
@@ -50,16 +50,20 @@ public class CatalogController {
             @RequestParam Optional<String> author,
             @RequestParam(value = "limit", defaultValue = "3", required = false) int limit) {
         if (title.isPresent() && author.isPresent()) {
-            return prepareResponseForGetAll(catalogUseCase.findByTitleAndAuthor(title.get(), author.get()));
+            return prepareResponseForGetAll(limitBookList(catalogUseCase.findByTitleAndAuthor(title.get(), author.get()), limit));
         } else if (title.isPresent()) {
-            return prepareResponseForGetAll(catalogUseCase.findByTitle(title.get()));
+            return prepareResponseForGetAll(limitBookList(catalogUseCase.findByTitle(title.get()), limit));
         } else if (author.isPresent()) {
-            return prepareResponseForGetAll(catalogUseCase.findByAuthor(author.get()));
+            return prepareResponseForGetAll(limitBookList(catalogUseCase.findByAuthor(author.get()), limit));
         }
-        return prepareResponseForGetAll(catalogUseCase.findAll()
+        return prepareResponseForGetAll(limitBookList(catalogUseCase.findAll(),limit));
+    }
+
+    private List<Book> limitBookList(List<Book> bookList, int limit) {
+        return bookList
                 .stream()
                 .limit(limit)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 
     private ResponseEntity<List<Book>> prepareResponseForGetAll(List<Book> collection) {
