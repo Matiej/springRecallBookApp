@@ -2,7 +2,6 @@ package com.testaarosa.springRecallBookApp.uploads.application.port;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
 
 @Builder
 @Getter
