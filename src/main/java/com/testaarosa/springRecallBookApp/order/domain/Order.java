@@ -30,9 +30,9 @@ public class Order {
     @JoinColumn(name = "order_id")
     @ToString.Exclude
     private List<OrderItem> itemList = new ArrayList<>();
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "recipient_id")
+    @ManyToOne()
     @ToString.Exclude
+    @JoinColumn(name = "recipient_id")
     private Recipient recipient;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
@@ -65,7 +65,6 @@ public class Order {
         itemList.clear();
         itemList.addAll(orderItemList);
     }
-
 
 
 }
