@@ -39,45 +39,18 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findByTitle(String title) {
-        return bookJpaRepository.findAll()
-                .stream()
-                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
-                .collect(Collectors.toList());
+        return bookJpaRepository.findAllByTitleContainsIgnoreCase(title);
     }
 
     @Override
-    public List<Book> findByAuthor(String author) {
-        return bookJpaRepository.findAll()
-                .stream()
-//                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
-                .collect(Collectors.toList());
+    public List<Book> findByAuthor(String authorName) {
+        return bookJpaRepository.findAllByLinkedAuthors_nameContainsIgnoreCaseOrLinkedAuthors_lastNameContainsIgnoreCase(authorName, authorName);
     }
 
     @Override
     public List<Book> findByTitleAndAuthor(String title, String author) {
-        return bookJpaRepository.findAll()
-                .stream()
-                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
-//                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
-                .collect(Collectors.toList());
+        return bookJpaRepository.findAllByTitleAndAuthorName(title, author);
     }
-
-//    @Override
-//    public Optional<Book> findOneByTitle(String title) {
-//        return findAll()
-//                .stream()
-//                .filter(book -> book.getTitle().equals(title))
-//                .findAny();
-//    }
-//
-//    @Override
-//    public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
-//        return bookJpaRepository.findAll()
-//                .stream()
-//                .filter(bookTitle -> bookTitle.getTitle().toLowerCase().contains(title.toLowerCase()))
-////                .filter(bookAuthor -> bookAuthor.getAuthor().toLowerCase().contains(author.toLowerCase()))
-//                .findAny();
-//    }
 
     @Override
     public Book addBook(CreateBookCommand command) {

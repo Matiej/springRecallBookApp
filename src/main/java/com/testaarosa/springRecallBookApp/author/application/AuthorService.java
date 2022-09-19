@@ -32,17 +32,17 @@ public class AuthorService implements AuthorUseCase {
         Optional<Integer> yearOfBirth = authorQuery.getYearOfBirth();
         int limit = authorQuery.getLimit();
         if (name.isPresent() && lastName.isPresent() && yearOfBirth.isPresent()) {
-            return repository.findAllByAllParamsLimited(name.get().toUpperCase(), lastName.get().toUpperCase(), yearOfBirth.get(), limit);
+            return repository.findAllByAllParamsLimited(name.get(), lastName.get(), yearOfBirth.get(), limit);
         } else if (name.isPresent() && lastName.isPresent()) {
-            return repository.findAllByNameAndLastNameLimited(name.get().toUpperCase(), lastName.get().toUpperCase(), limit);
+            return repository.findAllByNameAndLastNameLimited(name.get(), lastName.get(), limit);
         } else if (name.isPresent() && yearOfBirth.isPresent()) {
-            return repository.finAllByNameAndYearOfBirthLimited(name.get().toUpperCase(), yearOfBirth.get(), limit);
+            return repository.finAllByNameAndYearOfBirthLimited(name.get(), yearOfBirth.get(), limit);
         } else if (yearOfBirth.isPresent() && lastName.isPresent()) {
-            return repository.findAllByYearOfBirthAndLastNameLimited(yearOfBirth.get(), lastName.get().toUpperCase(), limit);
+            return repository.findAllByYearOfBirthAndLastNameLimited(yearOfBirth.get(), lastName.get(), limit);
         } else if (name.isPresent()) {
-            return repository.findAllByName(name.get().toUpperCase(), limit);
+            return repository.findAllByName(name.get(), limit);
         } else if (lastName.isPresent()) {
-            return repository.findAllByLastName(lastName.get().toUpperCase(), limit);
+            return repository.findAllByLastName(lastName.get(), limit);
         } else if(yearOfBirth.isPresent()) {
             return repository.findAllByYearOfBirth(yearOfBirth.get(), limit);
         } else {
