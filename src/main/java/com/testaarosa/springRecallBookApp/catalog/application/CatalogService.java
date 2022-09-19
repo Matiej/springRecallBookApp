@@ -1,9 +1,9 @@
 package com.testaarosa.springRecallBookApp.catalog.application;
 
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
+import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.application.port.*;
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
-import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.uploads.application.port.SaveUploadCommand;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadResponse;
@@ -11,6 +11,7 @@ import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,8 +29,8 @@ class CatalogService implements CatalogUseCase {
     private final AuthorUseCase authorUseCase;
 
     @Override
-    public List<Book> findAll() {
-        return bookJpaRepository.findAll();
+    public List<Book> findAll(Pageable pageable) {
+        return bookJpaRepository.findAll(pageable).stream().toList();
     }
 
     @Override
@@ -38,18 +39,18 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    public List<Book> findByTitle(String title) {
-        return bookJpaRepository.findAllByTitleContainsIgnoreCase(title);
+    public List<Book> findByTitle(String title, Pageable pageable) {
+        return bookJpaRepository.findAllByTitleContainsIgnoreCase(title, pageable);
     }
 
     @Override
-    public List<Book> findByAuthor(String authorName) {
-        return bookJpaRepository.findAllByLinkedAuthors_nameContainsIgnoreCaseOrLinkedAuthors_lastNameContainsIgnoreCase(authorName, authorName);
+    public List<Book> findByAuthor(String authorName, Pageable pageable) {
+        return bookJpaRepository.findAllByLinkedAuthors_nameContainsIgnoreCaseOrLinkedAuthors_lastNameContainsIgnoreCase(authorName, authorName, pageable);
     }
 
     @Override
-    public List<Book> findByTitleAndAuthor(String title, String author) {
-        return bookJpaRepository.findAllByTitleAndAuthorName(title, author);
+    public List<Book> findByTitleAndAuthor(String title, String author, Pageable pageable) {
+        return bookJpaRepository.findAllByTitleAndAuthorName(title, author, pageable);
     }
 
     @Override
@@ -72,7 +73,7 @@ class CatalogService implements CatalogUseCase {
                     Book updatedBook = updateBookFields(command, bookToUpdate);
                     bookJpaRepository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
-                }).orElseGet(() -> UpdateBookResponse.FAILURE(List.of("No book for update found for ID: " + command.getId())));
+                }).orElseGet(() -> UpdateBookResponse.FAILURE(List.of("Book not found for update with ID: " + command.getId())));
     }
 
     private Book updateBookFields(UpdateBookCommand command, Book book) {
