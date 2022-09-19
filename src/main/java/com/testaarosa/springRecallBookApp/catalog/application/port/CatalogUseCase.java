@@ -17,10 +17,6 @@ public interface CatalogUseCase {
 
     List<Book> findByTitleAndAuthor(String title, String author);
 
-    Optional<Book> findOneByTitle(String title);
-
-    Optional<Book> findOneByTitleAndAuthor(String title, String author);
-
     Book addBook(CreateBookCommand command);
 
     UpdateBookResponse updateBook(UpdateBookCommand command);

@@ -1,7 +1,8 @@
-package com.testaarosa.springRecallBookApp.catalog.domain;
+package com.testaarosa.springRecallBookApp.author.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

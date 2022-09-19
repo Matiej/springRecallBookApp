@@ -1,7 +1,7 @@
-package com.testaarosa.springRecallBookApp.catalog.application.port;
+package com.testaarosa.springRecallBookApp.author.application.port;
 
-import com.testaarosa.springRecallBookApp.catalog.controller.AuthorQueryCommand;
-import com.testaarosa.springRecallBookApp.catalog.domain.Author;
+import com.testaarosa.springRecallBookApp.author.controller.AuthorQueryCommand;
+import com.testaarosa.springRecallBookApp.author.domain.Author;
 
 import java.util.List;
 import java.util.Optional;

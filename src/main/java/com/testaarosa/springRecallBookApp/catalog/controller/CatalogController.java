@@ -56,7 +56,7 @@ class CatalogController {
         } else if (author.isPresent()) {
             return prepareResponseForGetAll(limitBookList(catalogUseCase.findByAuthor(author.get()), limit));
         }
-        return prepareResponseForGetAll(limitBookList(catalogUseCase.findAll(),limit));
+        return prepareResponseForGetAll(limitBookList(catalogUseCase.findAll(), limit));
     }
 
     private List<Book> limitBookList(List<Book> bookList, int limit) {
@@ -85,7 +85,7 @@ class CatalogController {
                 .map(book -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
                         .body(book))
-                .orElse(ResponseEntity.notFound()
+                .orElseGet(() -> ResponseEntity.notFound()
                         .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
                         .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), "Book with ID: " + id + " not found!")
                         .build());

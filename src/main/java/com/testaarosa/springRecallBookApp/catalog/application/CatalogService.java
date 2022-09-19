@@ -1,8 +1,9 @@
 package com.testaarosa.springRecallBookApp.catalog.application;
 
+import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
 import com.testaarosa.springRecallBookApp.catalog.application.port.*;
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
-import com.testaarosa.springRecallBookApp.catalog.domain.Author;
+import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.uploads.application.port.SaveUploadCommand;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadResponse;
@@ -61,22 +62,22 @@ class CatalogService implements CatalogUseCase {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<Book> findOneByTitle(String title) {
-        return findAll()
-                .stream()
-                .filter(book -> book.getTitle().equals(title))
-                .findAny();
-    }
-
-    @Override
-    public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
-        return bookJpaRepository.findAll()
-                .stream()
-                .filter(bookTitle -> bookTitle.getTitle().toLowerCase().contains(title.toLowerCase()))
-//                .filter(bookAuthor -> bookAuthor.getAuthor().toLowerCase().contains(author.toLowerCase()))
-                .findAny();
-    }
+//    @Override
+//    public Optional<Book> findOneByTitle(String title) {
+//        return findAll()
+//                .stream()
+//                .filter(book -> book.getTitle().equals(title))
+//                .findAny();
+//    }
+//
+//    @Override
+//    public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
+//        return bookJpaRepository.findAll()
+//                .stream()
+//                .filter(bookTitle -> bookTitle.getTitle().toLowerCase().contains(title.toLowerCase()))
+////                .filter(bookAuthor -> bookAuthor.getAuthor().toLowerCase().contains(author.toLowerCase()))
+//                .findAny();
+//    }
 
     @Override
     public Book addBook(CreateBookCommand command) {

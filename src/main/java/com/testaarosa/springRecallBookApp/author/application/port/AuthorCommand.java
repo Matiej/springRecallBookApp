@@ -1,6 +1,6 @@
-package com.testaarosa.springRecallBookApp.catalog.application.port;
+package com.testaarosa.springRecallBookApp.author.application.port;
 
-import com.testaarosa.springRecallBookApp.catalog.domain.Author;
+import com.testaarosa.springRecallBookApp.author.domain.Author;
 import lombok.Builder;
 import lombok.Value;
 
