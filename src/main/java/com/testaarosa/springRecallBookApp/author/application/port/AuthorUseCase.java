@@ -10,6 +10,9 @@ public interface AuthorUseCase {
     List<Author> findAll();
     Optional<Author> findById(Long id);
     List<Author> findAllByParams(AuthorQueryCommand authorQuery);
+    Author addAuthor(CreateAuthorCommand command);
+    UpdatedAuthorResponse updateAuthor(UpdateAuthorCommand command);
+    void removeById(Long id);
 }
 
 

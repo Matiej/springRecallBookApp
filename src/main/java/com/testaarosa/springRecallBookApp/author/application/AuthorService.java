@@ -1,10 +1,14 @@
 package com.testaarosa.springRecallBookApp.author.application;
 
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
+import com.testaarosa.springRecallBookApp.author.application.port.CreateAuthorCommand;
+import com.testaarosa.springRecallBookApp.author.application.port.UpdateAuthorCommand;
+import com.testaarosa.springRecallBookApp.author.application.port.UpdatedAuthorResponse;
 import com.testaarosa.springRecallBookApp.author.controller.AuthorQueryCommand;
 import com.testaarosa.springRecallBookApp.author.dataBase.AuthorJpaRepository;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,11 +47,50 @@ public class AuthorService implements AuthorUseCase {
             return repository.findAllByName(name.get(), limit);
         } else if (lastName.isPresent()) {
             return repository.findAllByLastName(lastName.get(), limit);
-        } else if(yearOfBirth.isPresent()) {
+        } else if (yearOfBirth.isPresent()) {
             return repository.findAllByYearOfBirth(yearOfBirth.get(), limit);
         } else {
             return repository.findAllLimited(limit);
         }
     }
 
+    @Override
+    public Author addAuthor(CreateAuthorCommand command) {
+        return repository.save(command.toAuthor());
+    }
+
+    @Override
+    public UpdatedAuthorResponse updateAuthor(UpdateAuthorCommand command) {
+        return repository.findById(command.getId())
+                .map(authorToUpdate -> {
+                    Author updateAuthor = updateAuthorFields(command, authorToUpdate);
+                    repository.save(updateAuthor);
+                    return UpdatedAuthorResponse.SUCCESS;
+                }).orElseGet(() -> UpdatedAuthorResponse.FAILURE(List.of("Author not found for update with ID: " + command.getId())));
+    }
+
+    private Author updateAuthorFields(UpdateAuthorCommand command, Author author) {
+        if (StringUtils.isNoneBlank(command.getName())) {
+            author.setName(command.getName());
+        }
+        if (StringUtils.isNoneBlank(command.getLastName())) {
+            author.setLastName(command.getLastName());
+        }
+        if (command.getYearOfBirth() != null && command.getYearOfBirth() > 0) {
+            author.setYearOfBirth(command.getYearOfBirth());
+        }
+        return author;
+    }
+
+    @Override
+    public void removeById(Long id) {
+        repository.findById(id).ifPresent(author -> {
+            if (null != author.getLinkedBooks() && author.getLinkedBooks().size() > 0) {
+                throw new IllegalArgumentException("Can't delete author id: '" + id +
+                        "' because is assigned " + "'" + author.getLinkedBooks().size() + "' books");
+            } else {
+                repository.deleteById(id);
+            }
+        });
+    }
 }

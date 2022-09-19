@@ -1,6 +1,7 @@
 package com.testaarosa.springRecallBookApp.author.controller;
 
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
+import com.testaarosa.springRecallBookApp.author.application.port.UpdatedAuthorResponse;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,15 +10,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +30,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @Validated
 @Tag(name = "Authors API", description = "API designed to manipulate the Author object")
 class AuthorController {
+    private static final String DEFAULT_QUERY_LIMIT = "3";
     private final AuthorUseCase authorUseCase;
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
@@ -42,7 +43,7 @@ class AuthorController {
     public ResponseEntity<List<Author>> findALl(@RequestParam Optional<String> name,
                                                 @RequestParam Optional<String> lastName,
                                                 @RequestParam Optional<Integer> yearOfBirth,
-                                                @RequestParam(value = "limit", defaultValue = "3", required = false) int limit) {
+                                                @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
 
         return prepareResponseForGetAll(authorUseCase.findAllByParams(AuthorQueryCommand.builder()
                 .name(name)
@@ -75,6 +76,65 @@ class AuthorController {
         return ResponseEntity.ok()
                 .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
                 .body(authorList);
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add new author", description = "Add new author using RestAuthorCommand. All fields are validated")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Author object created successful"),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
+    })
+    public ResponseEntity<?> addAuthor(@Validated({CreateAuthorCommandGroup.class})
+                                       @RequestBody RestAuthorCommand command) {
+        Author author = authorUseCase.addAuthor(command.toCreateAuthorCommand());
+        return ResponseEntity.created(getUri(author.getId()))
+                .headers(getSuccessfulHeaders(HttpStatus.CREATED, HttpMethod.POST))
+                .build();
+    }
+
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update author object", description = "Update existing author using ID. All fields are validated")
+    @Parameter(name = "id", required = true, description = "Updating author ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Author object updated successful"),
+            @ApiResponse(responseCode = "204", description = "Can't update, no author found"),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
+    })
+    public ResponseEntity<Object> updateAuthor(@PathVariable("id") @NotNull(message = "AuthorId filed can't be null)")
+                                               @Min(value = 1, message = "AuthorId field value must be greater than 0") Long id,
+                                               @Validated({UpdateAuthorCommandGroup.class})
+                                               @RequestBody RestAuthorCommand command) {
+        UpdatedAuthorResponse updatedAuthorResponse = authorUseCase.updateAuthor(command.toUpdateAuthorCommand(id));
+        if (!updatedAuthorResponse.isSuccess()) {
+            return ResponseEntity.noContent()
+                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
+                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NO_CONTENT.name())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), updatedAuthorResponse.getErrorList().toString())
+                    .build();
+        }
+        return ResponseEntity.accepted()
+                .location(getUri(id))
+                .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PATCH))
+                .build();
+    }
+
+    private static URI getUri(Long id) {
+        return ServletUriComponentsBuilder
+                .fromCurrentServletMapping()
+                .path("/catalog")
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri();
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Remove author object by ID", description = "Remove author by data base ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Removed successful"),
+    })
+    public void deleteById(@PathVariable Long id) {
+        authorUseCase.removeById(id);
     }
 }
 
