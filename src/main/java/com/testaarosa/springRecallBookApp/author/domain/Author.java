@@ -3,6 +3,7 @@ package com.testaarosa.springRecallBookApp.author.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
+import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,8 +21,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-public class Author {
+public class Author extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,10 +32,6 @@ public class Author {
     @ToString.Exclude
     @JsonIgnoreProperties(value = "linkedAuthors")
     private Set<Book> linkedBooks = new HashSet<>();
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime lastUpdatedAt;
 
     public Author(String name, String lastName, Integer yearOfBirth) {
         this.name = name;
@@ -47,13 +43,14 @@ public class Author {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Author author = (Author) o;
-        return Objects.equals(id, author.id) && Objects.equals(name, author.name) && Objects.equals(lastName, author.lastName) && Objects.equals(yearOfBirth, author.yearOfBirth) && Objects.equals(linkedBooks, author.linkedBooks) && Objects.equals(createdAt, author.createdAt) && Objects.equals(lastUpdatedAt, author.lastUpdatedAt);
+        return Objects.equals(id, author.id) && Objects.equals(name, author.name) && Objects.equals(lastName, author.lastName) && Objects.equals(yearOfBirth, author.yearOfBirth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, lastName, yearOfBirth, linkedBooks, createdAt, lastUpdatedAt);
+        return Objects.hash(super.hashCode(), id, name, lastName, yearOfBirth);
     }
 
     public void addBook(Book book) {
