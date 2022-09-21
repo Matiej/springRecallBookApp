@@ -4,6 +4,7 @@ import com.testaarosa.springRecallBookApp.author.dataBase.AuthorJpaRepository;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CreateBookCommand;
+import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
@@ -41,6 +42,22 @@ public class AppStartUp implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        Book oneBook = new Book();
+        oneBook.setId(1L);
+        oneBook.setTitle("ALA");
+        oneBook.setYear(1999);
+        oneBook.setUUID("123");
+        oneBook.setPrice(new BigDecimal(11));
+
+        Book oneBook2 = new Book();
+        oneBook2.setId(1L);
+        oneBook2.setTitle("ALA");
+        oneBook2.setYear(1999);
+        oneBook2.setUUID("1232");
+        oneBook2.setPrice(new BigDecimal(11));
+
+        boolean equals = oneBook.equals(oneBook2);
+
         initData();
     }
 

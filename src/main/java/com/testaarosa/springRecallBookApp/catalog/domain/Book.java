@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.catalog.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
+import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,6 +12,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -19,11 +21,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-public class Book {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+public class Book extends BaseEntity {
     @Column(name = "title")
     private String title;
     private Integer year;
@@ -38,10 +36,6 @@ public class Book {
     @ToString.Exclude
     @JsonIgnoreProperties(value = "linkedBooks")
     private Set<Author> linkedAuthors = new HashSet<>();
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime lastUpdatedAt;
 
     public Book(String title, Integer year, BigDecimal price) {
         this.title = title;
@@ -49,11 +43,18 @@ public class Book {
         this.price = price;
     }
 
-    public Book(String title, Integer year, BigDecimal price, Set<Author> linkedAuthors) {
-        this.title = title;
-        this.year = year;
-        this.price = price;
-        this.linkedAuthors = linkedAuthors;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Book book = (Book) o;
+        return Objects.equals(title, book.title) && Objects.equals(year, book.year) && Objects.equals(price, book.price) && Objects.equals(bookCoverId, book.bookCoverId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), title, year, price, bookCoverId);
     }
 
     public void addAuthor(Author author) {

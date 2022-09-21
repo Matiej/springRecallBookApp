@@ -1,6 +1,7 @@
 package com.testaarosa.springRecallBookApp.order.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,11 +23,7 @@ import java.util.Objects;
 @Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Order extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
     @ToString.Exclude
@@ -39,11 +36,6 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-    @LastModifiedDate
-    private LocalDateTime lastUpdatedAt;
-
     public BigDecimal totalPrice() {
         return itemList.stream()
                 .map(item -> item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())))
@@ -54,13 +46,14 @@ public class Order {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Order order = (Order) o;
-        return Objects.equals(id, order.id) && Objects.equals(itemList, order.itemList) && Objects.equals(recipient, order.recipient) && orderStatus == order.orderStatus && Objects.equals(createdAt, order.createdAt) && Objects.equals(lastUpdatedAt, order.lastUpdatedAt);
+        return Objects.equals(itemList, order.itemList) && orderStatus == order.orderStatus;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, itemList, recipient, orderStatus, createdAt, lastUpdatedAt);
+        return Objects.hash(super.hashCode(), itemList, orderStatus);
     }
 
     public void replaceOrderItems(List<OrderItem> orderItemList) {
