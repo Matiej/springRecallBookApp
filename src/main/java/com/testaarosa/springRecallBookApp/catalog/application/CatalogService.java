@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -54,16 +55,18 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    @Transactional
     public Book addBook(CreateBookCommand command) {
-        return bookJpaRepository.save(toBook(command));
+        Book bookToSave = toBook(command);
+        return bookJpaRepository.save(bookToSave);
     }
 
     private Book toBook(CreateBookCommand command) {
-        Set<Author> authors = fetchAuthorsById(command.getAuthors());
-        return new Book(command.getTitle(),
+        Book book = new Book(command.getTitle(),
                 command.getYear(),
-                command.getPrice(),
-                authors);
+                command.getPrice());
+        fetchAuthorsById(command.getAuthors()).forEach(book::addAuthor);
+        return book;
     }
 
     @Override
@@ -81,7 +84,8 @@ class CatalogService implements CatalogUseCase {
             book.setTitle(command.getTitle());
         }
         if (command.getAuthors() != null && command.getAuthors().size() > 0) {
-            book.setLinkedAuthors(fetchAuthorsById(command.getAuthors()));
+            book.removeAuthors();
+            fetchAuthorsById(command.getAuthors()).forEach(book::addAuthor);
         }
         if (command.getYear() != null && command.getYear() > 0) {
             book.setYear(command.getYear());

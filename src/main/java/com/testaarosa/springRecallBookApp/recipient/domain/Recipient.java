@@ -39,13 +39,10 @@ public class Recipient {
             mappedBy = "recipient")
     @ToString.Exclude
     @JsonIgnoreProperties(value = "recipient")
-    private Set<Order> orders;
+    private Set<Order> orders = new HashSet<>();
 
 
-    public boolean addOrder(Order order) {
-        if (orders == null) {
-            orders = new HashSet<>();
-        }
-        return orders.add(order);
+    public void addOrder(Order order) {
+        orders.add(order);
     }
 }
