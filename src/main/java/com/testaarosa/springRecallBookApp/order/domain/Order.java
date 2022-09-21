@@ -24,9 +24,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Order extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
     @ToString.Exclude
@@ -51,12 +48,12 @@ public class Order extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Order order = (Order) o;
-        return Objects.equals(id, order.id) && Objects.equals(itemList, order.itemList) && orderStatus == order.orderStatus;
+        return Objects.equals(itemList, order.itemList) && orderStatus == order.orderStatus;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, itemList, orderStatus);
+        return Objects.hash(super.hashCode(), itemList, orderStatus);
     }
 
     public void replaceOrderItems(List<OrderItem> orderItemList) {

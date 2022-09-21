@@ -22,9 +22,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class Author extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String name;
     private String lastName;
     private Integer yearOfBirth;
@@ -45,12 +42,12 @@ public class Author extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Author author = (Author) o;
-        return Objects.equals(id, author.id) && Objects.equals(name, author.name) && Objects.equals(lastName, author.lastName) && Objects.equals(yearOfBirth, author.yearOfBirth);
+        return Objects.equals(name, author.name) && Objects.equals(lastName, author.lastName) && Objects.equals(yearOfBirth, author.yearOfBirth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, name, lastName, yearOfBirth);
+        return Objects.hash(super.hashCode(), name, lastName, yearOfBirth);
     }
 
     public void addBook(Book book) {
