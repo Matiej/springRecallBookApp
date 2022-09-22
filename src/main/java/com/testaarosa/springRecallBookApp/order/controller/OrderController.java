@@ -105,15 +105,15 @@ class OrderController {
     }
 
     @PatchMapping(value = "/{id}", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Update order", description = "Add an order using order id and RestOrderItem. All fields are validated")
+    @Operation(summary = "Update order items", description = "Update an order items using order id and RestOrderItem. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating order ID")
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "Order updated successful"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
-    public ResponseEntity<?> updateOrder(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                         @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                         @Valid @RequestBody RestUpdateOrderCommand command) {
+    public ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                              @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
+                                              @Valid @RequestBody RestUpdateOrderCommand command) {
         OrderResponse updateOrderResponse = orderUseCase.updateOrder(command.toUpdateOrderCommand(id));
         if (!updateOrderResponse.isSuccess()) {
             return ResponseEntity.notFound()
@@ -135,8 +135,34 @@ class OrderController {
             @ApiResponse(responseCode = "204", description = "Order removed successful"),
     })
     public void removeOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
+                                @Min(value = 1, message = "OrderId field value must be greater than 0") Long id) {
         orderUseCase.removeOrderById(id);
+    }
+
+    @PutMapping("/{id}/status")
+    @Operation(summary = "Update order status", description = "Update order status using order id and RestOrderItem. All fields are validated")
+    @Parameter(name = "id", required = true, description = "Updating order ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Order updated successful"),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
+            @ApiResponse(responseCode = "404", description = "No order for update found"),
+
+    })
+    public ResponseEntity<?> updateOrderStatus(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                               @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
+                                               @Valid @RequestBody RestUpdateOrderStatusCommand command) {
+
+        OrderResponse orderResponse = orderUseCase.updateOrderStatus(id, command.getOrderStatus());
+        if (!orderResponse.isSuccess()) {
+            return ResponseEntity.notFound()
+                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PUT.name())
+                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getErrorList().toString())
+                    .build();
+        }
+        return ResponseEntity.created(getUri(orderResponse.getOrderId()))
+                .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PUT))
+                .build();
     }
 
     private static URI getUri(Long id) {

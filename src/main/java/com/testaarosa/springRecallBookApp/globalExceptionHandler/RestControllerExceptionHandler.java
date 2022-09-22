@@ -41,10 +41,10 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     }
 
     @ExceptionHandler({IllegalArgumentException.class})
-    public final ResponseEntity<Object> handleIllegalStateException(RuntimeException rex, WebRequest request) {
+    public final ResponseEntity<Object> handleIllegalArgumentException(RuntimeException rex, WebRequest request) {
         String message = "Given argument error=> ";
         log.error(message, rex);
-        HttpStatus serviceUnavailable = HttpStatus.NOT_FOUND;
+        HttpStatus serviceUnavailable = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
         return ResponseEntity.status(serviceUnavailable)
                 .headers(getExceptionHeaders(serviceUnavailable.name(), message))
@@ -53,7 +53,6 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 
     @ExceptionHandler({ConstraintViolationException.class})
     public final ResponseEntity<Object> handleConstraintViolationException(RuntimeException rex, WebRequest request) {
-        //todo prepared for database, uncoment code to
         String message = "Path parameter error. ";
         log.error(message, rex);
         HttpStatus serviceUnavailable = HttpStatus.BAD_REQUEST;
