@@ -83,6 +83,25 @@ public class OrderService implements OrderUseCase {
         repository.deleteById(id);
     }
 
+    @Override
+    public OrderResponse updateOrderStatus(Long id, String orderStatus) {
+        OrderResponse.OrderResponseBuilder orderResponseBuilder = OrderResponse.builder();
+        OrderStatus.parseOrderString(orderStatus).ifPresentOrElse(status -> repository.findById(id)
+                .ifPresentOrElse(order -> {
+                            order.updateOrderStatus(status);
+                            repository.save(order);
+                            orderResponseBuilder
+                                    .orderId(id)
+                                    .success(true);
+                        },
+                        () -> orderResponseBuilder
+                                .success(false)
+                                .errorList(List.of("Can't find order with ID: " + id))), () -> orderResponseBuilder
+                .success(false)
+                .errorList(List.of("Unable to find given order status: '" + orderStatus +"'.")));
+        return orderResponseBuilder.build();
+    }
+
     private List<OrderItem> getOrderItemList(List<PlaceOrderItem> command) {
         return command
                 .stream()

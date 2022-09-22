@@ -73,9 +73,9 @@ public class AppStartUp implements CommandLineRunner {
         recipientUseCase.addRecipient(recipient);
 
 
-        Author james1 = new Author("James","Nowak",1979);
-        Author james2 = new Author("James","Nowak",1979);
-        Author james3 = new Author("James","Nowak",1979);
+        Author james1 = new Author("James","Jeden",1979);
+        Author james2 = new Author("James","Dwa",1979);
+        Author james3 = new Author("James","Trzy",1979);
         authorJpaRepository.save(james1);
         authorJpaRepository.save(james2);
         authorJpaRepository.save(james3);
@@ -87,6 +87,7 @@ public class AppStartUp implements CommandLineRunner {
         catalogUseCase.addBook(CreateBookCommand.builder().title("Harry Potter").authors(new HashSet<>(Arrays.asList(james3.getId(), anna.getId()))).year(2022).price(new BigDecimal("112.00")).build());
         catalogUseCase.addBook(CreateBookCommand.builder().title("Black Out").authors(new HashSet<>(Arrays.asList(anna.getId()))).year(2010).price(new BigDecimal("240.10")).build());
         catalogUseCase.addBook(CreateBookCommand.builder().title("Total Snow").authors(new HashSet<>(Arrays.asList(james1.getId()))).year(2001).price(new BigDecimal("40.10")).build());
+        catalogUseCase.addBook(CreateBookCommand.builder().title("FOG").authors(new HashSet<>(Arrays.asList(james1.getId(), annaJackowska.getId()))).year(2001).price(new BigDecimal("40.10")).build());
 
 //        catalogUseCase.addBook(CreateBookCommand.builder().title("Sezon Burz").author("Stefan Burczymucha").year(2005).price(new BigDecimal("281.01")).build());
 //        catalogUseCase.addBook(CreateBookCommand.builder().title("Black Knight").author("Jowi Kielosi").year(2014).price(new BigDecimal("90.89")).build());
