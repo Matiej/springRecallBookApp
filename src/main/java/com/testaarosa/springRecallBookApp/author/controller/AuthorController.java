@@ -3,6 +3,7 @@ package com.testaarosa.springRecallBookApp.author.controller;
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
 import com.testaarosa.springRecallBookApp.author.application.port.UpdatedAuthorResponse;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
+import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -130,11 +131,15 @@ class AuthorController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove author object by ID", description = "Remove author by data base ID")
+    @Parameter(name = "isForceDelete", required = true, description = "If isForceDelete param is true, author will be deleted even if he has linked books")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Removed successful"),
     })
-    public void deleteById(@PathVariable Long id) {
-        authorUseCase.removeById(id);
+    public void deleteById(@PathVariable @NotNull(message = "AuthorId filed can't be null)")
+                           @Min(value = 1, message = "AuthorId field value must be greater than 0") Long id,
+                           @RequestParam(value = "isForceDelete", defaultValue = "false")
+                           @NotNull(message = "UploadId field can't be empty or null") Boolean isForceDelete) {
+        authorUseCase.removeById(id, isForceDelete);
     }
 }
 

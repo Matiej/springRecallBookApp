@@ -55,7 +55,7 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    @Transactional
+    @Transactional()
     public Book addBook(CreateBookCommand command) {
         Book bookToSave = toBook(command);
         return bookJpaRepository.save(bookToSave);
@@ -74,9 +74,12 @@ class CatalogService implements CatalogUseCase {
         return bookJpaRepository.findById(command.getId())
                 .map(bookToUpdate -> {
                     Book updatedBook = updateBookFields(command, bookToUpdate);
+                    //save method is not mandatory here when we use @Transactional annotation.
+                    // Hibernate save it after finish all lines in the method
+                    //but I prefer save method. It's clearer
                     bookJpaRepository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
-                }).orElseGet(() -> UpdateBookResponse.FAILURE(List.of("Book not found for update with ID: " + command.getId())));
+                }).orElseGet(() -> UpdateBookResponse.FAILURE(List.of("Book with ID: " + command.getId() +", not found for update.")));
     }
 
     private Book updateBookFields(UpdateBookCommand command, Book book) {
