@@ -10,6 +10,8 @@ public interface CatalogUseCase {
 
     List<Book> findAll(Pageable pageable);
 
+    List<Book> findAllEager(Pageable pageable);
+
     Optional<Book> findById(Long id);
 
     List<Book> findByTitle(String title, Pageable pageable);

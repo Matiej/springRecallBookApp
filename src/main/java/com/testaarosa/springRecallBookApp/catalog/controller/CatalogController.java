@@ -59,7 +59,7 @@ class CatalogController {
         } else if (author.isPresent()) {
             return prepareResponseForGetAll(catalogUseCase.findByAuthor(author.get(), pageable));
         }
-        return prepareResponseForGetAll(catalogUseCase.findAll(pageable));
+        return prepareResponseForGetAll(catalogUseCase.findAllEager(pageable));
     }
 
     private List<Book> limitBookList(List<Book> bookList, int limit) {

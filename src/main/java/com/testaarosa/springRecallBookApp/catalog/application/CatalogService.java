@@ -35,6 +35,11 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    public List<Book> findAllEager(Pageable pageable) {
+        return bookJpaRepository.findAllEager(pageable);
+    }
+
+    @Override
     public Optional<Book> findById(Long id) {
         return bookJpaRepository.findById(id);
     }
