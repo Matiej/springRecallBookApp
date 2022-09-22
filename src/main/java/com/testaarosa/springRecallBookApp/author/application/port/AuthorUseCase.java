@@ -12,7 +12,7 @@ public interface AuthorUseCase {
     List<Author> findAllByParams(AuthorQueryCommand authorQuery);
     Author addAuthor(CreateAuthorCommand command);
     UpdatedAuthorResponse updateAuthor(UpdateAuthorCommand command);
-    void removeById(Long id);
+    void removeById(Long id, Boolean isForceDelete);
 }
 
 

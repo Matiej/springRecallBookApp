@@ -83,12 +83,14 @@ public class AuthorService implements AuthorUseCase {
     }
 
     @Override
-    public void removeById(Long id) {
+    public void removeById(Long id, Boolean isForceDelete) {
         repository.findById(id).ifPresent(author -> {
-            if (null != author.getLinkedBooks() && author.getLinkedBooks().size() > 0) {
+            if (null != author.getLinkedBooks() && author.getLinkedBooks().size() > 0
+                    && !isForceDelete) {
                 throw new IllegalArgumentException("Can't delete author id: '" + id +
-                        "' because is assigned " + "'" + author.getLinkedBooks().size() + "' books");
+                        "' because is assigned to " + "'" + author.getLinkedBooks().size() + "' books");
             } else {
+                author.removeAllBooks();
                 repository.deleteById(id);
             }
         });

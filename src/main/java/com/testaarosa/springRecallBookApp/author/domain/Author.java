@@ -59,4 +59,9 @@ public class Author extends BaseEntity {
         linkedBooks.remove(book);
         book.getLinkedAuthors().remove(this);
     }
+
+    public void removeAllBooks() {
+        linkedBooks.forEach(book -> book.removeAuthor(this));
+        linkedBooks.clear();
+    }
 }
