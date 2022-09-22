@@ -27,7 +27,7 @@ public class Book extends BaseEntity {
     private Integer year;
     private BigDecimal price;
     private Long bookCoverId;
-    @ManyToMany()
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "author_book",
             joinColumns = @JoinColumn(name = "book_id"),
