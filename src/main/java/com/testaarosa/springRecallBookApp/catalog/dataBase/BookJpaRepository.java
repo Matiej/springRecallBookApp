@@ -24,7 +24,6 @@ public interface BookJpaRepository extends JpaRepository<Book, Long>, PagingAndS
     List<Book> findAllByTitleContainsIgnoreCase(String title, Pageable pageable);
 
     //join detach -> to avoid N+1 notation
-    @Query("SELECT b FROM Book b JOIN FETCH b.linkedAuthors")
+    @Query("SELECT DISTINCT b FROM Book b JOIN FETCH b.linkedAuthors")
     List<Book> findAllEager(Pageable pageable);
-
 }
