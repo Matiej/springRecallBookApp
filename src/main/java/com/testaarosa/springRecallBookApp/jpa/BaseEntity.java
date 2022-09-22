@@ -25,17 +25,19 @@ public abstract class BaseEntity {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime lastUpdatedAt;
+    @Version
+    private long version;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BaseEntity that = (BaseEntity) o;
-        return Objects.equals(getUUID(), that.getUUID()) && Objects.equals(getCreatedAt(), that.getCreatedAt()) && Objects.equals(getLastUpdatedAt(), that.getLastUpdatedAt());
+        return Objects.equals(id, that.id) && Objects.equals(UUID, that.UUID) && Objects.equals(createdAt, that.createdAt) && Objects.equals(lastUpdatedAt, that.lastUpdatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUUID(), getCreatedAt(), getLastUpdatedAt());
+        return Objects.hash(id, UUID, createdAt, lastUpdatedAt);
     }
 }
