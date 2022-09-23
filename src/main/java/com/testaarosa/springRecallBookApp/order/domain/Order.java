@@ -4,16 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,7 +24,7 @@ public class Order extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
     @ToString.Exclude
-    private List<OrderItem> itemList = new ArrayList<>();
+    private Set<OrderItem> itemList = new HashSet<>();
     @ManyToOne()
     @ToString.Exclude
     @JoinColumn(name = "recipient_id")
@@ -56,9 +53,9 @@ public class Order extends BaseEntity {
         return Objects.hash(super.hashCode(), itemList, orderStatus);
     }
 
-    public void replaceOrderItems(List<OrderItem> orderItemList) {
+    public void replaceOrderItems(Set<OrderItem> orderItems) {
         itemList.clear();
-        itemList.addAll(orderItemList);
+        itemList.addAll(orderItems);
     }
 
 

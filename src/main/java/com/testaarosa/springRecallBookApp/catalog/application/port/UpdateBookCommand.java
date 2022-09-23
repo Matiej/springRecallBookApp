@@ -14,6 +14,7 @@ public class UpdateBookCommand {
     Set<Long> authors;
     Integer year;
     BigDecimal price;
+    Long available;
     public static UpdateBookCommandBuilder builder(Long id) {
         return hiddenBuilder().id(id);
     }

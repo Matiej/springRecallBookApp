@@ -13,4 +13,5 @@ public class CreateBookCommand {
     Set<Long> authors;
     Integer year;
     BigDecimal price;
+    Long availAble;
 }

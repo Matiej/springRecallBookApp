@@ -1,6 +1,7 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
+import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.order.application.port.*;
 import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,54 +30,41 @@ public class OrderService implements OrderUseCase {
     @Override
     @Transactional
     public OrderResponse placeOrder(PlaceOrderCommand command) {
-        List<String> errorList = new ArrayList<>();
+        Set<OrderItem> orderItemList = getOrderItems(command.getItemList());
 
-        List<OrderItem> orderItemList = getOrderItemList(command.getItemList());
+        Recipient recipient = recipientUseCase.findById(command.getRecipientId())
+                .orElseThrow(() -> new IllegalArgumentException("Can't find recipient with ID: " + command.getRecipientId()));
+        Order order = Order.builder()
+                .orderStatus(OrderStatus.NEW)
+                .recipient(recipient)
+                .itemList(orderItemList)
+                .build();
+        recipient.addOrder(order);
+        Order savedOrder = repository.save(order);
+        catalogUseCase.saveAll(updateBooksQuantity(orderItemList));
+        return OrderResponse.success(savedOrder.getId());
+    }
 
-        Optional<Recipient> optionalRecipient = recipientUseCase.findById(command.getRecipientId());
-
-        if (orderItemList.isEmpty()) {
-            errorList.add("No books found for Id's: " + command.getItemList().stream().map(item -> String.valueOf(item.getBookId())).collect(Collectors.joining(", ")));
-        }
-        if (optionalRecipient.isEmpty()) {
-            errorList.add("No recipient found for Id:" + command.getRecipientId());
-        }
-        if (errorList.isEmpty()) {
-            Recipient recipient = optionalRecipient.get();
-            Order order = Order.builder()
-                    .orderStatus(OrderStatus.NEW)
-                    .recipient(recipient)
-                    .itemList(orderItemList)
-                    .build();
-            recipient.addOrder(order);
-            Order savedOrder = repository.save(order);
-            return OrderResponse.success(savedOrder.getId());
-        }
-        return OrderResponse.failure(errorList);
+    private Set<Book> updateBooksQuantity(Set<OrderItem> orderItemList) {
+        return orderItemList.stream()
+                .map(item -> {
+                    Book book = item.getBook();
+                    book.setAvailable(book.getAvailable() - item.getQuantity());
+                    return book;
+                }).collect(Collectors.toSet());
     }
 
     @Override
     public OrderResponse updateOrder(UpdateOrderCommand command) {
-        List<String> errorList = new ArrayList<>();
 
-        List<OrderItem> orderItemList = getOrderItemList(command.getItemList());
-        Optional<Order> optionalOrder = repository.findById(command.getOrderId());
+        Set<OrderItem> orderItemList = getOrderItems(command.getItemList());
+        Order order = repository.findById(command.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
 
-        if (orderItemList.isEmpty()) {
-            errorList.add("No books found for Id's: " + command.getItemList().stream().map(item -> String.valueOf(item.getBookId())).collect(Collectors.joining(", ")));
-        }
-        if (optionalOrder.isEmpty()) {
-            errorList.add("No order found for Id:" + command.getOrderId());
-        }
-
-        if (errorList.isEmpty()) {
-            Order order = optionalOrder.get();
-            order.replaceOrderItems(orderItemList);
-            order.setLastUpdatedAt(LocalDateTime.now());
-            Order savedOrder = repository.save(order);
-            return OrderResponse.success(savedOrder.getId());
-        }
-        return OrderResponse.failure(errorList);
+        order.replaceOrderItems(orderItemList);
+        order.setLastUpdatedAt(LocalDateTime.now());
+        Order savedOrder = repository.save(order);
+        return OrderResponse.success(savedOrder.getId());
     }
 
     @Override
@@ -98,19 +87,29 @@ public class OrderService implements OrderUseCase {
                                 .success(false)
                                 .errorList(List.of("Can't find order with ID: " + id))), () -> orderResponseBuilder
                 .success(false)
-                .errorList(List.of("Unable to find given order status: '" + orderStatus +"'.")));
+                .errorList(List.of("Unable to find given order status: '" + orderStatus + "'.")));
         return orderResponseBuilder.build();
     }
 
-    private List<OrderItem> getOrderItemList(List<PlaceOrderItem> command) {
-        return command
+    private Set<OrderItem> getOrderItems(List<PlaceOrderItem> placeOrderItems) {
+        return placeOrderItems
                 .stream()
-                .filter(p -> catalogUseCase.findById(p.getBookId()).isPresent())
-                .map(placeOrderItem -> OrderItem.builder()
-                        .book(catalogUseCase.findById(placeOrderItem.getBookId()).get())
-                        .quantity(placeOrderItem.getQuantity())
-                        .build())
-                .toList();
+                .map(this::toOrderItem)
+                .collect(Collectors.toSet());
+    }
+
+    private OrderItem toOrderItem(PlaceOrderItem placeOrderItem) {
+        Book book = catalogUseCase.findOne(placeOrderItem.getBookId());
+        int placeOrderItemQuantity = placeOrderItem.getQuantity();
+        Long bookAvailable = book.getAvailable();
+        if (bookAvailable >= placeOrderItemQuantity) {
+            return OrderItem.builder()
+                    .book(book)
+                    .quantity(placeOrderItemQuantity)
+                    .build();
+        }
+        throw new IllegalArgumentException("Too many books id: " + placeOrderItem.getBookId() +
+                " requested: " + placeOrderItemQuantity + " of: " + bookAvailable + " available");
     }
 
 }
