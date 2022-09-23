@@ -45,6 +45,11 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    public Book findOne(Long id) {
+        return bookJpaRepository.getReferenceById(id);
+    }
+
+    @Override
     public List<Book> findByTitle(String title, Pageable pageable) {
         return bookJpaRepository.findAllByTitleContainsIgnoreCase(title, pageable);
     }
@@ -69,7 +74,8 @@ class CatalogService implements CatalogUseCase {
     private Book toBook(CreateBookCommand command) {
         Book book = new Book(command.getTitle(),
                 command.getYear(),
-                command.getPrice());
+                command.getPrice(),
+                command.getAvailAble());
         fetchAuthorsById(command.getAuthors()).forEach(book::addAuthor);
         return book;
     }
@@ -84,7 +90,7 @@ class CatalogService implements CatalogUseCase {
                     //but I prefer save method. It's clearer
                     bookJpaRepository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
-                }).orElseGet(() -> UpdateBookResponse.FAILURE(List.of("Book with ID: " + command.getId() +", not found for update.")));
+                }).orElseGet(() -> UpdateBookResponse.FAILURE(List.of("Book with ID: " + command.getId() + ", not found for update.")));
     }
 
     private Book updateBookFields(UpdateBookCommand command, Book book) {
@@ -145,6 +151,11 @@ class CatalogService implements CatalogUseCase {
                 bookJpaRepository.save(book);
             }
         });
+    }
+
+    @Override
+    public void saveAll(Set<Book> updateBooksQuantity) {
+        bookJpaRepository.saveAll(updateBooksQuantity);
     }
 
 }

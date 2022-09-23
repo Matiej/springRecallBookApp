@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CatalogUseCase {
 
@@ -13,6 +14,7 @@ public interface CatalogUseCase {
     List<Book> findAllEager(Pageable pageable);
 
     Optional<Book> findById(Long id);
+    Book findOne(Long id);
 
     List<Book> findByTitle(String title, Pageable pageable);
 
@@ -29,4 +31,6 @@ public interface CatalogUseCase {
     void updateBookCover(UpdateBookCoverCommand command);
 
     void removeCoverByBookId(Long id);
+
+    void saveAll(Set<Book> updateBooksQuantity);
 }

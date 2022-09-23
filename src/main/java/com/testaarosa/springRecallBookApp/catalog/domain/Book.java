@@ -4,13 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -27,6 +23,7 @@ public class Book extends BaseEntity {
     private Integer year;
     private BigDecimal price;
     private Long bookCoverId;
+    private Long available;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "author_book",
@@ -37,10 +34,11 @@ public class Book extends BaseEntity {
     @JsonIgnoreProperties(value = "linkedBooks")
     private Set<Author> linkedAuthors = new HashSet<>();
 
-    public Book(String title, Integer year, BigDecimal price) {
+    public Book(String title, Integer year, BigDecimal price, Long available) {
         this.title = title;
         this.year = year;
         this.price = price;
+        this.available = available;
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .body(exceptionResponse);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class})
+    @ExceptionHandler({IllegalArgumentException.class, EntityNotFoundException.class})
     public final ResponseEntity<Object> handleIllegalArgumentException(RuntimeException rex, WebRequest request) {
         String message = "Given argument error=> ";
         log.error(message, rex);
