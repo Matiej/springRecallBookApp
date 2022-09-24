@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,8 +30,16 @@ public class OrderService implements OrderUseCase {
     public OrderResponse placeOrder(PlaceOrderCommand command) {
         Set<OrderItem> orderItemList = getOrderItems(command.getItemList());
 
-        Recipient recipient = recipientUseCase.findById(command.getRecipientId())
-                .orElseThrow(() -> new IllegalArgumentException("Can't find recipient with ID: " + command.getRecipientId()));
+        Recipient orderRecipient = command.getPlaceOrderRecipient().toRecipient();
+
+        Recipient recipient = recipientUseCase.findOneByEmail(command.getPlaceOrderRecipient().getEmail())
+                .map(foundRecipient -> {
+                    foundRecipient.updateFields(orderRecipient);
+                    recipientUseCase.updateRecipient(foundRecipient);
+                    return foundRecipient;
+                })
+                .orElse(orderRecipient);
+
         Order order = Order.builder()
                 .orderStatus(OrderStatus.NEW)
                 .recipient(recipient)

@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -22,10 +20,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Recipient extends BaseEntity {
-    @Setter
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String name;
     private String lastName;
     private String phone;
@@ -36,7 +30,16 @@ public class Recipient extends BaseEntity {
             mappedBy = "recipient")
     @ToString.Exclude
     @JsonIgnoreProperties(value = "recipient")
+    @Singular
     private Set<Order> orders = new HashSet<>();
+
+    public Recipient(String name, String lastName, String phone, String email, RecipientAddress recipientAddress) {
+        this.name = name;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.email = email;
+        this.recipientAddress = recipientAddress;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -44,15 +47,29 @@ public class Recipient extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Recipient recipient = (Recipient) o;
-        return Objects.equals(id, recipient.id) && Objects.equals(name, recipient.name) && Objects.equals(lastName, recipient.lastName) && Objects.equals(phone, recipient.phone) && Objects.equals(email, recipient.email) && Objects.equals(recipientAddress, recipient.recipientAddress);
+        return Objects.equals(name, recipient.name) && Objects.equals(lastName, recipient.lastName) && Objects.equals(phone, recipient.phone)
+                && Objects.equals(email, recipient.email) && Objects.equals(recipientAddress, recipient.recipientAddress);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), id, name, lastName, phone, email, recipientAddress);
+        return Objects.hash(super.hashCode(), name, lastName, phone, email, recipientAddress);
     }
 
     public void addOrder(Order order) {
-        orders.add(order);
+        this.getOrders().add(order);
+    }
+
+    public void updateFields(Recipient newRecipient) {
+        if (!newRecipient.getName().equalsIgnoreCase(name)) {
+            this.setName(newRecipient.getName());
+        }
+        if (!newRecipient.getLastName().equalsIgnoreCase(lastName)) {
+            this.setLastName(newRecipient.getLastName());
+        }
+        if (!newRecipient.getPhone().equalsIgnoreCase(phone)) {
+            this.setPhone(newRecipient.getPhone());
+        }
+        this.setRecipientAddress(newRecipient.getRecipientAddress());
     }
 }

@@ -1,9 +1,6 @@
 package com.testaarosa.springRecallBookApp.recipient.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Embeddable;
 
@@ -12,6 +9,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
+@EqualsAndHashCode
 public class RecipientAddress {
     private String street;
     private String buildingNumber;
@@ -19,6 +17,4 @@ public class RecipientAddress {
     private String district;
     private String city;
     private String zipCode;
-
-
 }

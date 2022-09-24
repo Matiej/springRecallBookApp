@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 
 @Builder
 @Value
-public class RestRecipientCommand {
+class RestRecipientCommand {
     @NotBlank(groups = {SaveRecipientGroup.class}, message = "Name field can't be blank, empty or null")
     String name;
     @NotBlank(groups = {SaveRecipientGroup.class}, message = "LastName field can't be blank, empty or null")

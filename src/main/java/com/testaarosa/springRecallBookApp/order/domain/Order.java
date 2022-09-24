@@ -25,7 +25,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "order_id")
     @ToString.Exclude
     private Set<OrderItem> itemList = new HashSet<>();
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @ToString.Exclude
     @JoinColumn(name = "recipient_id")
     @JsonIgnoreProperties(value = "orders")

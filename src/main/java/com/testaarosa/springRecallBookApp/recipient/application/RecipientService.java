@@ -37,6 +37,11 @@ class RecipientService implements RecipientUseCase {
     }
 
     @Override
+    public Recipient updateRecipient(Recipient recipient) {
+        return repository.save(recipient);
+    }
+
+    @Override
     public RecipientResponse updateRecipient(UpdateRecipientCommand command) {
         return findById(command.getId())
                 .map(recipient -> {
@@ -46,7 +51,7 @@ class RecipientService implements RecipientUseCase {
     }
 
     @Override
-    public Optional<Recipient> getAllRecipientsByEmail(String email) {
+    public Optional<Recipient> findOneByEmail(String email) {
         return repository.findByEmailContainingIgnoreCase(email);
     }
 
