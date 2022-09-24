@@ -4,13 +4,17 @@ import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientRe
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.application.port.SaveRecipientCommand;
 import com.testaarosa.springRecallBookApp.recipient.application.port.UpdateRecipientCommand;
+import com.testaarosa.springRecallBookApp.recipient.controller.RecipientQueryCommand;
 import com.testaarosa.springRecallBookApp.recipient.dataBase.RecipientJpaRepository;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +23,11 @@ class RecipientService implements RecipientUseCase {
 
     @Override
     public Recipient addRecipient(SaveRecipientCommand command) {
+        repository.findByEmailContainingIgnoreCase(command.getEmail())
+                .ifPresent(s-> {
+                    throw new IllegalArgumentException("The user with email: " + command.getEmail() +
+                            " is already in data base.");
+                });
         return repository.save(command.toRecipient());
     }
 
@@ -37,8 +46,8 @@ class RecipientService implements RecipientUseCase {
     }
 
     @Override
-    public List<Recipient> getAllRecipientsByEmail(String email) {
-        return repository.getAllRecipientsByEmail(email);
+    public Optional<Recipient> getAllRecipientsByEmail(String email) {
+        return repository.findByEmailContainingIgnoreCase(email);
     }
 
     @Override
@@ -49,5 +58,36 @@ class RecipientService implements RecipientUseCase {
     @Override
     public void removeRecipientById(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public List<Recipient> finaAllByParams(RecipientQueryCommand command) {
+        String name = command.getName();
+        String lastName = command.getLastName();
+        String zipCode = command.getZipCode();
+        int limit = command.getLimit();
+        if (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(lastName) && StringUtils.isNotEmpty(zipCode)) {
+            return repository.findAllByNameAndLastNameAndZipCode(name, lastName, zipCode, limit);
+        } else if (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(lastName)) {
+            return repository.findaAllByNameAndLastName(name, lastName, limit);
+
+        } else if (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(zipCode)) {
+            return repository.findAllByNameAndZipCode(name, zipCode, limit);
+
+        } else if (StringUtils.isNotEmpty(lastName) && StringUtils.isNotEmpty(zipCode)) {
+            return repository.findAllByLastNameAndZipCode(lastName, zipCode, limit);
+
+        } else if (StringUtils.isNotEmpty(name)) {
+            return repository.findAllByNameContainingIgnoreCase(name, Pageable.ofSize(limit));
+
+        } else if (StringUtils.isNotEmpty(lastName)) {
+            return repository.findAllByLastNameContainingIgnoreCase(lastName, Pageable.ofSize(limit));
+
+        } else if (StringUtils.isNotEmpty(zipCode)) {
+            return repository.findAllByRecipientAddress_ZipCodeContainingIgnoreCase(zipCode, Pageable.ofSize(limit));
+
+        } else {
+            return repository.findAll(Pageable.ofSize(limit)).stream().collect(Collectors.toList());
+        }
     }
 }

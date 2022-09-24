@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.List;
@@ -37,19 +38,25 @@ public class RecipientController {
     private final RecipientUseCase recipientUseCase;
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get all recipients", description = "Get all recipients from data base")
+    @Operation(summary = "Get all recipients", description = "Get all recipients from data base by name and last name")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No recipients found!"),
     })
-    public ResponseEntity<List<Recipient>> getAll(@RequestParam Optional<String> email,
+    public ResponseEntity<List<Recipient>> getAll(@RequestParam Optional<String> name,
+                                                  @RequestParam Optional<String> lastName,
+                                                  @RequestParam Optional<String> zipCode,
                                                   @RequestParam(value = "limit", defaultValue = "3", required = false) int limit) {
-        return email
-                .map(s -> prepareResponseForGetAll(recipientUseCase.getAllRecipientsByEmail(s)))
-                .orElseGet(() -> prepareResponseForGetAll(recipientUseCase.findAll()
-                        .stream()
-                        .limit(limit)
-                        .collect(Collectors.toList())));
+        RecipientQueryCommand.RecipientQueryCommandBuilder queryCommandBuilder = RecipientQueryCommand.builder();
+        name.ifPresent(queryCommandBuilder::name);
+        lastName.ifPresent(queryCommandBuilder::lastName);
+        zipCode.ifPresent(queryCommandBuilder::zipCode);
+        List<Recipient> recipientList = recipientUseCase.finaAllByParams(queryCommandBuilder
+                .limit(limit)
+                .build());
+        return ResponseEntity.ok()
+                .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
+                .body(recipientList);
     }
 
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)

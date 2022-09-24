@@ -49,15 +49,15 @@ public class AppStartUp implements CommandLineRunner {
     }
 
     private void initData() {
-        SaveRecipientCommand recipient = SaveRecipientCommand.builder()
-                .name("Ksawery Nowak")
-                .phone("661555777")
-                .street("Starej Drogi 11")
-                .city("Warszawa")
-                .zipCode("01-001")
-                .email("ksawer@gmail.com")
-                .build();
-        recipientUseCase.addRecipient(recipient);
+//        SaveRecipientCommand recipient = SaveRecipientCommand.builder()
+//                .name("Ksawery Nowak")
+//                .phone("661555777")
+//                .street("Starej Drogi 11")
+//                .city("Warszawa")
+//                .zipCode("01-001")
+//                .email("ksawer@gmail.com")
+//                .build();
+//        recipientUseCase.addRecipient(recipient);
 
 
         Author james1 = new Author("James", "Jeden", 1979);
