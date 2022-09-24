@@ -1,6 +1,8 @@
 package com.testaarosa.springRecallBookApp.recipient.application.port;
 
+import com.testaarosa.springRecallBookApp.recipient.controller.RecipientQueryCommand;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +15,11 @@ public interface RecipientUseCase {
 
     RecipientResponse updateRecipient(UpdateRecipientCommand command);
 
-    List<Recipient> getAllRecipientsByEmail(String email);
+    Optional<Recipient> getAllRecipientsByEmail(String email);
 
     List<Recipient> findAll();
 
     void removeRecipientById(Long id);
+
+    List<Recipient> finaAllByParams(RecipientQueryCommand build);
 }
