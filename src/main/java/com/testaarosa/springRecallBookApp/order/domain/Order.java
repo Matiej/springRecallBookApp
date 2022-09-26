@@ -59,8 +59,10 @@ public class Order extends BaseEntity {
     }
 
 
-    public void updateOrderStatus(OrderStatus newStatus) {
-        this.setOrderStatus(orderStatus.updateOrderStatus(newStatus));
+    public UpdateOrderStatusResult updateOrderStatus(OrderStatus newStatus) {
+        UpdateOrderStatusResult updateOrderStatusResult = orderStatus.updateOrderStatus(newStatus);
+        this.setOrderStatus(updateOrderStatusResult.getOrderStatus());
+        return updateOrderStatusResult;
     }
 }
 
