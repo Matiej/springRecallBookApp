@@ -1,8 +1,8 @@
 package com.testaarosa.springRecallBookApp.catalog.controller;
 
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
-import com.testaarosa.springRecallBookApp.catalog.application.port.UpdateBookCoverCommand;
-import com.testaarosa.springRecallBookApp.catalog.application.port.UpdateBookResponse;
+import com.testaarosa.springRecallBookApp.catalog.application.UpdateBookCoverCommand;
+import com.testaarosa.springRecallBookApp.catalog.application.UpdateBookResponse;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import io.swagger.v3.oas.annotations.Operation;

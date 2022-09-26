@@ -1,7 +1,7 @@
 package com.testaarosa.springRecallBookApp.author.controller;
 
-import com.testaarosa.springRecallBookApp.author.application.port.CreateAuthorCommand;
-import com.testaarosa.springRecallBookApp.author.application.port.UpdateAuthorCommand;
+import com.testaarosa.springRecallBookApp.author.application.CreateAuthorCommand;
+import com.testaarosa.springRecallBookApp.author.application.UpdateAuthorCommand;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

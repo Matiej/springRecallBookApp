@@ -1,7 +1,7 @@
 package com.testaarosa.springRecallBookApp.order.controller;
 
-import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderCommand;
-import com.testaarosa.springRecallBookApp.order.application.port.PlaceOrderRecipient;
+import com.testaarosa.springRecallBookApp.order.application.PlaceOrderCommand;
+import com.testaarosa.springRecallBookApp.order.application.PlaceOrderRecipient;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.controller.SaveRecipientGroup;
 import lombok.Data;

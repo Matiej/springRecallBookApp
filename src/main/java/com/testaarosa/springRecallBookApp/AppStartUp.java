@@ -1,18 +1,10 @@
 package com.testaarosa.springRecallBookApp;
 
 import com.testaarosa.springRecallBookApp.author.dataBase.AuthorJpaRepository;
-import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
-import com.testaarosa.springRecallBookApp.catalog.application.port.CreateBookCommand;
-import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
-import com.testaarosa.springRecallBookApp.recipient.application.port.SaveRecipientCommand;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
 
 @Component
 public class AppStartUp implements CommandLineRunner {

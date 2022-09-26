@@ -1,14 +1,10 @@
 package com.testaarosa.springRecallBookApp.uploads.domain;
 
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
-import com.testaarosa.springRecallBookApp.uploads.application.port.UploadResponse;
+import com.testaarosa.springRecallBookApp.uploads.application.UploadResponse;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Builder

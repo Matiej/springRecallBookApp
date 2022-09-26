@@ -1,9 +1,6 @@
 package com.testaarosa.springRecallBookApp.recipient.application;
 
-import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientResponse;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
-import com.testaarosa.springRecallBookApp.recipient.application.port.SaveRecipientCommand;
-import com.testaarosa.springRecallBookApp.recipient.application.port.UpdateRecipientCommand;
 import com.testaarosa.springRecallBookApp.recipient.controller.RecipientQueryCommand;
 import com.testaarosa.springRecallBookApp.recipient.dataBase.RecipientJpaRepository;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;

@@ -1,5 +1,9 @@
 package com.testaarosa.springRecallBookApp.catalog.application.port;
 
+import com.testaarosa.springRecallBookApp.catalog.application.CreateBookCommand;
+import com.testaarosa.springRecallBookApp.catalog.application.UpdateBookCommand;
+import com.testaarosa.springRecallBookApp.catalog.application.UpdateBookCoverCommand;
+import com.testaarosa.springRecallBookApp.catalog.application.UpdateBookResponse;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import org.springframework.data.domain.Pageable;
 

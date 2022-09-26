@@ -1,9 +1,6 @@
 package com.testaarosa.springRecallBookApp.author.application;
 
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
-import com.testaarosa.springRecallBookApp.author.application.port.CreateAuthorCommand;
-import com.testaarosa.springRecallBookApp.author.application.port.UpdateAuthorCommand;
-import com.testaarosa.springRecallBookApp.author.application.port.UpdatedAuthorResponse;
 import com.testaarosa.springRecallBookApp.author.controller.AuthorQueryCommand;
 import com.testaarosa.springRecallBookApp.author.dataBase.AuthorJpaRepository;
 import com.testaarosa.springRecallBookApp.author.domain.Author;

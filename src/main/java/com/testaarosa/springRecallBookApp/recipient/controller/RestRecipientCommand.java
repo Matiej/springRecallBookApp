@@ -1,7 +1,7 @@
 package com.testaarosa.springRecallBookApp.recipient.controller;
 
-import com.testaarosa.springRecallBookApp.recipient.application.port.SaveRecipientCommand;
-import com.testaarosa.springRecallBookApp.recipient.application.port.UpdateRecipientCommand;
+import com.testaarosa.springRecallBookApp.recipient.application.SaveRecipientCommand;
+import com.testaarosa.springRecallBookApp.recipient.application.UpdateRecipientCommand;
 import lombok.Builder;
 import lombok.Value;
 

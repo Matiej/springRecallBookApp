@@ -1,7 +1,7 @@
 package com.testaarosa.springRecallBookApp.recipient.controller;
 
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
-import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientResponse;
+import com.testaarosa.springRecallBookApp.recipient.application.RecipientResponse;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,12 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
