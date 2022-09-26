@@ -92,4 +92,9 @@ public class AuthorService implements AuthorUseCase {
             }
         });
     }
+
+    @Override
+    public void save(Author author) {
+        repository.save(author);
+    }
 }
