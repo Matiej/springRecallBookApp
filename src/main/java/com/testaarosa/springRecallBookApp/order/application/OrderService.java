@@ -7,6 +7,7 @@ import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
+import com.testaarosa.springRecallBookApp.order.domain.UpdateOrderStatusResult;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.AllArgsConstructor;
@@ -47,11 +48,11 @@ public class OrderService implements OrderUseCase {
                 .build();
         recipient.addOrder(order);
         Order savedOrder = repository.save(order);
-        catalogUseCase.saveAll(updateBooksQuantity(orderItemList));
+        catalogUseCase.saveAll(reduceBooksQuantity(orderItemList));
         return OrderResponse.success(savedOrder.getId());
     }
 
-    private Set<Book> updateBooksQuantity(Set<OrderItem> orderItemList) {
+    private Set<Book> reduceBooksQuantity(Set<OrderItem> orderItemList) {
         return orderItemList.stream()
                 .map(item -> {
                     Book book = item.getBook();
@@ -61,7 +62,8 @@ public class OrderService implements OrderUseCase {
     }
 
     @Override
-    public OrderResponse updateOrder(UpdateOrderCommand command) {
+    @Transactional
+    public OrderResponse updateOrderItems(UpdateOrderCommand command) {
 
         Set<OrderItem> orderItemList = getOrderItems(command.getItemList());
         Order order = repository.findById(command.getOrderId())
@@ -74,16 +76,14 @@ public class OrderService implements OrderUseCase {
     }
 
     @Override
-    public void removeOrderById(Long id) {
-        repository.deleteById(id);
-    }
-
-    @Override
     public OrderResponse updateOrderStatus(Long id, String orderStatus) {
         OrderResponse.OrderResponseBuilder orderResponseBuilder = OrderResponse.builder();
         OrderStatus.parseOrderString(orderStatus).ifPresentOrElse(status -> repository.findById(id)
                 .ifPresentOrElse(order -> {
-                            order.updateOrderStatus(status);
+                            UpdateOrderStatusResult updateOrderStatusResult = order.updateOrderStatus(status);
+                            if(updateOrderStatusResult.isRevoked()) {
+                                revokeBooksQuantity(order.getItemList());
+                            }
                             repository.save(order);
                             orderResponseBuilder
                                     .orderId(id)
@@ -95,6 +95,20 @@ public class OrderService implements OrderUseCase {
                 .success(false)
                 .errorList(List.of("Unable to find given order status: '" + orderStatus + "'.")));
         return orderResponseBuilder.build();
+    }
+
+    private Set<Book> revokeBooksQuantity(Set<OrderItem> orderItemList) {
+        return orderItemList.stream()
+                .map(item -> {
+                    Book book = item.getBook();
+                    book.setAvailable(book.getAvailable() + item.getQuantity());
+                    return book;
+                }).collect(Collectors.toSet());
+    }
+
+    @Override
+    public void removeOrderById(Long id) {
+        repository.deleteById(id);
     }
 
     private Set<OrderItem> getOrderItems(List<PlaceOrderItem> placeOrderItems) {

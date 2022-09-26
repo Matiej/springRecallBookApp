@@ -8,20 +8,19 @@ import java.util.Optional;
 public enum OrderStatus {
     NEW {
         @Override
-        public OrderStatus updateOrderStatus(OrderStatus status) {
+        public UpdateOrderStatusResult updateOrderStatus(OrderStatus status) {
             return switch (status) {
-                case PAID -> PAID;
-                case CANCELED -> CANCELED;
-                case ABANDONED -> ABANDONED;
+                case PAID -> UpdateOrderStatusResult.ok(status);
+                case CANCELED, ABANDONED -> UpdateOrderStatusResult.revoked(status);
                 default -> super.updateOrderStatus(status);
             };
         }
     },
     PAID {
         @Override
-        public OrderStatus updateOrderStatus(OrderStatus status) {
+        public UpdateOrderStatusResult updateOrderStatus(OrderStatus status) {
             if(status == SHIPPED) {
-                return SHIPPED;
+                return UpdateOrderStatusResult.ok(status);
             }
             return super.updateOrderStatus(status);
         }
@@ -30,7 +29,7 @@ public enum OrderStatus {
     ABANDONED,
     SHIPPED;
 
-    public OrderStatus updateOrderStatus(OrderStatus status) {
+    public UpdateOrderStatusResult updateOrderStatus(OrderStatus status) {
         throw new IllegalArgumentException("Unable to change current order status: " + this.name()
                 + "  to '" + status.name() + "' status.");
     }

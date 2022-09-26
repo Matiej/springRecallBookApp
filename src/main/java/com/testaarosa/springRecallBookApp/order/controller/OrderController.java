@@ -114,7 +114,7 @@ class OrderController {
     public ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                               @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
                                               @Valid @RequestBody RestUpdateOrderCommand command) {
-        OrderResponse updateOrderResponse = orderUseCase.updateOrder(command.toUpdateOrderCommand(id));
+        OrderResponse updateOrderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id));
         if (!updateOrderResponse.isSuccess()) {
             return ResponseEntity.notFound()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
