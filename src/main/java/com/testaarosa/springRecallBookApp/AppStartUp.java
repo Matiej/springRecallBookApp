@@ -29,21 +29,6 @@ public class AppStartUp implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Book oneBook = new Book();
-        oneBook.setId(1L);
-        oneBook.setTitle("ALA");
-        oneBook.setYear(1999);
-        oneBook.setUUID("123");
-        oneBook.setPrice(new BigDecimal(11));
-
-        Book oneBook2 = new Book();
-        oneBook2.setId(1L);
-        oneBook2.setTitle("ALA");
-        oneBook2.setYear(1999);
-        oneBook2.setUUID("1232");
-        oneBook2.setPrice(new BigDecimal(11));
-
-        boolean equals = oneBook.equals(oneBook2);
 
         initData();
     }
@@ -60,25 +45,25 @@ public class AppStartUp implements CommandLineRunner {
 //        recipientUseCase.addRecipient(recipient);
 
 
-        Author james1 = new Author("James", "Jeden", 1979);
-        Author james2 = new Author("James", "Dwa", 1979);
-        Author james3 = new Author("James", "Trzy", 1979);
-        authorJpaRepository.save(james1);
-        authorJpaRepository.save(james2);
-        authorJpaRepository.save(james3);
-        Author anna = new Author("Anna", "Babo", 1990);
-        authorJpaRepository.save(anna);
-        Author annaJackowska = new Author("Anna", "Jackowska", 1980);
-        authorJpaRepository.save(annaJackowska);
-
-        catalogUseCase.addBook(CreateBookCommand.builder().title("Harry Potter").authors(new HashSet<>(Arrays.asList(james3.getId(), anna.getId()))).year(2022).price(new BigDecimal("112.00")).availAble(11L)
-                .build());
-        catalogUseCase.addBook(CreateBookCommand.builder().title("Black Out").authors(new HashSet<>(Arrays.asList(anna.getId()))).year(2010).price(new BigDecimal("240.10")).availAble(30L)
-                .build());
-        catalogUseCase.addBook(CreateBookCommand.builder().title("Total Snow").authors(new HashSet<>(Arrays.asList(james1.getId()))).year(2001).price(new BigDecimal("40.10")).availAble(40L)
-                .build());
-        catalogUseCase.addBook(CreateBookCommand.builder().title("FOG").authors(new HashSet<>(Arrays.asList(james1.getId(), annaJackowska.getId()))).year(2001).price(new BigDecimal("10.10")).availAble(50L)
-                .build());
+//        Author james1 = new Author("James", "Jeden", 1979);
+//        Author james2 = new Author("James", "Dwa", 1979);
+//        Author james3 = new Author("James", "Trzy", 1979);
+//        authorJpaRepository.save(james1);
+//        authorJpaRepository.save(james2);
+//        authorJpaRepository.save(james3);
+//        Author anna = new Author("Anna", "Babo", 1990);
+//        authorJpaRepository.save(anna);
+//        Author annaJackowska = new Author("Anna", "Jackowska", 1980);
+//        authorJpaRepository.save(annaJackowska);
+//
+//        catalogUseCase.addBook(CreateBookCommand.builder().title("Harry Potter").authors(new HashSet<>(Arrays.asList(james3.getId(), anna.getId()))).year(2022).price(new BigDecimal("112.00")).availAble(11L)
+//                .build());
+//        catalogUseCase.addBook(CreateBookCommand.builder().title("Black Out").authors(new HashSet<>(Arrays.asList(anna.getId()))).year(2010).price(new BigDecimal("240.10")).availAble(30L)
+//                .build());
+//        catalogUseCase.addBook(CreateBookCommand.builder().title("Total Snow").authors(new HashSet<>(Arrays.asList(james1.getId()))).year(2001).price(new BigDecimal("40.10")).availAble(40L)
+//                .build());
+//        catalogUseCase.addBook(CreateBookCommand.builder().title("FOG").authors(new HashSet<>(Arrays.asList(james1.getId(), annaJackowska.getId()))).year(2001).price(new BigDecimal("10.10")).availAble(50L)
+//                .build());
 
 //        catalogUseCase.addBook(CreateBookCommand.builder().title("Sezon Burz").author("Stefan Burczymucha").year(2005).price(new BigDecimal("281.01")).build());
 //        catalogUseCase.addBook(CreateBookCommand.builder().title("Black Knight").author("Jowi Kielosi").year(2014).price(new BigDecimal("90.89")).build());
