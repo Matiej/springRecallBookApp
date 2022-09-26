@@ -1,7 +1,7 @@
 package com.testaarosa.springRecallBookApp.uploads.infrastructure;
 
-import com.testaarosa.springRecallBookApp.uploads.application.port.SaveUploadCommand;
-import com.testaarosa.springRecallBookApp.uploads.application.port.UploadResponse;
+import com.testaarosa.springRecallBookApp.uploads.application.SaveUploadCommand;
+import com.testaarosa.springRecallBookApp.uploads.application.UploadResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;

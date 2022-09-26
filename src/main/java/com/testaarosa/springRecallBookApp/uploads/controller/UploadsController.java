@@ -1,8 +1,8 @@
 package com.testaarosa.springRecallBookApp.uploads.controller;
 
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
-import com.testaarosa.springRecallBookApp.uploads.application.port.UpdateUploadCommand;
-import com.testaarosa.springRecallBookApp.uploads.application.port.UpdateUploadResponse;
+import com.testaarosa.springRecallBookApp.uploads.application.UpdateUploadCommand;
+import com.testaarosa.springRecallBookApp.uploads.application.UpdateUploadResponse;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

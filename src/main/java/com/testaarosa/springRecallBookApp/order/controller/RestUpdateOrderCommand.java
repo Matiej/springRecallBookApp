@@ -1,6 +1,6 @@
 package com.testaarosa.springRecallBookApp.order.controller;
 
-import com.testaarosa.springRecallBookApp.order.application.port.UpdateOrderCommand;
+import com.testaarosa.springRecallBookApp.order.application.UpdateOrderCommand;
 import lombok.Data;
 
 @Data

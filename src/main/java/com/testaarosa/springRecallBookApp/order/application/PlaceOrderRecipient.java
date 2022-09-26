@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.order.application.port;
+package com.testaarosa.springRecallBookApp.order.application;
 
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import com.testaarosa.springRecallBookApp.recipient.domain.RecipientAddress;
