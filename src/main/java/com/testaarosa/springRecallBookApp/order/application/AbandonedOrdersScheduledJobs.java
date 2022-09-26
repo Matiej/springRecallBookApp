@@ -4,9 +4,7 @@ package com.testaarosa.springRecallBookApp.order.application;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,17 +17,17 @@ import java.util.List;
 import static com.testaarosa.springRecallBookApp.order.domain.OrderStatus.ABANDONED;
 import static com.testaarosa.springRecallBookApp.order.domain.OrderStatus.NEW;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class AbandonedOrdersScheduledJobs {
-    @Value(value = "${days.to.abandon.orders:1}")
+    @Value(value = "${app.days.to.abandon.orders:1}")
     private int DAYS_TO_ABANDON_ORDERS;
     private final OrderJpaRepository repository;
     private final OrderUseCase orderUseCase;
 
     @Transactional
-    @Scheduled(fixedRate = 60_000L)
+    @Scheduled(cron = "${app.orders.abandoned.cron}")
     public void run() {
         log.info("Start job: " + this.getClass().getSimpleName() + " to search orders to change status as ABANDONED");
         LocalDateTime timeStamp = LocalDateTime.now().minusHours(DAYS_TO_ABANDON_ORDERS);// test verson
