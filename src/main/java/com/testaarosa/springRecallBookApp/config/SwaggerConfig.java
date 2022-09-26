@@ -11,21 +11,30 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-    private static final String[] PATH_TO_MACH = {"/catalog/**",
+    private static final String[] PUBLIC_PATH_TO_MACH = {"/catalog/**",
             "/uploads/**",
             "/orders/**",
             "/recipients/**",
             "/authors/**"
     };
 
+    private static final String ADMIN_PATH_TO_MAP = "/admin/**";
+
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("springRecallBookApp-public")
-                .pathsToMatch(PATH_TO_MACH)
+                .pathsToMatch(PUBLIC_PATH_TO_MACH)
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi adminApi() {
+        return GroupedOpenApi.builder()
+                .group("springRecallBookApp-admin")
+                .pathsToMatch(ADMIN_PATH_TO_MAP)
+                .build();
+    }
     @Bean
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()
