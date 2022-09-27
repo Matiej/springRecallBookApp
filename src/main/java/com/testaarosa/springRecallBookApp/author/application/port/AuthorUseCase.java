@@ -17,7 +17,6 @@ public interface AuthorUseCase {
     UpdatedAuthorResponse updateAuthor(UpdateAuthorCommand command);
     void removeById(Long id, Boolean isForceDelete);
 
-    void save(Author author);
 }
 
 

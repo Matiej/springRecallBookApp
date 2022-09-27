@@ -46,9 +46,9 @@ class AuthorController {
                                                 @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
 
         return prepareResponseForGetAll(authorUseCase.findAllByParams(AuthorQueryCommand.builder()
-                .name(name)
-                .lastName(lastName)
-                .yearOfBirth(yearOfBirth)
+                .name(name.orElse(null))
+                .lastName(lastName.orElse(null))
+                .yearOfBirth(yearOfBirth.orElse(null))
                 .limit(limit).build()));
     }
 

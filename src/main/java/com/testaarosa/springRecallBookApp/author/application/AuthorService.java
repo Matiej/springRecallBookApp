@@ -6,6 +6,7 @@ import com.testaarosa.springRecallBookApp.author.dataBase.AuthorJpaRepository;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,24 +29,24 @@ public class AuthorService implements AuthorUseCase {
 
     @Override
     public List<Author> findAllByParams(AuthorQueryCommand authorQuery) {
-        Optional<String> name = authorQuery.getName();
-        Optional<String> lastName = authorQuery.getLastName();
-        Optional<Integer> yearOfBirth = authorQuery.getYearOfBirth();
+        String name = authorQuery.getName();
+        String lastName = authorQuery.getLastName();
+        Integer yearOfBirth = authorQuery.getYearOfBirth();
         int limit = authorQuery.getLimit();
-        if (name.isPresent() && lastName.isPresent() && yearOfBirth.isPresent()) {
-            return repository.findAllByAllParamsLimited(name.get(), lastName.get(), yearOfBirth.get(), limit);
-        } else if (name.isPresent() && lastName.isPresent()) {
-            return repository.findAllByNameAndLastNameLimited(name.get(), lastName.get(), limit);
-        } else if (name.isPresent() && yearOfBirth.isPresent()) {
-            return repository.finAllByNameAndYearOfBirthLimited(name.get(), yearOfBirth.get(), limit);
-        } else if (yearOfBirth.isPresent() && lastName.isPresent()) {
-            return repository.findAllByYearOfBirthAndLastNameLimited(yearOfBirth.get(), lastName.get(), limit);
-        } else if (name.isPresent()) {
-            return repository.findAllByName(name.get(), limit);
-        } else if (lastName.isPresent()) {
-            return repository.findAllByLastName(lastName.get(), limit);
-        } else if (yearOfBirth.isPresent()) {
-            return repository.findAllByYearOfBirth(yearOfBirth.get(), limit);
+        if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(lastName) && yearOfBirth != null) {
+            return repository.findAllByAllParamsLimited(name, lastName, yearOfBirth, limit);
+        } else if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(lastName)) {
+            return repository.findAllByNameAndLastNameLimited(name, lastName, limit);
+        } else if (StringUtils.isNotBlank(name) && yearOfBirth != null) {
+            return repository.finAllByNameAndYearOfBirthLimited(name, yearOfBirth, limit);
+        } else if (yearOfBirth != null && StringUtils.isNotBlank(lastName)) {
+            return repository.findAllByYearOfBirthAndLastNameLimited(yearOfBirth, lastName, limit);
+        } else if (StringUtils.isNotBlank(name)) {
+            return repository.findAllByName(name, limit);
+        } else if (StringUtils.isNotBlank(lastName)) {
+            return repository.findAllByLastName(lastName, limit);
+        } else if (yearOfBirth != null) {
+            return repository.findAllByYearOfBirth(yearOfBirth, limit);
         } else {
             return repository.findAllLimited(limit);
         }
@@ -91,10 +92,5 @@ public class AuthorService implements AuthorUseCase {
                 repository.deleteById(id);
             }
         });
-    }
-
-    @Override
-    public void save(Author author) {
-        repository.save(author);
     }
 }

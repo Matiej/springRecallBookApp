@@ -8,8 +8,8 @@ import java.util.Optional;
 @Value
 @Builder
 public class AuthorQueryCommand {
-    Optional<String> name;
-    Optional<String> lastName;
-    Optional<Integer> yearOfBirth;
+    String name;
+    String lastName;
+    Integer yearOfBirth;
     int limit;
 }
