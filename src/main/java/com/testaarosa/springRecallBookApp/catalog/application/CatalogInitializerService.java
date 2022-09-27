@@ -5,6 +5,7 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.testaarosa.springRecallBookApp.author.application.CreateAuthorCommand;
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
+import com.testaarosa.springRecallBookApp.author.controller.AuthorQueryCommand;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogInitializer;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +24,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 @Service
@@ -35,7 +38,7 @@ class CatalogInitializerService implements CatalogInitializer {
     private final CatalogUseCase catalogUseCase;
 
     @Override
-    @Transactional
+//    @Transactional
     public void init() {
 //        createRecipient();
         placeOrder();
@@ -56,7 +59,7 @@ class CatalogInitializerService implements CatalogInitializer {
 
     private void createBookFromCVS(CsvBook csvbook) {
         Set<Author> authorFromCsv = createAuthorFromCsv(csvbook.getAuthors());
-        Set<Long> authorsId = authorFromCsv.stream().map(Author::getId).collect(Collectors.toSet());
+        Set<Long> authorsId = authorFromCsv.stream().map(Author::getId).collect(toSet());
         CreateBookCommand createBookCommand = new CreateBookCommand(
                 csvbook.getTitle(),
                 authorsId,
@@ -68,16 +71,32 @@ class CatalogInitializerService implements CatalogInitializer {
 
     private Set<Author> createAuthorFromCsv(String nameAndLastName) {
         String[] splitAuthors = nameAndLastName.split(",");
-        return Arrays.stream(splitAuthors).map(authors -> {
-            String[] authorNameAndLastName = authors.split(" ", 2);
-            log.info(authors);
-            CreateAuthorCommand.CreateAuthorCommandBuilder builder = CreateAuthorCommand.builder();
-            builder.name(authorNameAndLastName[0]);
-            if (authorNameAndLastName.length > 1) {
-                builder.lastName(authorNameAndLastName[1]);
-            }
-            return authorUseCase.addAuthor(builder.build());
-        }).collect(Collectors.toSet());
+        return Arrays.stream(splitAuthors)
+                .filter(StringUtils::isNotBlank)
+                .map(authors -> {
+                    String[] authorNameAndLastName = authors.split(" ", 2);
+                    log.info("Author from cvs file -> " + Arrays.toString(authorNameAndLastName));
+                    CreateAuthorCommand.CreateAuthorCommandBuilder builder = CreateAuthorCommand.builder()
+                            .name(authorNameAndLastName[0]);
+
+                    AuthorQueryCommand.AuthorQueryCommandBuilder queryCommandBuilder = AuthorQueryCommand.builder()
+                            .name(authorNameAndLastName[0])
+                            .limit(1);
+
+                    if (authorNameAndLastName.length > 1) {
+                        builder.lastName(authorNameAndLastName[1]);
+                        queryCommandBuilder.lastName(authorNameAndLastName[1]);
+                    }
+                    return authorUseCase.findAllByParams(queryCommandBuilder.build()).stream()
+                            .findFirst().stream().peek(author -> log.info("Author found in data base with id: " + author.getId()
+                                    + " name: " + author.getName() + ", lastName: " + author.getLastName() + "."))
+                            .findFirst()
+                            .orElseGet(() -> {
+                                CreateAuthorCommand command = builder.build();
+                                log.info("Saving new author from csv file: " + command.toString());
+                                return authorUseCase.addAuthor(command);
+                            });
+                }).collect(toSet());
     }
 
     private void placeOrder() {
