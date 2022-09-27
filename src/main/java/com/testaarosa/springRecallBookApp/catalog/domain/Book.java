@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class Book extends BaseEntity {
-    @Column(name = "title")
+    @Column(name = "title", unique = true)
     private String title;
     private Integer year;
     private BigDecimal price;

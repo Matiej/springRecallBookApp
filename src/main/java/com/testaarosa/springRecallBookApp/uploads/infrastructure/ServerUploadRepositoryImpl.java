@@ -47,7 +47,7 @@ class ServerUploadRepositoryImpl implements ServerUploadRepository {
     }
 
     private Path createCoverDirectory() {
-        String coversPath = getUpladsPath()
+        String coversPath = getUplaodsPath()
                 .toString();
         Path pathToCreate = Paths.get(coversPath);
         if (!Files.exists(pathToCreate)) {
@@ -83,7 +83,7 @@ class ServerUploadRepositoryImpl implements ServerUploadRepository {
         return file;
     }
 
-    private StringJoiner getUpladsPath() {
+    private StringJoiner getUplaodsPath() {
         return new StringJoiner(File.separator)
                 .add(System.getProperty(USER_DIR))
                 .add(UPLOAD_PATH);

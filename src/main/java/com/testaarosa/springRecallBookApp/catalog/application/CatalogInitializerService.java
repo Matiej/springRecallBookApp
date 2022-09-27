@@ -9,25 +9,30 @@ import com.testaarosa.springRecallBookApp.author.controller.AuthorQueryCommand;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogInitializer;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
+import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.recipient.application.SaveRecipientCommand;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
+import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.StringJoiner;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Service
@@ -36,6 +41,7 @@ class CatalogInitializerService implements CatalogInitializer {
     private final RecipientUseCase recipientUseCase;
     private final AuthorUseCase authorUseCase;
     private final CatalogUseCase catalogUseCase;
+    private final UploadUseCase uploadUseCase;
 
     @Override
 //    @Transactional
@@ -66,7 +72,34 @@ class CatalogInitializerService implements CatalogInitializer {
                 Integer.valueOf(csvbook.getYear()),
                 new BigDecimal(csvbook.getAmount()),
                 10L);
-        catalogUseCase.addBook(createBookCommand);
+        Book book = catalogUseCase.addBook(createBookCommand);
+        catalogUseCase.updateBookCover(updateBookCoverFromCsv(book, csvbook.getThumbnail()));
+
+    }
+
+    private UpdateBookCoverCommand updateBookCoverFromCsv(Book book, String bookThumbnail) {
+        UpdateBookCoverCommand.UpdateBookCoverCommandBuilder updateBookCoverCommandBuilder = UpdateBookCoverCommand.builder();
+        try {
+            URL thumbnailURL = new URL(bookThumbnail);
+            URLConnection urlConnection = thumbnailURL.openConnection();
+            String contentType = urlConnection.getContentType();
+            byte[] bookCover = IOUtils.toByteArray(thumbnailURL);
+            updateBookCoverCommandBuilder.id(book.getId())
+                    .file(bookCover)
+                    .fileName(prepareFileName(book.getTitle(), contentType))
+                    .fileContentType(contentType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return updateBookCoverCommandBuilder.build();
+    }
+
+    private String prepareFileName(String bookTitle, String contentType) {
+        return new StringJoiner(".")
+                .add(StringUtils.deleteWhitespace(bookTitle).toLowerCase())
+                .add(MimeType.getExtensionByContentType(contentType))
+                .toString();
     }
 
     private Set<Author> createAuthorFromCsv(String nameAndLastName) {
