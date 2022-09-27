@@ -10,6 +10,13 @@ import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogInitializer;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
+import com.testaarosa.springRecallBookApp.order.application.PlaceOrderCommand;
+import com.testaarosa.springRecallBookApp.order.application.PlaceOrderItem;
+import com.testaarosa.springRecallBookApp.order.application.PlaceOrderRecipient;
+import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
+import com.testaarosa.springRecallBookApp.order.domain.Order;
+import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
+import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.application.SaveRecipientCommand;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
@@ -22,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,6 +37,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -41,14 +50,14 @@ class CatalogInitializerService implements CatalogInitializer {
     private final RecipientUseCase recipientUseCase;
     private final AuthorUseCase authorUseCase;
     private final CatalogUseCase catalogUseCase;
-    private final UploadUseCase uploadUseCase;
+    private final OrderUseCase orderUseCase;
 
     @Override
-//    @Transactional
+    @Transactional
     public void init() {
-//        createRecipient();
-        placeOrder();
         addBook();
+        createRecipient();
+        placeOrder();
     }
 
     private void addBook() {
@@ -132,20 +141,47 @@ class CatalogInitializerService implements CatalogInitializer {
                 }).collect(toSet());
     }
 
-    private void placeOrder() {
-
-    }
-
     private void createRecipient() {
-        SaveRecipientCommand recipient = SaveRecipientCommand.builder()
-                .name("Ksawery Nowak")
+        SaveRecipientCommand ksawery = SaveRecipientCommand.builder()
+                .name("Ksawery")
+                .lastName("Nowak")
                 .phone("661555777")
-                .street("Starej Drogi 11")
+                .street("Starej Drogi")
+                .buildingNumber("11")
+                .apartmentNumber("2")
+                .district("Blabla")
                 .city("Warszawa")
                 .zipCode("01-001")
                 .email("ksawer@gmail.com")
                 .build();
-        recipientUseCase.addRecipient(recipient);
+        recipientUseCase.addRecipient(ksawery);
+    }
+
+    private void placeOrder() {
+
+        PlaceOrderItem placeOrderItem1 = new PlaceOrderItem(2L, 2);
+        PlaceOrderItem placeOrderItem2 = new PlaceOrderItem(11L, 1);
+        PlaceOrderItem placeOrderItem3 = new PlaceOrderItem(1L, 3);
+
+        PlaceOrderRecipient placeOrderRecipient = PlaceOrderRecipient.builder()
+                .name("Marek")
+                .lastName("Kowlaski")
+                .phone("113 5564 646")
+                .street("Malowniczka")
+                .buildingNumber("2a")
+                .district("Upaupa")
+                .city("Sopot")
+                .zipCode("55-021")
+                .email("kowalma@gmail.com")
+                .build();
+
+        PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.builder()
+                .itemList(List.of(placeOrderItem1, placeOrderItem2, placeOrderItem3))
+                .orderStatus(OrderStatus.NEW)
+                .placeOrderRecipient(placeOrderRecipient)
+                .build();
+
+        orderUseCase.placeOrder(placeOrderCommand);
 
     }
 
