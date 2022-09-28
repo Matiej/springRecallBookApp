@@ -5,11 +5,16 @@ import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.application.CreateBookCommand;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -17,10 +22,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.annotation.DirtiesContext.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class CatalogControllerIT {
 
     @Autowired
@@ -30,16 +37,39 @@ class CatalogControllerIT {
     @Autowired
     CatalogUseCase catalogUseCase;
 
+    @BeforeEach
+    public void init() {
+        prepareAdnAddBooks();
+    }
+
     @Test
+    @DisplayName("Should method find all 2 books saved in H2 database. No params given to the method.")
     public void getAllBooksTest() {
         //given
-        List<Book> books = prepareAdnAddBooks();
 
         //when
         ResponseEntity<List<Book>> catalogControllerAll = catalogController.getAll(Optional.empty(), Optional.empty(), 10);
 
         //then
         assertEquals(2, catalogControllerAll.getBody().size());
+
+    }
+
+    @Test
+    @DisplayName("Should method find all 1 book saved in H2 database. Author name give.")
+    public void getAllBooksForGivenAuthorTest() {
+        //given
+        String givenAuthorName = "Brian";
+        String expectedBookTitle = "Mama mia";
+
+        //when
+        ResponseEntity<List<Book>> catalogControllerAll = catalogController.getAll(Optional.empty(),
+                Optional.of(givenAuthorName), 10);
+
+        //then
+        List<Book> books = catalogControllerAll.getBody();
+        assertEquals(1, books.size());
+        assertEquals(expectedBookTitle, books.get(0).getTitle());
 
     }
 
