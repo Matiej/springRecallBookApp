@@ -20,6 +20,7 @@ import java.util.Set;
 public class Book extends BaseEntity {
     @Column(name = "title", unique = true)
     private String title;
+    @Column(name = "bookYear")
     private Integer year;
     private BigDecimal price;
     private Long bookCoverId;
