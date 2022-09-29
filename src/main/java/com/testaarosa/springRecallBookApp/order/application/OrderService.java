@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class OrderService implements OrderUseCase {
+class OrderService implements OrderUseCase {
     private final OrderJpaRepository repository;
     private final RecipientUseCase recipientUseCase;
     private final CatalogUseCase catalogUseCase;
