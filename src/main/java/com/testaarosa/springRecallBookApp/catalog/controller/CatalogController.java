@@ -50,7 +50,8 @@ class CatalogController {
     public ResponseEntity<List<Book>> getAll(
             @RequestParam Optional<String> title,
             @RequestParam Optional<String> author,
-            @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
+            @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false)
+            @Min(value = 1, message = "Page size cannot be less than one") int limit) {
         Pageable pageable = Pageable.ofSize(limit);
         if (title.isPresent() && author.isPresent()) {
             return prepareResponseForGetAll(catalogUseCase.findByTitleAndAuthor(title.get(), author.get(), pageable));
