@@ -4,7 +4,7 @@ import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import com.testaarosa.springRecallBookApp.uploads.application.UploadResponse;
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
 import java.util.Objects;
 
 @Builder
