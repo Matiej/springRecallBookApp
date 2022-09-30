@@ -1,6 +1,6 @@
 package com.testaarosa.springRecallBookApp.uploads.application;
 
-import com.testaarosa.springRecallBookApp.uploads.application.port.*;
+import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
 import com.testaarosa.springRecallBookApp.uploads.domain.UploadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

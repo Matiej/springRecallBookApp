@@ -24,7 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,5 +61,9 @@ public class CatalogControllerWebTest extends CatalogTestBase {
                 .andExpect(status().is(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(jsonInString(givenBooks)));
+
+        //then
+        verify(catalogUseCase, times(1)).findAllEager(Pageable.ofSize(givenLimit));
+        verifyNoMoreInteractions(catalogUseCase);
     }
 }

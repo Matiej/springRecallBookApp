@@ -2,7 +2,7 @@ package com.testaarosa.springRecallBookApp.catalog.application;
 
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
-import com.testaarosa.springRecallBookApp.catalog.application.port.*;
+import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.uploads.application.SaveUploadCommand;
