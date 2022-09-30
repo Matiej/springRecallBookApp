@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.catalog.controller;
 
 import com.testaarosa.springRecallBookApp.author.dataBase.AuthorJpaRepository;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
+import com.testaarosa.springRecallBookApp.catalog.CatalogTestBase;
 import com.testaarosa.springRecallBookApp.catalog.application.CreateBookCommand;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class CatalogControllerIT {
+class CatalogControllerTestIT extends CatalogTestBase {
 
     @Autowired
     private CatalogController catalogController;
@@ -36,15 +37,10 @@ class CatalogControllerIT {
     @Autowired
     private CatalogUseCase catalogUseCase;
 
-    @BeforeAll
-    static void init(TestInfo testInfo) {
-        log.info("Start test suite: {}.", testInfo.getTestClass());
-    }
-
     @BeforeEach
     void setup(TestInfo testInfo) {
         log.info("Starting test: {}.", testInfo.getDisplayName());
-        prepareAdnAddBooks();
+        prepareAndAddBooks();
     }
 
     @Test
@@ -131,7 +127,7 @@ class CatalogControllerIT {
     }
 
 
-    private List<Book> prepareAdnAddBooks() {
+    private List<Book> prepareAndAddBooks() {
         List<Author> authors = authorJpaRepository.saveAll(prepareAuthors());
         CreateBookCommand effective_java = CreateBookCommand.builder()
                 .authors(Set.of(authors.get(0).getId()))
