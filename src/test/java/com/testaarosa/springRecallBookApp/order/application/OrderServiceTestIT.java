@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -20,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class OrderServiceTestIT {
+    //todo 1 check book reduceQuantity, 2 check recipient if it is updated if one is saved 3 if it is  saved well
     @Autowired
     private BookJpaRepository bookJpaRepository;
 
@@ -42,7 +45,7 @@ class OrderServiceTestIT {
     }
 
     @Test
-    @DisplayName("Should user can place order, method placeOrder()")
+    @DisplayName("Should user place an order, method placeOrder()")
     void userCanPlaceOrder() {
         //given
         List<Book> books = prepareAdnAddBooks();
@@ -59,6 +62,31 @@ class OrderServiceTestIT {
         assertTrue(orderResponse.isSuccess());
     }
 
+    @Test
+    @DisplayName("Should not place an order, not enough available books, method placeOrder()")
+    void userCannotPlaceOrder() {
+        //given
+        List<Book> books = prepareAdnAddBooks();
+        int orderQuantity = 100;
+        PlaceOrderCommand placeOrderCommand = PlaceOrderCommand.builder()
+                .placeOrderRecipient(preparePlaceOrderRecipient())
+                .item(new PlaceOrderItem(books.get(0).getId(), orderQuantity))
+                .item(new PlaceOrderItem(books.get(1).getId(), 1))
+                .build();
+        PlaceOrderItem placeOrderItem = placeOrderCommand.getItemList().get(0);
+        String expectedErrorMessage = "Too many books id: " + placeOrderItem.getBookId() + " requested: "
+                + orderQuantity + " of: " + books.get(0).getAvailable() + " available";
+
+        //when
+        Throwable throwable = catchThrowable(() -> orderService.placeOrder(placeOrderCommand));
+
+        //then
+        then(throwable).as("An IllegalArgumentException should be thrown if more books as available")
+                .isInstanceOf(IllegalArgumentException.class)
+                .as("Check that message equal expected message")
+                .hasMessageContaining(expectedErrorMessage);
+    }
+
     private PlaceOrderRecipient preparePlaceOrderRecipient() {
         return PlaceOrderRecipient.builder()
                 .name("Jan")
@@ -69,7 +97,7 @@ class OrderServiceTestIT {
 
     private List<Book> prepareAdnAddBooks() {
 
-        Book effective_java= new Book(
+        Book effective_java = new Book(
                 "Effective Java",
                 2005,
                 new BigDecimal(10),
