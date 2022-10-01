@@ -63,13 +63,6 @@ class CatalogController {
         return prepareResponseForGetAll(catalogUseCase.findAllEager(pageable));
     }
 
-    private List<Book> limitBookList(List<Book> bookList, int limit) {
-        return bookList
-                .stream()
-                .limit(limit)
-                .collect(Collectors.toList());
-    }
-
     private ResponseEntity<List<Book>> prepareResponseForGetAll(List<Book> collection) {
         return ResponseEntity.ok()
                 .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))

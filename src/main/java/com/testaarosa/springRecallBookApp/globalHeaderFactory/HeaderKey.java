@@ -4,7 +4,7 @@ public enum HeaderKey {
     STATUS("Status"),
     MESSAGE("Message"),
     CREATED_AT("CreatedAt"),
-    UPDATED_AT("UpadtedAt"),
+    UPDATED_AT("UpdatedAt"),
     SERVER_FILENAME("ServerFileName");
 
     private String headerKeyLabel;
