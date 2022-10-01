@@ -107,6 +107,9 @@ class CatalogService implements CatalogUseCase {
         if (command.getPrice() != null && command.getPrice().compareTo(BigDecimal.ZERO) > -1) {
             book.setPrice(command.getPrice());
         }
+        if(command.getAvailable() != null) {
+            book.setAvailable(command.getAvailable());
+        }
         return book;
     }
 
