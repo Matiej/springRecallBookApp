@@ -107,7 +107,7 @@ class CatalogService implements CatalogUseCase {
         if (command.getPrice() != null && command.getPrice().compareTo(BigDecimal.ZERO) > -1) {
             book.setPrice(command.getPrice());
         }
-        if(command.getAvailable() != null) {
+        if (command.getAvailable() != null) {
             book.setAvailable(command.getAvailable());
         }
         return book;
@@ -131,17 +131,20 @@ class CatalogService implements CatalogUseCase {
         log.info("Received cover command: " + command.getFileName()
                 + ", bytes: " + command.getFile().length);
         bookJpaRepository.findById(command.getId())
-                .ifPresent(book -> {
-                    log.info("Book, id: " + book.getId() + " has been found");
-                    UploadResponse uploadResponse = uploadUseCase.save(SaveUploadCommand.builder()
-                            .fileName(command.getFileName())
-                            .file(command.getFile())
-                            .contentType(command.getFileContentType())
-                            .build());
-                    book.setBookCoverId(uploadResponse.getId());
-                    Book savedBook = bookJpaRepository.save(book);
-                    log.info("Book id " + savedBook.getId() + " has been updated. Cover path added: " + uploadResponse.getPath());
-                });
+                .ifPresentOrElse(book -> {
+                            log.info("Book, id: " + book.getId() + " has been found");
+                            UploadResponse uploadResponse = uploadUseCase.save(SaveUploadCommand.builder()
+                                    .fileName(command.getFileName())
+                                    .file(command.getFile())
+                                    .contentType(command.getFileContentType())
+                                    .build());
+                            book.setBookCoverId(uploadResponse.getId());
+                            Book savedBook = bookJpaRepository.save(book);
+                            log.info("Book id " + savedBook.getId() + " has been updated. Cover path added: " + uploadResponse.getPath());
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("Can't find book ID:" + command.getId());
+                        });
     }
 
     @Override
