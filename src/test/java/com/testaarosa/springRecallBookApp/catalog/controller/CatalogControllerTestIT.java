@@ -7,26 +7,42 @@ import com.testaarosa.springRecallBookApp.catalog.application.CreateBookCommand;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
+import com.testaarosa.springRecallBookApp.uploads.dataBase.UploadJpaRepository;
+import com.testaarosa.springRecallBookApp.uploads.domain.Upload;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintViolationException;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,14 +50,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@TestPropertySource("classpath:application-test.properties")
 class CatalogControllerTestIT extends CatalogTestBase {
-
+    @Value("${cover.picture.path}")
+    private String UPLOAD_PATH;
+    @Value("${cover.user.app.dir}")
+    private String USER_DIR;
     @Autowired
     private CatalogController catalogController;
     @Autowired
     private AuthorJpaRepository authorJpaRepository;
     @Autowired
     private CatalogUseCase catalogUseCase;
+    @Autowired
+    private UploadUseCase uploadUseCase;
+    @Autowired
+    private UploadJpaRepository uploadJpaRepository;
 
     @BeforeEach
     void setup(TestInfo testInfo) {
@@ -276,7 +300,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @DisplayName("Should updateBook() create and add book into DB")
+    @DisplayName("Should updateBook() update book title and available.")
     @Transactional
     public void shouldUpdateBook() {
         //given
@@ -305,6 +329,212 @@ class CatalogControllerTestIT extends CatalogTestBase {
                 () -> assertEquals(100L, updatedBook.getAvailable()));
     }
 
+    @Test
+    @DisplayName("Should updateBook() not update book because of wrong book ID")
+    @Transactional
+    public void shouldNotUpdateBook() {
+        //given
+        List<Author> authors = prepareAuthors();
+        authorJpaRepository.saveAll(authors);
+
+        RestBookCommand restBookCommand = prepareRestBookCommand();
+        String oldBookTitle = restBookCommand.getTitle();
+        Long oldBookAvailable = restBookCommand.getAvailable();
+        catalogUseCase.addBook(restBookCommand.toCreateBookCommand());
+
+        Long bookIdToUpdate = 99L;
+        String expectedErrorMessage = "Book with ID: 99, not found for update.";
+
+        //when
+        String titleToUpdate = "Updated Title 3";
+        restBookCommand.setTitle(titleToUpdate);
+        restBookCommand.setAvailable(101L);
+        ResponseEntity<Object> response = catalogController.updateBook(bookIdToUpdate, restBookCommand);
+        Book notUpdatedBook = catalogUseCase.findOne(1L);
+
+        //then
+        assertNotNull(response);
+        List<String> message = response.getHeaders().get(HeaderKey.MESSAGE.getHeaderKeyLabel());
+        assertAll("Check response headers, status code and saved URI ",
+                () -> assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode()),
+                () -> assertNotNull(message),
+                () -> assertTrue(message.size() > 0),
+                () -> assertThat(message.get(0)).contains(expectedErrorMessage));
+        assertAll("Check updated book fields",
+                () -> assertEquals(oldBookTitle, notUpdatedBook.getTitle()),
+                () -> assertEquals(oldBookAvailable, notUpdatedBook.getAvailable()));
+    }
+
+    @Test
+    @DisplayName("Non existing author. Should updateBook() throws an exception.")
+    @Transactional
+    public void shouldNotUpdateBookNonExistingAuthorThrowsException() {
+        //given
+        List<Author> authors = prepareAuthors();
+        authorJpaRepository.saveAll(authors);
+
+        RestBookCommand restBookCommand = prepareRestBookCommand();
+        catalogUseCase.addBook(restBookCommand.toCreateBookCommand());
+
+        Long bookIdToUpdate = 1L;
+        Long authorIdToUpdate = 3L;
+        String expectedErrorMessage = "No author found with ID: 3";
+
+        //when
+        restBookCommand.setAuthors(Set.of(authorIdToUpdate));
+        Throwable throwable = catchThrowable(() -> catalogController.updateBook(bookIdToUpdate, restBookCommand));
+
+        //then
+        then(throwable).as("An IllegalArgumentException should be thrown if no given author in data base")
+                .isInstanceOf(IllegalArgumentException.class)
+                .as("Check that message equal expected message")
+                .hasMessageContaining(expectedErrorMessage);
+    }
+
+    @Test
+    @DisplayName("Should addBookCover() add picture file to the test directory and create upload")
+    @Transactional
+    public void shouldAddBookCover() throws URISyntaxException, IOException {
+        //given
+        String testFileName = "testCover.jpg";
+
+        //when
+        ResponseEntity<?> response = uploadBookCover(testFileName);
+
+        //then
+        assertAll("Check response",
+                () -> assertNotNull(response),
+                () -> assertEquals(HttpStatus.ACCEPTED, response.getStatusCode()));
+
+        Book bookWithCover = catalogUseCase.findOne(1L);
+        Upload upload = uploadJpaRepository.getReferenceById(bookWithCover.getBookCoverId());
+
+        assertAll("Check upload fields, and if upland is not null and if file exist in test direct",
+                () -> assertNotNull(upload),
+                () -> assertTrue(Files.exists(Path.of(upload.getPath()))),
+                () -> assertEquals(testFileName, upload.getFileName()),
+                () -> assertEquals(MediaType.IMAGE_JPEG_VALUE, upload.getContentType()),
+                () -> assertNotNull(upload.getServerFileName()),
+                () -> assertThat(upload.getServerFileName()).contains(testFileName));
+        // clean
+        cleanAfterUploadTest();
+    }
+
+    @Test
+    @DisplayName("Should addBookCover() throws exception, non existing book")
+    @Transactional
+    public void shouldAddBookCoverThrowsException() throws URISyntaxException {
+        //given
+        Long nonExistingBookId = 99L;
+        String expectedErrorMessage = "Can't find book ID:99";
+
+        String testFileName = "testCover.jpg";
+        MultipartFile multipartFile = prepareMultiPartFile(testFileName, MediaType.IMAGE_JPEG_VALUE);
+
+        //when
+        Throwable throwable = catchThrowable(() -> catalogController.addBookCover(nonExistingBookId, multipartFile));
+
+        //then
+        then(throwable).as("An IllegalArgumentException should be thrown if no given author in data base")
+                .isInstanceOf(IllegalArgumentException.class)
+                .as("Check that message equal expected message")
+                .hasMessageContaining(expectedErrorMessage);
+    }
+
+    @Test
+    @DisplayName("Should deleteBookCover() delete picture form server and remove upload")
+    @Transactional
+    public void shouldDeleteBookCover() throws URISyntaxException, IOException {
+        //given
+        String testFileName = "testCoverToDelete.jpg";
+        ResponseEntity<?> response = uploadBookCover(testFileName);
+        assertAll("Check response after adding a book.",
+                () -> assertNotNull(response),
+                () -> assertEquals(HttpStatus.ACCEPTED, response.getStatusCode()));
+
+        //when
+        Book bookWithCover = catalogUseCase.findOne(1L);
+        Upload upload = uploadJpaRepository.getReferenceById(bookWithCover.getBookCoverId());
+        catalogController.deleteCoverByBookId(1L);
+
+        //then
+        Optional<Upload> optionalUpload = uploadJpaRepository.findById(upload.getId());
+        assertTrue(optionalUpload.isEmpty());
+        Path testDir = new File(upload.getPath()).getAbsoluteFile().toPath();
+        assertTrue(Files.notExists(testDir));
+        //clean
+        cleanAfterUploadTest();
+    }
+
+    @Test
+    @DisplayName("Should deleteById() delete book by given ID")
+    public void shouldDeleteById() {
+        //given
+        RestBookCommand restBookCommand = prepareRestBookCommand();
+        List<Author> authors = prepareAuthors();
+        authorJpaRepository.saveAll(authors);
+        catalogController.addBook(restBookCommand);
+
+        //when
+        Book book = catalogUseCase.findOne(1L);
+        catalogUseCase.removeById(book.getId());
+
+        //then
+        Optional<Book> optionalBook = catalogUseCase.findById(book.getId());
+        assertTrue(optionalBook.isEmpty());
+    }
+
+
+    private ResponseEntity<?> uploadBookCover(String fileName) throws URISyntaxException, IOException {
+        RestBookCommand restBookCommand = prepareRestBookCommand();
+        List<Author> authors = prepareAuthors();
+        authorJpaRepository.saveAll(authors);
+        catalogController.addBook(restBookCommand);
+        Book createdBook = catalogUseCase.findOne(1L);
+        MultipartFile multipartFile = prepareMultiPartFile(fileName, MediaType.IMAGE_JPEG_VALUE);
+        return catalogController.addBookCover(createdBook.getId(), multipartFile);
+    }
+
+
+    private MultipartFile prepareMultiPartFile(String fileName, String mediaType) throws URISyntaxException {
+        return new MockMultipartFile(
+                "file",
+                fileName,
+                mediaType,
+                "<<some pictureData>>".getBytes(StandardCharsets.UTF_8));
+    }
+
+    private void cleanAfterUploadTest() throws IOException {
+        log.info("Trying to clean after test");
+        String testPath = new StringJoiner(File.separator)
+                .add(System.getProperty(USER_DIR))
+                .add(UPLOAD_PATH)
+                .toString();
+        Path testDir = new File(testPath).getAbsoluteFile().toPath();
+        if (Files.exists(testDir)) {
+            Stream<Path> fileLIst = Files.list(testDir);
+            fileLIst.forEach(path -> {
+                try {
+                    log.info("Deleteing file-> " + path.toString());
+                    Files.deleteIfExists(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            Files.delete(testDir);
+            log.info("Directory was deleted: " + testDir);
+        } else {
+            log.warn("Can not delete directory " + testDir + ", not exist but should!");
+        }
+    }
+
+    private String getPath() {
+        String testPath = new StringJoiner(File.separator)
+                .add(System.getProperty(USER_DIR))
+                .add(UPLOAD_PATH)
+                .toString();
+        return testPath;
+    }
 
     private RestBookCommand prepareRestBookCommand() {
         RestBookCommand effectiveJava2RestCommand = new RestBookCommand(

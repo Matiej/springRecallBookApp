@@ -91,7 +91,8 @@ class OrderService implements OrderUseCase {
                         },
                         () -> orderResponseBuilder
                                 .success(false)
-                                .errorList(List.of("Can't find order with ID: " + id))), () -> orderResponseBuilder
+                                .errorList(List.of("Can't find order with ID: " + id))),
+                () -> orderResponseBuilder
                 .success(false)
                 .errorList(List.of("Unable to find given order status: '" + orderStatus + "'.")));
         return orderResponseBuilder.build();

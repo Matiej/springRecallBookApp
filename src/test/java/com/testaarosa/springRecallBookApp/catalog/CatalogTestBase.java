@@ -3,8 +3,6 @@ package com.testaarosa.springRecallBookApp.catalog;
 import com.testaarosa.springRecallBookApp.BaseTest;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.TestInfo;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

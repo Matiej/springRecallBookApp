@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -158,7 +157,7 @@ class CatalogController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Removed successful"),
     })
-    public void deleteCoverByBookId(@NotNull(message = "BookId filed can't be null")
+    public void deleteCoverByBookId(@PathVariable("id") @NotNull(message = "BookId filed can't be null")
                                     @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
         catalogUseCase.removeCoverByBookId(id);
     }
