@@ -52,6 +52,20 @@ class OrderService implements OrderUseCase {
         return OrderResponse.success(savedOrder.getId());
     }
 
+    @Override
+    @Transactional
+    public OrderResponse updateOrderItems(UpdateOrderCommand command) {
+        Set<OrderItem> orderItemList = getOrderItems(command.getItemList());
+        Order order = repository.findById(command.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
+        revokeBooksQuantity(order.getItemList());
+        order.replaceOrderItems(orderItemList);
+        reduceBooksQuantity(orderItemList);
+        order.setLastUpdatedAt(LocalDateTime.now());
+        Order savedOrder = repository.save(order);
+        return OrderResponse.success(savedOrder.getId());
+    }
+
     private Set<Book> reduceBooksQuantity(Set<OrderItem> orderItemList) {
         return orderItemList.stream()
                 .map(item -> {
@@ -62,40 +76,39 @@ class OrderService implements OrderUseCase {
     }
 
     @Override
-    @Transactional
-    public OrderResponse updateOrderItems(UpdateOrderCommand command) {
-
-        Set<OrderItem> orderItemList = getOrderItems(command.getItemList());
-        Order order = repository.findById(command.getOrderId())
-                .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
-
-        order.replaceOrderItems(orderItemList);
-        order.setLastUpdatedAt(LocalDateTime.now());
-        Order savedOrder = repository.save(order);
-        return OrderResponse.success(savedOrder.getId());
+    public OrderResponse updateOrderStatus(Long id, String orderStatus) {
+        OrderResponse.OrderResponseBuilder orderResponseBuilder = OrderResponse.builder();
+        OrderStatus.parseOrderString(orderStatus)
+                .ifPresentOrElse(status -> repository.findById(id)
+                                .ifPresentOrElse(order -> {
+                                            UpdateOrderStatusResult updateOrderStatusResult = order.updateOrderStatus(status);
+                                            if (updateOrderStatusResult.isRevoked()) {
+                                                revokeBooksQuantity(order.getItemList());
+                                            }
+                                            repository.save(order);
+                                            orderResponseBuilder
+                                                    .orderId(id)
+                                                    .success(true);
+                                        },
+                                        () -> orderResponseBuilder
+                                                .success(false)
+                                                .errorList(List.of("Can't find order with ID: " + id))),
+                        () -> orderResponseBuilder
+                                .success(false)
+                                .errorList(List.of("Unable to find given order status: '" + orderStatus + "'.")));
+        return orderResponseBuilder.build();
     }
 
     @Override
-    public OrderResponse updateOrderStatus(Long id, String orderStatus) {
-        OrderResponse.OrderResponseBuilder orderResponseBuilder = OrderResponse.builder();
-        OrderStatus.parseOrderString(orderStatus).ifPresentOrElse(status -> repository.findById(id)
-                .ifPresentOrElse(order -> {
-                            UpdateOrderStatusResult updateOrderStatusResult = order.updateOrderStatus(status);
-                            if(updateOrderStatusResult.isRevoked()) {
-                                revokeBooksQuantity(order.getItemList());
-                            }
-                            repository.save(order);
-                            orderResponseBuilder
-                                    .orderId(id)
-                                    .success(true);
-                        },
-                        () -> orderResponseBuilder
-                                .success(false)
-                                .errorList(List.of("Can't find order with ID: " + id))),
-                () -> orderResponseBuilder
-                .success(false)
-                .errorList(List.of("Unable to find given order status: '" + orderStatus + "'.")));
-        return orderResponseBuilder.build();
+    @Transactional
+    public void removeOrderById(Long id) {
+        repository.findById(id).ifPresentOrElse(order -> {
+                    revokeBooksQuantity(order.getItemList());
+                    repository.deleteById(id);
+                },
+                () -> {
+                    throw new IllegalArgumentException("Cannot find order ID: " + id);
+                });
     }
 
     private Set<Book> revokeBooksQuantity(Set<OrderItem> orderItemList) {
@@ -105,11 +118,6 @@ class OrderService implements OrderUseCase {
                     book.setAvailable(book.getAvailable() + item.getQuantity());
                     return book;
                 }).collect(Collectors.toSet());
-    }
-
-    @Override
-    public void removeOrderById(Long id) {
-        repository.deleteById(id);
     }
 
     private Set<OrderItem> getOrderItems(List<PlaceOrderItem> placeOrderItems) {
