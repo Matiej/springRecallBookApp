@@ -3,21 +3,19 @@ package com.testaarosa.springRecallBookApp.order.application;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.Collections;
-import java.util.List;
-
 @Value
 @Builder
 public class OrderResponse {
     boolean success;
     Long orderId;
-    List<String> errorList;
+    String error;
 
     public static OrderResponse success(Long orderId) {
-        return new OrderResponse(true, orderId, Collections.emptyList());
+        return new OrderResponse(true, orderId, null);
     }
 
-    public static OrderResponse failure(List<String> errors) {
-        return new OrderResponse(false, null, errors);
+    public static OrderResponse failure(String error, Long orderId)
+    {
+        return new OrderResponse(false, orderId, error);
     }
 }

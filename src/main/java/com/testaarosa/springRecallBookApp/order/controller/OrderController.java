@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.order.controller;
 
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.order.application.OrderResponse;
+import com.testaarosa.springRecallBookApp.order.application.UpdateOrderStatusCommand;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
@@ -96,7 +97,7 @@ class OrderController {
             return ResponseEntity.notFound()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.POST.name())
                     .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
-                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getErrorList().toString())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getError().toString())
                     .build();
         }
         return ResponseEntity.created(savedUri)
@@ -114,12 +115,12 @@ class OrderController {
     public ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                               @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
                                               @Valid @RequestBody RestUpdateOrderCommand command) {
-        OrderResponse updateOrderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id));
+        OrderResponse updateOrderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id, "superadmin@admin.org"));
         if (!updateOrderResponse.isSuccess()) {
             return ResponseEntity.notFound()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
                     .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
-                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), updateOrderResponse.getErrorList().toString())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), updateOrderResponse.getError().toString())
                     .build();
         }
         return ResponseEntity.created(getUri(updateOrderResponse.getOrderId()))
@@ -151,14 +152,18 @@ class OrderController {
     public ResponseEntity<?> updateOrderStatus(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                                @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
                                                @Valid @RequestBody RestUpdateOrderStatusCommand command) {
-
-        OrderResponse orderResponse = orderUseCase.updateOrderStatus(id, command.getOrderStatus());
+//todo fix email when security is implement
+        OrderResponse orderResponse = orderUseCase.updateOrderStatus(UpdateOrderStatusCommand.builder()
+                .orderId(id)
+                .orderStatus(OrderStatus.valueOf(command.getOrderStatus()))
+                .recipientEmail("superadmin@admin.org")
+                .build());
         if (!orderResponse.isSuccess()) {
-            return ResponseEntity.notFound()
+            return ResponseEntity.status(404)
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PUT.name())
                     .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
-                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getErrorList().toString())
-                    .build();
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getError())
+                    .body(orderResponse);
         }
         return ResponseEntity.created(getUri(orderResponse.getOrderId()))
                 .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PUT))

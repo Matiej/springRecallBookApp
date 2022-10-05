@@ -8,9 +8,10 @@ import java.util.List;
 
 @Builder
 @Value
-public class UpdateOrderCommand {
+public class UpdateOrderItemsCommand {
     @Singular("item")
     List<PlaceOrderItem> itemList;
     Long orderId;
+    String recipientEmail;
 
 }

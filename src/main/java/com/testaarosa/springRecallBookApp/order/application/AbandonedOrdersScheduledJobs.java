@@ -36,7 +36,12 @@ public class AbandonedOrdersScheduledJobs {
         log.info("Found " + ordersToAbandon.size() + " orders to change status to ABANDONED");
         ordersToAbandon
                 .forEach(order -> {
-                    orderUseCase.updateOrderStatus(order.getId(), ABANDONED.name());
+                    UpdateOrderStatusCommand command = UpdateOrderStatusCommand.builder()
+                            .orderId(order.getId())
+                            .orderStatus(order.getOrderStatus())
+                            .recipientEmail("superadmin@admin.org")//todo-Maciek fix when security is implemented
+                            .build();
+                    orderUseCase.updateOrderStatus(command);
                     log.info("Order with ID: " + order.getId() + " was updated. Status has changed to: " + ABANDONED);
                 });
         log.info("End of job: " + this.getClass().getSimpleName());

@@ -1,15 +1,16 @@
 package com.testaarosa.springRecallBookApp.order.controller;
 
-import com.testaarosa.springRecallBookApp.order.application.UpdateOrderCommand;
+import com.testaarosa.springRecallBookApp.order.application.UpdateOrderItemsCommand;
 import lombok.Data;
 
 @Data
 class RestUpdateOrderCommand extends RestOrderCommand {
 
-    UpdateOrderCommand toUpdateOrderCommand(Long orderId) {
-        return UpdateOrderCommand.builder()
+    UpdateOrderItemsCommand toUpdateOrderCommand(Long orderId, String recipientEmail) {
+        return UpdateOrderItemsCommand.builder()
                 .itemList(getPlaceOrderItems())
                 .orderId(orderId)
+                .recipientEmail(recipientEmail)
                 .build();
 
     }
