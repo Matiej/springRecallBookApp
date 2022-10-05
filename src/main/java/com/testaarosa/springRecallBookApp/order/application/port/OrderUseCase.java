@@ -2,14 +2,15 @@ package com.testaarosa.springRecallBookApp.order.application.port;
 
 import com.testaarosa.springRecallBookApp.order.application.OrderResponse;
 import com.testaarosa.springRecallBookApp.order.application.PlaceOrderCommand;
-import com.testaarosa.springRecallBookApp.order.application.UpdateOrderCommand;
+import com.testaarosa.springRecallBookApp.order.application.UpdateOrderItemsCommand;
+import com.testaarosa.springRecallBookApp.order.application.UpdateOrderStatusCommand;
 
 public interface OrderUseCase {
 
     OrderResponse placeOrder(PlaceOrderCommand command);
-    OrderResponse updateOrderItems(UpdateOrderCommand command);
+    OrderResponse updateOrderItems(UpdateOrderItemsCommand command);
 
     void removeOrderById(Long id);
 
-    OrderResponse updateOrderStatus(Long id, String orderStatus);
+    OrderResponse updateOrderStatus(UpdateOrderStatusCommand command);
 }
