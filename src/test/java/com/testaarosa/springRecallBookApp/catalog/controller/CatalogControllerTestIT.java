@@ -5,6 +5,7 @@ import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.CatalogTestBase;
 import com.testaarosa.springRecallBookApp.catalog.application.CreateBookCommand;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
+import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
@@ -63,7 +64,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @Autowired
     private CatalogUseCase catalogUseCase;
     @Autowired
-    private UploadUseCase uploadUseCase;
+    private BookJpaRepository bookJpaRepository;
     @Autowired
     private UploadJpaRepository uploadJpaRepository;
 
@@ -195,8 +196,8 @@ class CatalogControllerTestIT extends CatalogTestBase {
         Long givenBookId = 1L;
         String bookTitle = "Effective Java";
         Integer year = 2005;
-        Long available = 50L;
-        BigDecimal price = new BigDecimal(50.00);
+        Long available = 12L;
+        BigDecimal price = new BigDecimal("50.00");
 
         //when
         ResponseEntity<Book> response = catalogController.getBookById(givenBookId);
@@ -484,7 +485,6 @@ class CatalogControllerTestIT extends CatalogTestBase {
         assertTrue(optionalBook.isEmpty());
     }
 
-
     private ResponseEntity<?> uploadBookCover(String fileName) throws URISyntaxException, IOException {
         RestBookCommand restBookCommand = prepareRestBookCommand();
         List<Author> authors = prepareAuthors();
@@ -494,7 +494,6 @@ class CatalogControllerTestIT extends CatalogTestBase {
         MultipartFile multipartFile = prepareMultiPartFile(fileName, MediaType.IMAGE_JPEG_VALUE);
         return catalogController.addBookCover(createdBook.getId(), multipartFile);
     }
-
 
     private MultipartFile prepareMultiPartFile(String fileName, String mediaType) throws URISyntaxException {
         return new MockMultipartFile(
@@ -546,28 +545,13 @@ class CatalogControllerTestIT extends CatalogTestBase {
         return effectiveJava2RestCommand;
     }
 
-
     private List<Book> prepareAndAddBooks() {
-        List<Author> authors = authorJpaRepository.saveAll(prepareAuthors());
-        CreateBookCommand effective_java = CreateBookCommand.builder()
-                .authors(Set.of(authors.get(0).getId()))
-                .title("Effective Java")
-                .year(2005)
-                .price(new BigDecimal(50))
-                .availAble(50L).build();
-        Book javaBook = catalogUseCase.addBook(effective_java);
-
-        CreateBookCommand mama_mia = CreateBookCommand.builder()
-                .authors(Set.of(authors.get(0).getId(), authors.get(1).getId()))
-                .title("Mama mia")
-                .year(2015)
-                .price(new BigDecimal(10))
-                .availAble(12L).build();
-        Book mamaMinaBook = catalogUseCase.addBook(mama_mia);
-
-        return Arrays.asList(javaBook, mamaMinaBook);
+        List<Author> authors = prepareAuthors();
+        List<Book> books = prepareBooks();
+        books.get(0).setLinkedAuthors(Set.of(authors.get(0)));
+        books.get(1).setLinkedAuthors(Set.of(authors.get(0), authors.get(1)));
+        return bookJpaRepository.saveAll(books);
     }
-
 
     private List<Author> prepareAuthors() {
         Author stefan = new Author("Stefan", "Konieczny", 1850);

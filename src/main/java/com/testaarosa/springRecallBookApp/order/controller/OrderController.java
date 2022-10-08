@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 @Tag(name = "Orders API ", description = "API designed to manipulate the order object")
 class OrderController {
+    @Value(value = "${app.admin.email}")
+    private String ADMIN;
     private final QueryOrderUseCase queryOrder;
     private final OrderUseCase orderUseCase;
 
@@ -115,7 +118,7 @@ class OrderController {
     public ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                               @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
                                               @Valid @RequestBody RestUpdateOrderCommand command) {
-        OrderResponse updateOrderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id, "superadmin@admin.org"));
+        OrderResponse updateOrderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id, ADMIN));
         if (!updateOrderResponse.isSuccess()) {
             return ResponseEntity.notFound()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
@@ -156,7 +159,7 @@ class OrderController {
         OrderResponse orderResponse = orderUseCase.updateOrderStatus(UpdateOrderStatusCommand.builder()
                 .orderId(id)
                 .orderStatus(OrderStatus.valueOf(command.getOrderStatus()))
-                .recipientEmail("superadmin@admin.org")
+                .recipientEmail(ADMIN)
                 .build());
         if (!orderResponse.isSuccess()) {
             return ResponseEntity.status(404)

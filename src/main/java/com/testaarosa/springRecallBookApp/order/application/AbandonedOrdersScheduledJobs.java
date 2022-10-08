@@ -23,6 +23,8 @@ import static com.testaarosa.springRecallBookApp.order.domain.OrderStatus.NEW;
 public class AbandonedOrdersScheduledJobs {
     @Value(value = "${app.days.to.abandon.orders:1}")
     private int DAYS_TO_ABANDON_ORDERS;
+    @Value(value = "${app.admin.email}")
+    private String ADMIN;
     private final OrderJpaRepository repository;
     private final OrderUseCase orderUseCase;
 
@@ -39,7 +41,7 @@ public class AbandonedOrdersScheduledJobs {
                     UpdateOrderStatusCommand command = UpdateOrderStatusCommand.builder()
                             .orderId(order.getId())
                             .orderStatus(order.getOrderStatus())
-                            .recipientEmail("superadmin@admin.org")//todo-Maciek fix when security is implemented
+                            .recipientEmail(ADMIN)//todo-Maciek fix when security is implemented
                             .build();
                     orderUseCase.updateOrderStatus(command);
                     log.info("Order with ID: " + order.getId() + " was updated. Status has changed to: " + ABANDONED);

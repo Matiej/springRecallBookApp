@@ -1,8 +1,10 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
+import com.testaarosa.springRecallBookApp.BaseTest;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
+import com.testaarosa.springRecallBookApp.order.OrderBaseTest;
 import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
@@ -30,7 +33,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class OrderServiceTestIT {
+@TestPropertySource("classpath:application-test.properties")
+class OrderServiceTestIT extends OrderBaseTest {
     @Autowired
     private BookJpaRepository bookJpaRepository;
     @Autowired
@@ -313,8 +317,8 @@ class OrderServiceTestIT {
 
     @Test
     @Transactional
-    @DisplayName("should not revoke other users order")
-    public void userCannotRevokeOtherUsersOrder() {
+    @DisplayName("Should not revoke other users order, method updateOrderStatus()")
+    public void shouldNotUpdateOtherUsersOrder() {
         //given
         List<Book> books = prepareAndAddBooks();
         Book book1 = books.get(0);
@@ -335,7 +339,31 @@ class OrderServiceTestIT {
         Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
         assertEquals(NEW, order.getOrderStatus());
         assertEquals(availableBeforeOrder - 1, book1.getAvailable());
+    }
 
+    @Test
+    @Transactional
+    @DisplayName("Should admin update other users order, method updateOrderStatus()")
+    public void shouldAdminUpdateOtherUsersOrder() {
+        //given
+        List<Book> books = prepareAndAddBooks();
+        Book book1 = books.get(0);
+        Long availableBeforeOrder = book1.getAvailable();
+
+        PlaceOrderRecipient placeOrderRecipient = preparePlaceOrderRecipient();
+        PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, 1, books.get(1), 2,
+                placeOrderRecipient);
+        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        assertEquals(availableBeforeOrder - 1, book1.getAvailable());
+
+        //when
+        orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
+                getADMIN_USER()));
+
+        //then
+        Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
+        assertEquals(CANCELED, order.getOrderStatus());
+        assertEquals(availableBeforeOrder, book1.getAvailable());
     }
 
     @Test
@@ -366,7 +394,51 @@ class OrderServiceTestIT {
         OrderResponse response = orderService.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
                 .item(placeOrderCommand.getItemList().get(1))
-                        .recipientEmail("superadmin@admin.org")
+                        .recipientEmail(preparePlaceOrderRecipient().getEmail())
+                .build());
+
+        //then
+        assertNotNull(response);
+        Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
+        Set<OrderItem> itemList = order.getItemList();
+        assertAll("Check order items",
+                () -> assertNotNull(itemList),
+                () -> assertEquals(1, itemList.size()));
+        assertAll("Check availability for given books after remove anorder",
+                () -> assertEquals(book1.getAvailable(), book1Available),
+                () -> assertEquals(book2.getAvailable(), book2Available - book2OrderQty),
+                () -> assertNotEquals(book2.getAvailable(), book2Available + 12));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Should ADMIN update other user order items, method updateOrderItem(), verify book that have revoked")
+    void shouldAdminUpdateOtherUserOrderItems() {
+        //given
+        List<Book> books = prepareAndAddBooks();
+
+        Book book1 = books.get(0);
+        int book1OrderQty = 10;
+        Long book1Available = book1.getAvailable();
+
+        Book book2 = books.get(1);
+        int book2OrderQty = 2;
+        Long book2Available = book2.getAvailable();
+
+        PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQty, book2, book2OrderQty);
+
+        //then
+        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        assertTrue(orderResponse.isSuccess());
+        assertAll("Check availability for given books before remove an order",
+                () -> assertEquals(book1Available - book1OrderQty, book1.getAvailable()),
+                () -> assertEquals(book2Available - book2OrderQty, book2.getAvailable()));
+
+        //when
+        OrderResponse response = orderService.updateOrderItems(UpdateOrderItemsCommand.builder()
+                .orderId(orderResponse.getOrderId())
+                .item(placeOrderCommand.getItemList().get(1))
+                .recipientEmail(getADMIN_USER())
                 .build());
 
         //then
@@ -399,6 +471,7 @@ class OrderServiceTestIT {
 
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQty, book2, book2OrderQty);
 
+        String unauthorizedUser = "alienRecipient@notauthorized.com";
         //then
         OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
@@ -409,7 +482,7 @@ class OrderServiceTestIT {
         //when
         OrderResponse response = orderService.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
-                .recipientEmail("alienRecipient@notauthorized.com")
+                .recipientEmail(unauthorizedUser)
                 .item(placeOrderCommand.getItemList().get(1))
                 .build());
 
@@ -500,20 +573,5 @@ class OrderServiceTestIT {
 
     private List<Book> prepareAndAddBooks() {
         return bookJpaRepository.saveAll(prepareBooks());
-    }
-
-    private List<Book> prepareBooks() {
-        Book effective_java = new Book(
-                "Effective Java",
-                2005,
-                new BigDecimal(10),
-                12L);
-
-        Book mama_mia = new Book(
-                "Mama mia",
-                2015,
-                new BigDecimal(10),
-                12L);
-        return Arrays.asList(effective_java, mama_mia);
     }
 }

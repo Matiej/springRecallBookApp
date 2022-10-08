@@ -11,7 +11,9 @@ import com.testaarosa.springRecallBookApp.order.domain.UpdateOrderStatusResult;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,8 +24,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 class OrderService implements OrderUseCase {
+    @Value("${app.admin.email}")
+    private String ADMIN;
     private final OrderJpaRepository repository;
     private final RecipientUseCase recipientUseCase;
     private final CatalogUseCase catalogUseCase;
@@ -110,7 +114,7 @@ class OrderService implements OrderUseCase {
     private boolean hasUserAccess(Order order, String userEmail) {
         String orderEmail = order.getRecipient().getEmail();
         return StringUtils.equalsIgnoreCase(orderEmail, userEmail) ||
-                StringUtils.equalsIgnoreCase("superadmin@admin.org", userEmail);
+                StringUtils.equalsIgnoreCase(ADMIN, userEmail);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.testaarosa.springRecallBookApp.order.domain;
 
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
+import com.testaarosa.springRecallBookApp.order.OrderBaseTest;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-class OrderTest {
+class OrderTest extends OrderBaseTest {
 
     @Test
     @DisplayName("Should method calculate ZERO if no order items.")
@@ -36,7 +37,7 @@ class OrderTest {
         //when
         BigDecimal totalPrice = order.totalPrice();
         //then
-        assertThat(totalPrice).isEqualTo(new BigDecimal(56));
+        assertThat(totalPrice).isEqualTo(new BigDecimal(40));
     }
 
     private Order prepareOrderForTest() {
@@ -61,21 +62,4 @@ class OrderTest {
         return Set.of(orderItem1, orderItem2);
     }
 
-    private List<Book> prepareBooks() {
-        Book book1 = new Book();
-        book1.setId(1l);
-        book1.setAvailable(12L);
-        book1.setYear(1999);
-        book1.setTitle("Book1");
-        book1.setPrice(new BigDecimal(12));
-
-        Book book2 = new Book();
-        book2.setId(2l);
-        book2.setAvailable(3L);
-        book2.setYear(1895);
-        book2.setTitle("Book2");
-        book2.setPrice(new BigDecimal(20));
-
-        return List.of(book1, book2);
-    }
 }
