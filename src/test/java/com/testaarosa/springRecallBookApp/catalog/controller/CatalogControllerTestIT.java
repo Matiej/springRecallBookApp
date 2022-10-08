@@ -3,12 +3,10 @@ package com.testaarosa.springRecallBookApp.catalog.controller;
 import com.testaarosa.springRecallBookApp.author.dataBase.AuthorJpaRepository;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.CatalogTestBase;
-import com.testaarosa.springRecallBookApp.catalog.application.CreateBookCommand;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
-import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
 import com.testaarosa.springRecallBookApp.uploads.dataBase.UploadJpaRepository;
 import com.testaarosa.springRecallBookApp.uploads.domain.Upload;
 import lombok.extern.slf4j.Slf4j;
@@ -190,7 +188,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getBookById() find book in data data base. Given correct id")
-    public void shouldGetBookById() {
+     void shouldGetBookById() {
         //given
         prepareAndAddBooks();
         Long givenBookId = 1L;
@@ -219,7 +217,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getBookById() not find book. Given not exist ID")
-    public void shouldNotGetBookById() {
+     void shouldNotGetBookById() {
         //given
         Long givenBookId = 1111L;
         String expectedMessage = "Book with ID: " + givenBookId + " not found!";
@@ -246,7 +244,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getBookById() throws exception. Given negative ID")
-    public void shouldThrowExceptionGetBookByNegativeId() {
+     void shouldThrowExceptionGetBookByNegativeId() {
         //given
         Long givenBookId = -1111L;
         String expectedErrorMessage = "BookId field value must be greater than 0";
@@ -263,7 +261,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should addBook() create and add book into DB")
-    public void shouldAddBook() {
+     void shouldAddBook() {
         //given
         RestBookCommand restBookCommand = prepareRestBookCommand();
         List<Author> authors = prepareAuthors();
@@ -284,7 +282,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should addBook() throws exception because no author in DB")
-    public void shouldNotAddBookAndThrowsIllegalArgumentException() {
+     void shouldNotAddBookAndThrowsIllegalArgumentException() {
         //given
         RestBookCommand restBookCommand = prepareRestBookCommand();
         List<Author> authors = prepareAuthors();
@@ -303,7 +301,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @Test
     @DisplayName("Should updateBook() update book title and available.")
     @Transactional
-    public void shouldUpdateBook() {
+     void shouldUpdateBook() {
         //given
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
@@ -333,7 +331,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @Test
     @DisplayName("Should updateBook() not update book because of wrong book ID")
     @Transactional
-    public void shouldNotUpdateBook() {
+     void shouldNotUpdateBook() {
         //given
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
@@ -369,7 +367,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @Test
     @DisplayName("Non existing author. Should updateBook() throws an exception.")
     @Transactional
-    public void shouldNotUpdateBookNonExistingAuthorThrowsException() {
+     void shouldNotUpdateBookNonExistingAuthorThrowsException() {
         //given
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
@@ -395,7 +393,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @Test
     @DisplayName("Should addBookCover() add picture file to the test directory and create upload")
     @Transactional
-    public void shouldAddBookCover() throws URISyntaxException, IOException {
+     void shouldAddBookCover() throws URISyntaxException, IOException {
         //given
         String testFileName = "testCover.jpg";
 
@@ -424,7 +422,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @Test
     @DisplayName("Should addBookCover() throws exception, non existing book")
     @Transactional
-    public void shouldAddBookCoverThrowsException() throws URISyntaxException {
+     void shouldAddBookCoverThrowsException() throws URISyntaxException {
         //given
         Long nonExistingBookId = 99L;
         String expectedErrorMessage = "Can't find book ID:99";
@@ -445,7 +443,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @Test
     @DisplayName("Should deleteBookCover() delete picture form server and remove upload")
     @Transactional
-    public void shouldDeleteBookCover() throws URISyntaxException, IOException {
+     void shouldDeleteBookCover() throws URISyntaxException, IOException {
         //given
         String testFileName = "testCoverToDelete.jpg";
         ResponseEntity<?> response = uploadBookCover(testFileName);
@@ -469,7 +467,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should deleteById() delete book by given ID")
-    public void shouldDeleteById() {
+     void shouldDeleteById() {
         //given
         RestBookCommand restBookCommand = prepareRestBookCommand();
         List<Author> authors = prepareAuthors();

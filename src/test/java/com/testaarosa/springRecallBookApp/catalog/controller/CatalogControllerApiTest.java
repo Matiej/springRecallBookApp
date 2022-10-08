@@ -44,7 +44,7 @@ public class CatalogControllerApiTest extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getAll() method API .......") //todo nice name
-    public void getAllBooks() {
+     void getAllBooks() {
         //given
         List<Book> givenBooks = prepareBooks();
         int givenLimit = 3;

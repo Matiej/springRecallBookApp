@@ -40,7 +40,7 @@ class CatalogControllerTest extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getAll() give back books, no filer params, given limit 10.")
-    public void shouldGetAllBooks() {
+     void shouldGetAllBooks() {
         //todo test this method with all options and params
         //given
         List<Book> givenBooks = prepareBooks();

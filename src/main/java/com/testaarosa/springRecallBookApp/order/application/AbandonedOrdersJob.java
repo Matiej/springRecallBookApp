@@ -1,6 +1,7 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
 
+import com.testaarosa.springRecallBookApp.clock.Clock;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
@@ -11,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,27 +22,28 @@ import static com.testaarosa.springRecallBookApp.order.domain.OrderStatus.NEW;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AbandonedOrdersScheduledJobs {
-    @Value(value = "${app.days.to.abandon.orders:1}")
-    private int DAYS_TO_ABANDON_ORDERS;
+public class AbandonedOrdersJob {
+    @Value(value = "${app.duration.to.abandon.orders:1}")
+    private Duration DURATION_TO_ABANDON_ORDERS;
     @Value(value = "${app.admin.email}")
     private String ADMIN;
     private final OrderJpaRepository repository;
     private final OrderUseCase orderUseCase;
+    private final Clock clock;
 
     @Transactional
     @Scheduled(cron = "${app.orders.abandoned.cron}")
     public void run() {
         log.info("Start job: " + this.getClass().getSimpleName() + " to search orders to change status as ABANDONED");
-        LocalDateTime timeStamp = LocalDateTime.now().minusHours(DAYS_TO_ABANDON_ORDERS);// test verson
-//        LocalDateTime.now().minusDays(DAYS_TO_ABANDON_ORDERS); // test ver
+//        LocalDateTime timeStamp = LocalDateTime.now().minus(DURATION_TO_ABANDON_ORDERS);
+        LocalDateTime timeStamp = clock.now().minus(DURATION_TO_ABANDON_ORDERS);//
         List<Order> ordersToAbandon = repository.findAllByOrderStatusAndAndCreatedAtLessThanEqual(NEW, timeStamp);
         log.info("Found " + ordersToAbandon.size() + " orders to change status to ABANDONED");
         ordersToAbandon
                 .forEach(order -> {
                     UpdateOrderStatusCommand command = UpdateOrderStatusCommand.builder()
                             .orderId(order.getId())
-                            .orderStatus(order.getOrderStatus())
+                            .orderStatus(ABANDONED)
                             .recipientEmail(ADMIN)//todo-Maciek fix when security is implemented
                             .build();
                     orderUseCase.updateOrderStatus(command);
