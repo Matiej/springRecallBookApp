@@ -10,7 +10,6 @@ import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.order.domain.UpdateOrderStatusResult;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,10 +90,8 @@ class OrderService implements OrderUseCase {
     public OrderResponse updateOrderStatus(UpdateOrderStatusCommand command) {
         Long orderId = command.getOrderId();
         String orderStatus = command.getOrderStatus().name();
-        OrderResponse.OrderResponseBuilder orderResponseBuilder = OrderResponse.builder();
         return repository.findById(orderId)
                 .map(order -> {
-                    //todo-Maciek IMPORTANT if seciurity impelemnt
                     if (!hasUserAccess(order, command.getRecipientEmail())) {
                         return OrderResponse.failure("Unauthorized", orderId);
                     }

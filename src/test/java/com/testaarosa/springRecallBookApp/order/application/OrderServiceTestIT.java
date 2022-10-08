@@ -1,6 +1,5 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
-import com.testaarosa.springRecallBookApp.BaseTest;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
@@ -19,8 +18,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -80,9 +77,11 @@ class OrderServiceTestIT extends OrderBaseTest {
         OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
 
         //then
+        Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
         Book book1AfterOrder = catalogUseCase.findOne(book1.getId());
         Book book2AfterOrder = catalogUseCase.findOne(book2.getId());
         assertTrue(orderResponse.isSuccess());
+        assertEquals(NEW, order.getOrderStatus());
         assertAll("Check availability for given books",
                 () -> assertEquals(book1AfterOrder.getAvailable(), book1Available - book1OrderQuantity),
                 () -> assertEquals(book2AfterOrder.getAvailable(), book2Available - book2OrderQuantity),
@@ -537,8 +536,14 @@ class OrderServiceTestIT extends OrderBaseTest {
                 .hasMessageContaining(expectedErrorMessage);
     }
 
+
+    private List<Book> prepareAndAddBooks() {
+        return bookJpaRepository.saveAll(prepareBooks());
+    }
+
+
     private UpdateOrderStatusCommand getUpdateOrderStatusCommand(Long orderResponse, OrderStatus orderStatus,
-                                                                 String recipientEmail) {
+                                                                   String recipientEmail) {
         return UpdateOrderStatusCommand
                 .builder()
                 .orderId(orderResponse)
@@ -547,31 +552,4 @@ class OrderServiceTestIT extends OrderBaseTest {
                 .build();
     }
 
-    private PlaceOrderCommand getPlaceOrderCommand(Book book1, int quantity1, Book book2, int quantity2, PlaceOrderRecipient recipient) {
-        return PlaceOrderCommand.builder()
-                .placeOrderRecipient(preparePlaceOrderRecipient())
-                .item(new PlaceOrderItem(book1.getId(), quantity1))
-                .item(new PlaceOrderItem(book2.getId(), quantity2))
-                .build();
-    }
-
-    private PlaceOrderCommand getPlaceOrderCommand(Book book1, int quantity1, Book book2, int quantity2) {
-        return getPlaceOrderCommand(book1, quantity1, book2, quantity2, preparePlaceOrderRecipient());
-    }
-
-    private PlaceOrderRecipient preparePlaceOrderRecipient() {
-        return preparePlaceOrderRecipient("jannowa@nowa.pl");
-    }
-
-    private PlaceOrderRecipient preparePlaceOrderRecipient(String email) {
-        return PlaceOrderRecipient.builder()
-                .name("Jan")
-                .lastName("Nowak")
-                .email(email)
-                .build();
-    }
-
-    private List<Book> prepareAndAddBooks() {
-        return bookJpaRepository.saveAll(prepareBooks());
-    }
 }

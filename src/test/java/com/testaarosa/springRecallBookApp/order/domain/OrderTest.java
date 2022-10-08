@@ -1,6 +1,5 @@
 package com.testaarosa.springRecallBookApp.order.domain;
 
-import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.order.OrderBaseTest;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import org.junit.jupiter.api.DisplayName;
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -17,7 +15,7 @@ class OrderTest extends OrderBaseTest {
 
     @Test
     @DisplayName("Should method calculate ZERO if no order items.")
-    public void calculateTotalPriceOfEmptyOrderItems() {
+     void calculateTotalPriceOfEmptyOrderItems() {
         //given
         Order order = Order.builder()
                 .orderStatus(OrderStatus.NEW)
@@ -31,7 +29,7 @@ class OrderTest extends OrderBaseTest {
 
     @Test
     @DisplayName("Should method calculate correct value for given order items.")
-    public void calculateTotalPrice() {
+     void calculateTotalPrice() {
         //given
         Order order = prepareOrderForTest();
         //when

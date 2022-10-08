@@ -46,7 +46,7 @@ public class CatalogControllerWebTest extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getAll() perform GET method and gives back 200code response")
-    public void shouldGetAllBooks() throws Exception {
+     void shouldGetAllBooks() throws Exception {
         //given
         int givenLimit = 3;
         List<Book> givenBooks = prepareBooks();
