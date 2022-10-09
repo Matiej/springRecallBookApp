@@ -75,8 +75,8 @@ class OrderController {
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No orders found!"),
     })
-    public ResponseEntity<Order> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                              @Min(value = 1, message = "OrderId field value must be greater than 0") Long id) {
+    public ResponseEntity<RichOrder> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                                  @Min(value = 1, message = "OrderId field value must be greater than 0") Long id) {
         return queryOrder.findOrderById(id)
                 .map(order -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
