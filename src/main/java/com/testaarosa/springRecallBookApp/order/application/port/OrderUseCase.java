@@ -13,6 +13,4 @@ public interface OrderUseCase {
     void removeOrderById(Long id);
 
     OrderResponse updateOrderStatus(UpdateOrderStatusCommand command);
-
-    OrderResponse findById(Long id);
 }

@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.order.controller;
 
 import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.order.application.OrderResponse;
+import com.testaarosa.springRecallBookApp.order.application.RichOrder;
 import com.testaarosa.springRecallBookApp.order.application.UpdateOrderStatusCommand;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;

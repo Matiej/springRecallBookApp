@@ -108,11 +108,6 @@ class OrderService implements OrderUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
     }
 
-    @Override
-    public OrderResponse findById(Long id) {
-        return null;
-    }
-
     private boolean hasUserAccess(Order order, String userEmail) {
         String orderEmail = order.getRecipient().getEmail();
         return StringUtils.equalsIgnoreCase(orderEmail, userEmail) ||

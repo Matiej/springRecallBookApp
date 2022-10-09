@@ -26,7 +26,15 @@ public class QueryOrderService implements QueryOrderUseCase {
     }
 
     @Override
-    public Optional<Order> findOrderById(Long id) {
-        return repository.findById(id);
+    public Optional<RichOrder> findOrderById(Long id) {
+        return Optional.of(repository.findById(id)
+                        .map(order ->
+                                RichOrder.builder()
+                                        .id(order.getId())
+                                        .orderStatus(order.getOrderStatus())
+                                        .orderItems(order.getItems())
+                                        .recipient(order.getRecipient())
+                                        .build()))
+                .orElseGet(Optional::empty);
     }
 }
