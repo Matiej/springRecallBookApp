@@ -6,7 +6,6 @@ import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.*;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -23,7 +22,7 @@ public class Order extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
     @ToString.Exclude
-    private Set<OrderItem> itemList = new HashSet<>();
+    private Set<OrderItem> items = new HashSet<>();
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @ToString.Exclude
     @JoinColumn(name = "recipient_id")
@@ -32,31 +31,24 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    public BigDecimal totalPrice() {
-        return itemList.stream()
-                .map(item -> item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Order order = (Order) o;
-        return Objects.equals(itemList, order.itemList) && orderStatus == order.orderStatus;
+        return Objects.equals(items, order.items) && orderStatus == order.orderStatus;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), itemList, orderStatus);
+        return Objects.hash(super.hashCode(), items, orderStatus);
     }
 
     public void replaceOrderItems(Set<OrderItem> orderItems) {
-        itemList.clear();
-        itemList.addAll(orderItems);
+        items.clear();
+        items.addAll(orderItems);
     }
-
 
     public UpdateOrderStatusResult updateOrderStatus(OrderStatus newStatus) {
         UpdateOrderStatusResult updateOrderStatusResult = orderStatus.updateOrderStatus(newStatus);

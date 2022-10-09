@@ -49,7 +49,7 @@ class OrderService implements OrderUseCase {
         Order order = Order.builder()
                 .orderStatus(OrderStatus.NEW)
                 .recipient(recipient)
-                .itemList(orderItemList)
+                .items(orderItemList)
                 .build();
         recipient.addOrder(order);
         Order savedOrder = repository.save(order);
@@ -68,7 +68,7 @@ class OrderService implements OrderUseCase {
         if (!hasUserAccess(order, command.getRecipientEmail())) {
             return OrderResponse.failure("Unauthorized", order.getId());
         }
-        revokeBooksQuantity(order.getItemList());
+        revokeBooksQuantity(order.getItems());
         order.replaceOrderItems(orderItemList);
         reduceBooksQuantity(orderItemList);
         order.setLastUpdatedAt(LocalDateTime.now());
@@ -101,11 +101,16 @@ class OrderService implements OrderUseCase {
                     }
                     UpdateOrderStatusResult result = order.updateOrderStatus(statusOptional.get());
                     if (result.isRevoked()) {
-                        revokeBooksQuantity(order.getItemList());
+                        revokeBooksQuantity(order.getItems());
                     }
                     return OrderResponse.success(orderId);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
+    }
+
+    @Override
+    public OrderResponse findById(Long id) {
+        return null;
     }
 
     private boolean hasUserAccess(Order order, String userEmail) {
@@ -118,7 +123,7 @@ class OrderService implements OrderUseCase {
     @Transactional
     public void removeOrderById(Long id) {
         repository.findById(id).ifPresentOrElse(order -> {
-                    revokeBooksQuantity(order.getItemList());
+                    revokeBooksQuantity(order.getItems());
                     repository.deleteById(id);
                 },
                 () -> {
