@@ -1,5 +1,6 @@
 package com.testaarosa.springRecallBookApp.order.application.port;
 
+import com.testaarosa.springRecallBookApp.order.application.RichOrder;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 
@@ -12,6 +13,6 @@ public interface QueryOrderUseCase {
 
     List<Order> findAllByOrderStatus(OrderStatus orderStatus);
 
-    Optional<Order> findOrderById(Long id);
+    Optional<RichOrder> findOrderById(Long id);
 
 }

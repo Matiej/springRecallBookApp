@@ -1,7 +1,11 @@
-package com.testaarosa.springRecallBookApp.order.domain;
+package com.testaarosa.springRecallBookApp.order.application;
 
 import com.testaarosa.springRecallBookApp.order.OrderBaseTest;
-import com.testaarosa.springRecallBookApp.order.application.RichOrder;
+import com.testaarosa.springRecallBookApp.order.domain.Order;
+import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
+import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
+import com.testaarosa.springRecallBookApp.order.price.OrderPrice;
+import com.testaarosa.springRecallBookApp.order.price.PriceService;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,9 +14,11 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-class OrderTest extends OrderBaseTest {
+public class PriceServiceTest extends OrderBaseTest {
+
+    private PriceService priceService = new PriceService();
 
     @Test
     @DisplayName("Should method calculate ZERO if no order items.")
@@ -22,11 +28,11 @@ class OrderTest extends OrderBaseTest {
                 .orderStatus(OrderStatus.NEW)
                 .orderItems(Collections.emptySet())
                 .build();
-        RichOrder richOrder = RichOrder.toRichOrder(order);
         //when
-        BigDecimal totalPrice = order.getItemsPrice();
+        OrderPrice orderPrice = priceService.calculateOrderPrice(order);
+
         //then
-        assertThat(totalPrice).isEqualTo(BigDecimal.ZERO);
+        assertThat(orderPrice.finalPrice()).isEqualTo(BigDecimal.ZERO);
     }
 
     @Test
@@ -35,9 +41,9 @@ class OrderTest extends OrderBaseTest {
         //given
         Order order = prepareRichOrder();
         //when
-        BigDecimal totalPrice = order.getItemsPrice();
+        OrderPrice orderPrice = priceService.calculateOrderPrice(order);
         //then
-        assertThat(totalPrice).isEqualTo(new BigDecimal(40));
+        assertThat(orderPrice.finalPrice()).isEqualTo(new BigDecimal("49.90"));
     }
 
     private Order prepareRichOrder() {
@@ -61,5 +67,4 @@ class OrderTest extends OrderBaseTest {
 
         return Set.of(orderItem1, orderItem2);
     }
-
 }

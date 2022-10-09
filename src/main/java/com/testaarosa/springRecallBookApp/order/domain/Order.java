@@ -23,20 +23,21 @@ public class Order extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_id")
     @ToString.Exclude
-    private Set<OrderItem> itemList = new HashSet<>();
+    private Set<OrderItem> orderItems = new HashSet<>();
+
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @ToString.Exclude
     @JoinColumn(name = "recipient_id")
     @JsonIgnoreProperties(value = "orders")
     private Recipient recipient;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
 
-    public BigDecimal totalPrice() {
-        return itemList.stream()
-                .map(item -> item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus = OrderStatus.NEW;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private Delivery delivery = Delivery.COURIER;
 
     @Override
     public boolean equals(Object o) {
@@ -44,19 +45,31 @@ public class Order extends BaseEntity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Order order = (Order) o;
-        return Objects.equals(itemList, order.itemList) && orderStatus == order.orderStatus;
+        return Objects.equals(orderItems, order.orderItems) && orderStatus == order.orderStatus;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), itemList, orderStatus);
+        return Objects.hash(super.hashCode(), orderItems, orderStatus);
     }
 
-    public void replaceOrderItems(Set<OrderItem> orderItems) {
-        itemList.clear();
-        itemList.addAll(orderItems);
+    public BigDecimal getItemsPrice() {
+        return orderItems.stream()
+                .map(item -> item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public BigDecimal getDeliverPrice() {
+        if(orderItems.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+        return delivery.getPrice();
+    }
+
+    public void replaceOrderItems(Set<OrderItem> newOrderItems) {
+        orderItems.clear();
+        orderItems.addAll(newOrderItems);
+    }
 
     public UpdateOrderStatusResult updateOrderStatus(OrderStatus newStatus) {
         UpdateOrderStatusResult updateOrderStatusResult = orderStatus.updateOrderStatus(newStatus);

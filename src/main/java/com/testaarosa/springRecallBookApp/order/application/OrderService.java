@@ -47,9 +47,8 @@ class OrderService implements OrderUseCase {
                 .orElse(orderRecipient);
 
         Order order = Order.builder()
-                .orderStatus(OrderStatus.NEW)
                 .recipient(recipient)
-                .itemList(orderItemList)
+                .orderItems(orderItemList)
                 .build();
         recipient.addOrder(order);
         Order savedOrder = repository.save(order);
@@ -68,7 +67,7 @@ class OrderService implements OrderUseCase {
         if (!hasUserAccess(order, command.getRecipientEmail())) {
             return OrderResponse.failure("Unauthorized", order.getId());
         }
-        revokeBooksQuantity(order.getItemList());
+        revokeBooksQuantity(order.getOrderItems());
         order.replaceOrderItems(orderItemList);
         reduceBooksQuantity(orderItemList);
         order.setLastUpdatedAt(LocalDateTime.now());
@@ -101,7 +100,7 @@ class OrderService implements OrderUseCase {
                     }
                     UpdateOrderStatusResult result = order.updateOrderStatus(statusOptional.get());
                     if (result.isRevoked()) {
-                        revokeBooksQuantity(order.getItemList());
+                        revokeBooksQuantity(order.getOrderItems());
                     }
                     return OrderResponse.success(orderId);
                 })
@@ -118,7 +117,7 @@ class OrderService implements OrderUseCase {
     @Transactional
     public void removeOrderById(Long id) {
         repository.findById(id).ifPresentOrElse(order -> {
-                    revokeBooksQuantity(order.getItemList());
+                    revokeBooksQuantity(order.getOrderItems());
                     repository.deleteById(id);
                 },
                 () -> {

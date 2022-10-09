@@ -4,6 +4,8 @@ import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCas
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import com.testaarosa.springRecallBookApp.order.OrderBaseTest;
+import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
+import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;
 import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
@@ -18,6 +20,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -35,11 +38,13 @@ class OrderServiceTestIT extends OrderBaseTest {
     @Autowired
     private BookJpaRepository bookJpaRepository;
     @Autowired
-    private OrderService orderService;
+    private OrderUseCase orderUseCase;
     @Autowired
     private OrderJpaRepository orderJpaRepository;
     @Autowired
     private CatalogUseCase catalogUseCase;
+    @Autowired
+    private QueryOrderUseCase queryOrderUseCase;
 
     @BeforeAll
     static void init(TestInfo testInfo) {
@@ -74,7 +79,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQuantity, book2, book2OrderQuantity);
 
         //when
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
 
         //then
         Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
@@ -102,7 +107,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
 
         //when
-        Throwable throwable = catchThrowable(() -> orderService.placeOrder(placeOrderCommand));
+        Throwable throwable = catchThrowable(() -> orderUseCase.placeOrder(placeOrderCommand));
 
         //then
         then(throwable).as("An EntityNotFoundException should be thrown if more books as available")
@@ -124,7 +129,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
 
         //when
-        Throwable throwable = catchThrowable(() -> orderService.placeOrder(placeOrderCommand));
+        Throwable throwable = catchThrowable(() -> orderUseCase.placeOrder(placeOrderCommand));
 
         //then
         then(throwable).as("An IllegalArgumentException should be thrown if more books as available")
@@ -145,7 +150,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         Long book2Available = book2.getAvailable();
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, 10, book2, 2);
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
         Book book1AfterOrder = catalogUseCase.findOne(book1.getId());
         Book book2AfterOrder = catalogUseCase.findOne(book2.getId());
@@ -154,7 +159,7 @@ class OrderServiceTestIT extends OrderBaseTest {
                 () -> assertEquals(book2AfterOrder.getAvailable(), book2Available - 2));
 
         //when
-        orderService.removeOrderById(orderResponse.getOrderId());
+        orderUseCase.removeOrderById(orderResponse.getOrderId());
 
         //then
         assertAll("Check availability for given books after remove anorder",
@@ -172,14 +177,14 @@ class OrderServiceTestIT extends OrderBaseTest {
         Book book2 = books.get(1);
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, 10, book2, 2);
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
 
         Long fakeOrderId = orderResponse.getOrderId() + 15;
         String expectedErrorMessage = "Cannot find order ID: " + fakeOrderId;
 
         //when
-        Throwable throwable = catchThrowable(() -> orderService.removeOrderById(fakeOrderId));
+        Throwable throwable = catchThrowable(() -> orderUseCase.removeOrderById(fakeOrderId));
 
         //then
         then(throwable).as("An IllegalArgumentException should be thrown if more books as available")
@@ -205,7 +210,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQty, book2, book2OrderQty);
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
         assertAll("Check availability for given books before remove an order",
                 () -> assertEquals(book1.getAvailable(), book1Available - book1OrderQty),
@@ -214,7 +219,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         //when
         UpdateOrderStatusCommand command = getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
                 placeOrderCommand.getPlaceOrderRecipient().getEmail());
-        OrderResponse canceledOrderResponse = orderService.updateOrderStatus(command);
+        OrderResponse canceledOrderResponse = orderUseCase.updateOrderStatus(command);
 
         //then
         Order order = orderJpaRepository.getReferenceById(canceledOrderResponse.getOrderId());
@@ -243,7 +248,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQty, book2, book2OrderQty);
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
         assertAll("Check availability for given books before remove an order",
                 () -> assertEquals(book1.getAvailable(), book1Available - book1OrderQty),
@@ -252,7 +257,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         //when
         UpdateOrderStatusCommand command = getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID,
                 placeOrderCommand.getPlaceOrderRecipient().getEmail());
-        orderService.updateOrderStatus(command);
+        orderUseCase.updateOrderStatus(command);
 
         //then
         assertAll("Check availability for given books after remove anorder",
@@ -271,14 +276,14 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, 1, book2, 1);
         String expectedErrorMessage = "Unable to change current order status: " + PAID.name()
                 + "  to '" + CANCELED.name() + "' status.";
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
 
-        orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
 
         //when
         Throwable throwable = catchThrowable(
-                () -> orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED, placeOrderCommand.getPlaceOrderRecipient().getEmail())));
+                () -> orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED, placeOrderCommand.getPlaceOrderRecipient().getEmail())));
 
         //then
         then(throwable).as("An IllegalArgumentException should be thrown if more books as available")
@@ -297,13 +302,13 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, 1, book2, 1);
         String expectedErrorMessage = "Unable to change current order status: " + SHIPPED.name()
                 + "  to '" + CANCELED.name() + "' status.";
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
-        orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
-        orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), SHIPPED, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), SHIPPED, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
 
         //when
-        Throwable throwable = catchThrowable(() -> orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(),
+        Throwable throwable = catchThrowable(() -> orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(),
                 CANCELED,
                 placeOrderCommand.getPlaceOrderRecipient().getEmail())));
 
@@ -326,12 +331,12 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderRecipient placeOrderRecipient = preparePlaceOrderRecipient();
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, 1, books.get(1), 2,
                 placeOrderRecipient);
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertEquals(availableBeforeOrder - 1, book1.getAvailable());
 
         //when
         String updateRecipientEmail = "alienRecipient@alien.com";
-        orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
                 updateRecipientEmail));
 
         //then
@@ -352,11 +357,11 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderRecipient placeOrderRecipient = preparePlaceOrderRecipient();
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, 1, books.get(1), 2,
                 placeOrderRecipient);
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertEquals(availableBeforeOrder - 1, book1.getAvailable());
 
         //when
-        orderService.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
                 getADMIN_USER()));
 
         //then
@@ -383,23 +388,23 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQty, book2, book2OrderQty);
 
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
         assertAll("Check availability for given books before remove an order",
                 () -> assertEquals(book1Available - book1OrderQty, book1.getAvailable()),
                 () -> assertEquals(book2Available - book2OrderQty, book2.getAvailable()));
 
         //when
-        OrderResponse response = orderService.updateOrderItems(UpdateOrderItemsCommand.builder()
+        OrderResponse response = orderUseCase.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
                 .item(placeOrderCommand.getItemList().get(1))
-                        .recipientEmail(preparePlaceOrderRecipient().getEmail())
+                .recipientEmail(preparePlaceOrderRecipient().getEmail())
                 .build());
 
         //then
         assertNotNull(response);
         Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
-        Set<OrderItem> itemList = order.getItemList();
+        Set<OrderItem> itemList = order.getOrderItems();
         assertAll("Check order items",
                 () -> assertNotNull(itemList),
                 () -> assertEquals(1, itemList.size()));
@@ -427,14 +432,14 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQty, book2, book2OrderQty);
 
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
         assertAll("Check availability for given books before remove an order",
                 () -> assertEquals(book1Available - book1OrderQty, book1.getAvailable()),
                 () -> assertEquals(book2Available - book2OrderQty, book2.getAvailable()));
 
         //when
-        OrderResponse response = orderService.updateOrderItems(UpdateOrderItemsCommand.builder()
+        OrderResponse response = orderUseCase.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
                 .item(placeOrderCommand.getItemList().get(1))
                 .recipientEmail(getADMIN_USER())
@@ -443,7 +448,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         //then
         assertNotNull(response);
         Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
-        Set<OrderItem> itemList = order.getItemList();
+        Set<OrderItem> itemList = order.getOrderItems();
         assertAll("Check order items",
                 () -> assertNotNull(itemList),
                 () -> assertEquals(1, itemList.size()));
@@ -472,14 +477,14 @@ class OrderServiceTestIT extends OrderBaseTest {
 
         String unauthorizedUser = "alienRecipient@notauthorized.com";
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
         assertAll("Check availability for given books before remove an order",
                 () -> assertEquals(book1Available - book1OrderQty, book1.getAvailable()),
                 () -> assertEquals(book2Available - book2OrderQty, book2.getAvailable()));
 
         //when
-        OrderResponse response = orderService.updateOrderItems(UpdateOrderItemsCommand.builder()
+        OrderResponse response = orderUseCase.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
                 .recipientEmail(unauthorizedUser)
                 .item(placeOrderCommand.getItemList().get(1))
@@ -488,7 +493,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         //then
         assertNotNull(response);
         Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
-        Set<OrderItem> itemList = order.getItemList();
+        Set<OrderItem> itemList = order.getOrderItems();
         assertAll("Check order items",
                 () -> assertNotNull(itemList),
                 () -> assertEquals(2, itemList.size()));
@@ -517,14 +522,14 @@ class OrderServiceTestIT extends OrderBaseTest {
         PlaceOrderCommand placeOrderCommand = getPlaceOrderCommand(book1, book1OrderQty, book2, book2OrderQty);
 
         //then
-        OrderResponse orderResponse = orderService.placeOrder(placeOrderCommand);
+        OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
         assertAll("Check availability for given books before remove an order",
                 () -> assertEquals(book1Available - book1OrderQty, book1.getAvailable()),
                 () -> assertEquals(book2Available - book2OrderQty, book2.getAvailable()));
 
         //when
-        Throwable throwable = catchThrowable(() -> orderService.updateOrderItems(UpdateOrderItemsCommand.builder()
+        Throwable throwable = catchThrowable(() -> orderUseCase.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(111L)
                 .item(placeOrderCommand.getItemList().get(1))
                 .build()));
@@ -536,14 +541,72 @@ class OrderServiceTestIT extends OrderBaseTest {
                 .hasMessageContaining(expectedErrorMessage);
     }
 
+    @Test
+    void shouldShippingCostAddedToTotalOrderPrice() {
+        //given
+        Book book = prepareOneBook(20, "39.99");
+
+        //when
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 1);
+        OrderResponse orderResponse = orderUseCase.placeOrder(command);
+
+        //then
+        assertEquals("49.89", queryOrderUseCase.findOrderById(orderResponse.getOrderId())
+                .get().getFinalPrice().toPlainString());
+
+    }
+
+    @Test
+    void shouldShippingCostDiscountedOver100Value() {
+        //given
+        Book book = prepareOneBook(20, "39.99");
+
+        //when
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 3);
+        OrderResponse orderResponse = orderUseCase.placeOrder(command);
+
+        //then
+        RichOrder richOrder = queryOrderUseCase.findOrderById(orderResponse.getOrderId()).get();
+        assertEquals("119.97", richOrder.getFinalPrice().toPlainString());
+        assertEquals("119.97", richOrder.getOrderPrice().getItemsPrice().toPlainString());
+    }
+
+    @Test
+    void shouldCheapestBookIsHalfPriceWhenTotalOver200Value() {
+        Book book = prepareOneBook(20, "39.99");
+
+        //when
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 6);
+        OrderResponse orderResponse = orderUseCase.placeOrder(command);
+
+        //then
+        RichOrder richOrder = queryOrderUseCase.findOrderById(orderResponse.getOrderId()).get();
+        assertEquals("219.94", richOrder.getFinalPrice().toPlainString());
+    }
+
+    @Test
+    void shouldCheapestBookIsFreeWhenTotalOver400Value() {
+        Book book = prepareOneBook(20, "41.20");
+
+        //when
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 10);
+        OrderResponse orderResponse = orderUseCase.placeOrder(command);
+
+        //then
+        RichOrder richOrder = queryOrderUseCase.findOrderById(orderResponse.getOrderId()).get();
+        assertEquals("370.80", richOrder.getFinalPrice().toPlainString());
+    }
 
     private List<Book> prepareAndAddBooks() {
         return bookJpaRepository.saveAll(prepareBooks());
     }
 
+    private Book prepareOneBook(long available, String price) {
+        return bookJpaRepository.save(new Book("Mama mia", 2015, new BigDecimal(price), available));
+    }
 
     private UpdateOrderStatusCommand getUpdateOrderStatusCommand(Long orderResponse, OrderStatus orderStatus,
-                                                                   String recipientEmail) {
+                                                                 String recipientEmail) {
         return UpdateOrderStatusCommand
                 .builder()
                 .orderId(orderResponse)

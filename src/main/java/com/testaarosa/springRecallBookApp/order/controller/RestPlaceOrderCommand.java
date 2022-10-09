@@ -2,11 +2,13 @@ package com.testaarosa.springRecallBookApp.order.controller;
 
 import com.testaarosa.springRecallBookApp.order.application.PlaceOrderCommand;
 import com.testaarosa.springRecallBookApp.order.application.PlaceOrderRecipient;
+import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.controller.SaveRecipientGroup;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 class RestPlaceOrderCommand extends RestOrderCommand{
@@ -28,12 +30,16 @@ class RestPlaceOrderCommand extends RestOrderCommand{
     String city;
     @NotBlank(groups = {SaveRecipientGroup.class}, message = "zipCode field can't be blank, empty or null")
     String zipCode;
+    @NotNull(message = "Delivery option cannot be empty")
+    Delivery delivery;
+
 
     PlaceOrderCommand toPlaceOrderCommand() {
         return PlaceOrderCommand.builder()
                 .itemList(getPlaceOrderItems())
                 .orderStatus(OrderStatus.NEW)
                 .placeOrderRecipient(toPlaceOrderRecipient())
+                .delivery(delivery)
                 .build();
     }
 
