@@ -4,6 +4,8 @@ import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCa
 import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
+import com.testaarosa.springRecallBookApp.order.price.OrderPrice;
+import com.testaarosa.springRecallBookApp.order.price.PriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class QueryOrderService implements QueryOrderUseCase {
     private final OrderJpaRepository repository;
+    private final PriceService priceService;
 
     @Override
     public List<Order> findAll() {
@@ -27,14 +30,12 @@ public class QueryOrderService implements QueryOrderUseCase {
 
     @Override
     public Optional<RichOrder> findOrderById(Long id) {
-        return Optional.of(repository.findById(id)
-                        .map(order ->
-                                RichOrder.builder()
-                                        .id(order.getId())
-                                        .orderStatus(order.getOrderStatus())
-                                        .orderItems(order.getItems())
-                                        .recipient(order.getRecipient())
-                                        .build()))
+        return Optional
+                .of(repository.findById(id)
+                        .map(order -> {
+                            OrderPrice orderPrice = priceService.calculateOrderPrice(order);
+                            return RichOrder.toRichOrderWithFinalPrice(orderPrice, order);
+                        }))
                 .orElseGet(Optional::empty);
     }
 }

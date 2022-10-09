@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum OrderStatus {
+    //maszyna stanow wzorzec. State machine pattern
     NEW {
         @Override
         public UpdateOrderStatusResult updateOrderStatus(OrderStatus status) {

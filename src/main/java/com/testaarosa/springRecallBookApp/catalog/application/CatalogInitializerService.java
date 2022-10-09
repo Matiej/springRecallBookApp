@@ -14,6 +14,7 @@ import com.testaarosa.springRecallBookApp.order.application.PlaceOrderCommand;
 import com.testaarosa.springRecallBookApp.order.application.PlaceOrderItem;
 import com.testaarosa.springRecallBookApp.order.application.PlaceOrderRecipient;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
+import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.application.SaveRecipientCommand;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
@@ -176,6 +177,7 @@ class CatalogInitializerService implements CatalogInitializer {
                 .itemList(List.of(placeOrderItem1, placeOrderItem2, placeOrderItem3))
                 .orderStatus(OrderStatus.NEW)
                 .placeOrderRecipient(placeOrderRecipient)
+                .delivery(Delivery.SELF_PICKUP)
                 .build();
 
         orderUseCase.placeOrder(placeOrderCommand);

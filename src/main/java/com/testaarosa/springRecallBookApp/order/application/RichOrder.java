@@ -1,8 +1,10 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
+import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
+import com.testaarosa.springRecallBookApp.order.price.OrderPrice;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.Builder;
 import lombok.Value;
@@ -19,20 +21,31 @@ public class RichOrder {
     Set<OrderItem> orderItems;
     Recipient recipient;
     LocalDateTime createdAt;
-
-    public BigDecimal totalPrice() {
-        return orderItems.stream()
-                .map(item -> item.getBook().getPrice().multiply(new BigDecimal(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+    Delivery delivery;
+    OrderPrice orderPrice;
+    BigDecimal finalPrice;
 
     public static RichOrder toRichOrder(Order order) {
         return RichOrder.builder()
                 .id(order.getId())
                 .orderStatus(order.getOrderStatus())
-                .orderItems(order.getItems())
+                .orderItems(order.getOrderItems())
                 .recipient(order.getRecipient())
                 .createdAt(order.getCreatedAt())
+                .delivery(order.getDelivery())
+                .build();
+    }
+
+    public static RichOrder toRichOrderWithFinalPrice(OrderPrice orderPrice, Order order) {
+        return RichOrder.builder()
+                .id(order.getId())
+                .orderStatus(order.getOrderStatus())
+                .orderItems(order.getOrderItems())
+                .recipient(order.getRecipient())
+                .createdAt(order.getCreatedAt())
+                .delivery(order.getDelivery())
+                .orderPrice(orderPrice)
+                .finalPrice(orderPrice.finalPrice())
                 .build();
     }
 }
