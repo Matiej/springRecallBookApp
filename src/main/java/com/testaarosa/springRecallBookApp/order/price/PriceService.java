@@ -3,6 +3,7 @@ package com.testaarosa.springRecallBookApp.order.price;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,6 +16,7 @@ public class PriceService {
             new DiscountDeliveryStrategy()
     );
 
+    @Transactional
     public OrderPrice calculateOrderPrice(Order order) {
         return new OrderPrice(
                 order.getItemsPrice(),

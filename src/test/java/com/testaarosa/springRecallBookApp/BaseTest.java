@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 public abstract class BaseTest {
-    private final String ADMIN_USER = "admintest@testadmin.org";
+    private static final String TEST_ADMIN_USER = "admintest@testadmin.org";
 
     @BeforeAll
     static void init(TestInfo testInfo) {
@@ -60,7 +60,7 @@ public abstract class BaseTest {
         return Arrays.asList(effective_java, mama_mia);
     }
 
-    public String getADMIN_USER() {
-        return ADMIN_USER;
+    protected String getADMIN_USER() {
+        return TEST_ADMIN_USER;
     }
 }

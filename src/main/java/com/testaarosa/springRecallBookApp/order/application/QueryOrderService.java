@@ -8,6 +8,7 @@ import com.testaarosa.springRecallBookApp.order.price.OrderPrice;
 import com.testaarosa.springRecallBookApp.order.price.PriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class QueryOrderService implements QueryOrderUseCase {
     }
 
     @Override
+    @Transactional
     public Optional<RichOrder> findOrderById(Long id) {
         return Optional
                 .of(repository.findById(id)

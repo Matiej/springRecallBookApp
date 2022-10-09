@@ -11,7 +11,7 @@ public class OrderPrice {
     BigDecimal totalDiscounts;
 
     public BigDecimal finalPrice() {
-        return itemsPrice.add(deliveryPrice).min(totalDiscounts);
+        return itemsPrice.add(deliveryPrice).subtract(totalDiscounts);
     }
 
 }

@@ -60,12 +60,15 @@ public class Order extends BaseEntity {
     }
 
     public BigDecimal getDeliverPrice() {
+        if(orderItems.isEmpty()){
+            return BigDecimal.ZERO;
+        }
         return delivery.getPrice();
     }
 
-    public void replaceOrderItems(Set<OrderItem> orderItems) {
+    public void replaceOrderItems(Set<OrderItem> newOrderItems) {
         orderItems.clear();
-        orderItems.addAll(orderItems);
+        orderItems.addAll(newOrderItems);
     }
 
     public UpdateOrderStatusResult updateOrderStatus(OrderStatus newStatus) {
