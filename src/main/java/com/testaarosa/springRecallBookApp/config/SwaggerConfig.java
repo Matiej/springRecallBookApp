@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-    private static final String[] PUBLIC_PATH_TO_MACH = {"/catalog/**",
+    private static final String[] PUBLIC_PATH_TO_MACH = {
+            "/catalog/**",
             "/uploads/**",
             "/orders/**",
             "/recipients/**",
@@ -24,6 +25,7 @@ public class SwaggerConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("springRecallBookApp-public")
+                .group("PUBLIC")
                 .pathsToMatch(PUBLIC_PATH_TO_MACH)
                 .build();
     }
@@ -32,6 +34,7 @@ public class SwaggerConfig {
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
                 .group("springRecallBookApp-admin")
+                .displayName("springRecallBookApp-ADMIN-API")
                 .pathsToMatch(ADMIN_PATH_TO_MAP)
                 .build();
     }
