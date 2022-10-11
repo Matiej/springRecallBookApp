@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final static String[] GET_AUTH_ALL_USERS_PATTERNS = {
             "/catalog/**",
@@ -24,9 +26,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/orders",
     };
 
-    private final static String[] AUTH_ADMIN_USER = {
-            "/admin/**"
-    };
     private final static String[] AUTH_DOC_SWAGGER_PATTERNS = {
             "/swagger-ui/**",
             "/swaggeradmin-openapi/**",
@@ -57,7 +56,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(AUTH_DOC_SWAGGER_PATTERNS).permitAll()
                 .mvcMatchers(HttpMethod.GET, GET_AUTH_ALL_USERS_PATTERNS).permitAll()
                 .mvcMatchers(HttpMethod.POST, POST_AUTH_ALL_USERS_PATTERNS).permitAll()
-                .mvcMatchers("/**").hasAuthority("DOCUMENTATION_ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
@@ -71,15 +69,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("plainuser")
                 .password(passwordEncoder().encode("test123"))
-                .authorities("USER")
+                .roles("USER")
                 .and()
                 .withUser("admin")
                 .password(passwordEncoder().encode("admin"))
-                .authorities("ADMIN")
-                .and()
-                .withUser("swaggeradmin")
-                .password(passwordEncoder().encode("apiadmin"))
-                .authorities("DOCUMENTATION_ADMIN");
+                .roles("ADMIN");
     }
 
     @Bean
