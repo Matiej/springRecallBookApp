@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -46,6 +47,7 @@ class OrderController {
     private final QueryOrderUseCase queryOrder;
     private final OrderUseCase orderUseCase;
 
+    @Secured(value = "ROLE_ADMIN")
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all orders from data base",
             description = "Filtering by order status. It is enum. Limit default 3 nor required")
@@ -69,6 +71,7 @@ class OrderController {
                 .body(orderList);
     }
 
+    @Secured(value = {"ROLE_ADMIN", "ROLE_USER"})
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get order by ID from data base",
             description = "Find order by ID in data base")
@@ -111,6 +114,7 @@ class OrderController {
                 .build();
     }
 
+    @Secured(value = "ROLE_ADMIN")
     @PatchMapping(value = "/{id}", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update order items", description = "Update an order items using order id and RestOrderItem. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating order ID")
@@ -134,6 +138,7 @@ class OrderController {
                 .build();
     }
 
+    @Secured(value = "ROLE_ADMIN")
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove order", description = "Remove order by ID")
@@ -146,6 +151,7 @@ class OrderController {
         orderUseCase.removeOrderById(id);
     }
 
+    @Secured(value = {"ROLE_ADMIN", "ROLE_USER"})
     @PatchMapping("/{id}/status")
     @Operation(summary = "Update order status", description = "Update order status using order id and RestOrderItem. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating order ID")
