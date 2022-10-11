@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,9 +14,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private final static String[] AUTH_ALL_USERS_PATTERNS = {
+    private final static String[] GET_AUTH_ALL_USERS_PATTERNS = {
             "/catalog/**",
+            "/uploads/**",
+            "/authors/**"
     };
+
+    private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
+            "/orders",
+    };
+
     private final static String[] AUTH_ADMIN_USER = {
             "/admin/**"
     };
@@ -47,6 +55,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .mvcMatchers(AUTH_DOC_SWAGGER_PATTERNS).permitAll()
+                .mvcMatchers(HttpMethod.GET, GET_AUTH_ALL_USERS_PATTERNS).permitAll()
+                .mvcMatchers(HttpMethod.POST, POST_AUTH_ALL_USERS_PATTERNS).permitAll()
+                .mvcMatchers("/**").hasAuthority("DOCUMENTATION_ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
@@ -68,7 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .withUser("swaggeradmin")
                 .password(passwordEncoder().encode("apiadmin"))
-                .authorities("ADMIN");
+                .authorities("DOCUMENTATION_ADMIN");
     }
 
     @Bean

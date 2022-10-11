@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -29,6 +30,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Authors API", description = "API designed to manipulate the Author object")
+@SecurityRequirement(name = "springrecallbook-api_documentation")
 class AuthorController {
     private static final String DEFAULT_QUERY_LIMIT = "3";
     private final AuthorUseCase authorUseCase;

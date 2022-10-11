@@ -49,6 +49,7 @@ class OrderService implements OrderUseCase {
         Order order = Order.builder()
                 .recipient(recipient)
                 .orderItems(orderItemList)
+                .delivery(command.getDelivery())
                 .build();
         recipient.addOrder(order);
         Order savedOrder = repository.save(order);

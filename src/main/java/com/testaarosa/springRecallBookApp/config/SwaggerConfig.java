@@ -24,7 +24,7 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
-                .group("springRecallBookApp-public")
+                .group("1_springRecallBookApp-public")
                 .displayName("PUBLIC-API")
                 .pathsToMatch(PUBLIC_PATH_TO_MACH)
                 .build();
@@ -33,7 +33,7 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
-                .group("springRecallBookApp-admin")
+                .group("2_springRecallBookApp-admin")
                 .displayName("ADMIN-API")
                 .pathsToMatch(ADMIN_PATH_TO_MAP)
                 .build();

@@ -36,7 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Catalog API", description = "API designed to manipulate the object book ")
-@SecurityRequirement(name = "springrecallbook-api")
+@SecurityRequirement(name = "springrecallbook-api_documentation")
 class CatalogController {
     private final String DEFAULT_QUERY_LIMIT = "3";
     private final CatalogUseCase catalogUseCase;
