@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Orders API ", description = "API designed to manipulate the order object")
+@SecurityRequirement(name = "springrecallbook-api_documentation")
 class OrderController {
     @Value(value = "${app.admin.email}")
     private String ADMIN;
@@ -144,7 +146,7 @@ class OrderController {
         orderUseCase.removeOrderById(id);
     }
 
-    @PutMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     @Operation(summary = "Update order status", description = "Update order status using order id and RestOrderItem. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating order ID")
     @ApiResponses({
