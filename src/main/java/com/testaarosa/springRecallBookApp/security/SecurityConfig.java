@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.config;
+package com.testaarosa.springRecallBookApp.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -67,13 +67,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("plainuser")
-                .password(passwordEncoder().encode("test123"))
-                .roles("USER")
-                .and()
-                .withUser("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN");
+                .withUser("plainuser").password(passwordEncoder().encode("test123")).roles("USER")
+                .and().withUser("kowalma@gmail.com").password(passwordEncoder().encode("test123")).roles("USER")
+                .and().withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN");
     }
 
     @Bean
