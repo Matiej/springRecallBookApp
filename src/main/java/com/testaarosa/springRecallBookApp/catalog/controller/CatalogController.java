@@ -39,6 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Catalog API", description = "API designed to manipulate the object book ")
 @SecurityRequirement(name = "springrecallbook-api_documentation")
 class CatalogController {
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private final String DEFAULT_QUERY_LIMIT = "3";
     private final CatalogUseCase catalogUseCase;
 
@@ -90,7 +91,7 @@ class CatalogController {
                         .build());
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new book, uses restBookCommand", description = "Add new book using restBookCommand. All fields are validated")
     @ApiResponses({
@@ -98,6 +99,7 @@ class CatalogController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Void> addBook(@Validated({CreateBookCommandGroup.class}) @RequestBody RestBookCommand command) {
+
         Book createdBook = catalogUseCase.addBook(command.toCreateBookCommand());
         URI savedUri = getUri(createdBook.getId());
         return ResponseEntity.created(savedUri)
@@ -105,7 +107,7 @@ class CatalogController {
                 .build();
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @PatchMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update book object", description = "Update existing book using ID. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating book ID")
@@ -131,7 +133,7 @@ class CatalogController {
                 .build();
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @PutMapping(value = "/{id}/cover", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "Update book object - add cover picture", description = "Update existing book using book ID. Needed jpg picture attached")
     @Parameter(name = "id", required = true, description = "Updating book ID")
@@ -156,7 +158,7 @@ class CatalogController {
 
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @DeleteMapping(value = "/{id}/cover")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove cover book picture", description = "Remove book cover picture by book ID")
@@ -169,7 +171,7 @@ class CatalogController {
         catalogUseCase.removeCoverByBookId(id);
     }
 
-    @Secured(value = "ROLE_ADMIN")
+    @Secured(value = ROLE_ADMIN)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove book object by ID", description = "Remove book by data base ID")

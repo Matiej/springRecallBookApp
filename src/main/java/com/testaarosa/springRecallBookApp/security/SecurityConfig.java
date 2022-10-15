@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.config;
+package com.testaarosa.springRecallBookApp.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,13 +9,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final String ROLE_ADMIN = "ROLE_ADMIN";
     private final static String[] GET_AUTH_ALL_USERS_PATTERNS = {
             "/catalog/**",
             "/uploads/**",
@@ -67,17 +72,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("plainuser")
-                .password(passwordEncoder().encode("test123"))
-                .roles("USER")
-                .and()
-                .withUser("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN");
+                .withUser("plainuser").password(passwordEncoder().encode("test123")).roles("USER")
+                .and().withUser("kowalma@gmail.com").password(passwordEncoder().encode("test123")).roles("USER")
+                .and().withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN");
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public User systemUser() {
+        return new User("systemUser", "", List.of(new SimpleGrantedAuthority(ROLE_ADMIN)));
     }
 }

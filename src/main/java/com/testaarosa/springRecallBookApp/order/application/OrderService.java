@@ -10,9 +10,8 @@ import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.order.domain.UpdateOrderStatusResult;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
+import com.testaarosa.springRecallBookApp.security.UserSecurity;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,11 +24,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 class OrderService implements OrderUseCase {
-    @Value("${app.admin.email}")
-    private String ADMIN;
     private final OrderJpaRepository repository;
     private final RecipientUseCase recipientUseCase;
     private final CatalogUseCase catalogUseCase;
+    private final UserSecurity userSecurity;
 
     @Override
     @Transactional
@@ -64,9 +62,9 @@ class OrderService implements OrderUseCase {
         Order order = repository.findById(command.getOrderId())
                 .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
 
-        //todo IMPORTANT until not implement security
-        if (!hasUserAccess(order, command.getRecipientEmail())) {
-            return OrderResponse.failure("Unauthorized", order.getId());
+        if (!userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(), command.getUser())) {
+            String errorMessage = "Unauthorized action for user: " + command.getUser().getUsername();
+            return OrderResponse.failure(order.getId(), errorMessage, OrderResponse.OrderErrorStatus.FORBIDDEN);
         }
         revokeBooksQuantity(order.getOrderItems());
         order.replaceOrderItems(orderItemList);
@@ -92,12 +90,14 @@ class OrderService implements OrderUseCase {
         String orderStatus = command.getOrderStatus().name();
         return repository.findById(orderId)
                 .map(order -> {
-                    if (!hasUserAccess(order, command.getRecipientEmail())) {
-                        return OrderResponse.failure("Unauthorized", orderId);
+                    if (!userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(),command.getUser())) {
+                        String errorMessage = "Unauthorized action for user: " + command.getUser().getUsername();
+                        return OrderResponse.failure(order.getId(), errorMessage, OrderResponse.OrderErrorStatus.FORBIDDEN);
                     }
                     Optional<OrderStatus> statusOptional = OrderStatus.parseOrderString(orderStatus);
                     if (statusOptional.isEmpty()) {
-                        return OrderResponse.failure("Unable to find given order status: '" + orderStatus + "'.", orderId);
+                        String errorMessage = "Unable to find given order status: '" + orderStatus + "'.";
+                        return OrderResponse.failure(order.getId(), errorMessage, OrderResponse.OrderErrorStatus.NOT_FOUND);
                     }
                     UpdateOrderStatusResult result = order.updateOrderStatus(statusOptional.get());
                     if (result.isRevoked()) {
@@ -106,12 +106,6 @@ class OrderService implements OrderUseCase {
                     return OrderResponse.success(orderId);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
-    }
-
-    private boolean hasUserAccess(Order order, String userEmail) {
-        String orderEmail = order.getRecipient().getEmail();
-        return StringUtils.equalsIgnoreCase(orderEmail, userEmail) ||
-                StringUtils.equalsIgnoreCase(ADMIN, userEmail);
     }
 
     @Override

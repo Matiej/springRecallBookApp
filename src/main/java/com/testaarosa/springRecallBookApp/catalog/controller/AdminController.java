@@ -2,10 +2,7 @@ package com.testaarosa.springRecallBookApp.catalog.controller;
 
 
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogInitializer;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;

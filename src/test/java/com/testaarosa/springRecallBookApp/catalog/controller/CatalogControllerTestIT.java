@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
@@ -260,6 +261,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
     @DisplayName("Should addBook() create and add book into DB")
      void shouldAddBook() {
         //given
@@ -281,6 +283,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
     @DisplayName("Should addBook() throws exception because no author in DB")
      void shouldNotAddBookAndThrowsIllegalArgumentException() {
         //given
@@ -299,9 +302,10 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @DisplayName("Should updateBook() update book title and available.")
     @Transactional
-     void shouldUpdateBook() {
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    @DisplayName("Should updateBook() update book title and available.")
+    void shouldUpdateBook() {
         //given
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
@@ -329,8 +333,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @DisplayName("Should updateBook() not update book because of wrong book ID")
     @Transactional
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    @DisplayName("Should updateBook() not update book because of wrong book ID")
      void shouldNotUpdateBook() {
         //given
         List<Author> authors = prepareAuthors();
@@ -365,8 +370,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @DisplayName("Non existing author. Should updateBook() throws an exception.")
     @Transactional
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    @DisplayName("Non existing author. Should updateBook() throws an exception.")
      void shouldNotUpdateBookNonExistingAuthorThrowsException() {
         //given
         List<Author> authors = prepareAuthors();
@@ -391,8 +397,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @DisplayName("Should addBookCover() add picture file to the test directory and create upload")
     @Transactional
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    @DisplayName("Should addBookCover() add picture file to the test directory and create upload")
      void shouldAddBookCover() throws URISyntaxException, IOException {
         //given
         String testFileName = "testCover.jpg";
@@ -420,8 +427,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @DisplayName("Should addBookCover() throws exception, non existing book")
     @Transactional
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    @DisplayName("Should addBookCover() throws exception, non existing book")
      void shouldAddBookCoverThrowsException() throws URISyntaxException {
         //given
         Long nonExistingBookId = 99L;
@@ -441,8 +449,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @DisplayName("Should deleteBookCover() delete picture form server and remove upload")
     @Transactional
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    @DisplayName("Should deleteBookCover() delete picture form server and remove upload")
      void shouldDeleteBookCover() throws URISyntaxException, IOException {
         //given
         String testFileName = "testCoverToDelete.jpg";
@@ -466,6 +475,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
     @DisplayName("Should deleteById() delete book by given ID")
      void shouldDeleteById() {
         //given

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -25,8 +26,7 @@ import static com.testaarosa.springRecallBookApp.order.domain.OrderStatus.NEW;
 public class AbandonedOrdersJob {
     @Value(value = "${app.duration.to.abandon.orders:1}")
     private Duration DURATION_TO_ABANDON_ORDERS;
-    @Value(value = "${app.admin.email}")
-    private String ADMIN;
+    private final User systemUser;
     private final OrderJpaRepository repository;
     private final OrderUseCase orderUseCase;
     private final Clock clock;
@@ -35,16 +35,16 @@ public class AbandonedOrdersJob {
     @Scheduled(cron = "${app.orders.abandoned.cron}")
     public void run() {
         log.info("Start job: " + this.getClass().getSimpleName() + " to search orders to change status as ABANDONED");
-//        LocalDateTime timeStamp = LocalDateTime.now().minus(DURATION_TO_ABANDON_ORDERS);
         LocalDateTime timeStamp = clock.now().minus(DURATION_TO_ABANDON_ORDERS);//
         List<Order> ordersToAbandon = repository.findAllByOrderStatusAndAndCreatedAtLessThanEqual(NEW, timeStamp);
         log.info("Found " + ordersToAbandon.size() + " orders to change status to ABANDONED");
+
         ordersToAbandon
                 .forEach(order -> {
                     UpdateOrderStatusCommand command = UpdateOrderStatusCommand.builder()
                             .orderId(order.getId())
                             .orderStatus(ABANDONED)
-                            .recipientEmail(ADMIN)//todo-Maciek fix when security is implemented
+                            .user(systemUser)
                             .build();
                     orderUseCase.updateOrderStatus(command);
                     log.info("Order with ID: " + order.getId() + " was updated. Status has changed to: " + ABANDONED);
