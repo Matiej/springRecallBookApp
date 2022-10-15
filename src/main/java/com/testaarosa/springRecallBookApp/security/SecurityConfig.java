@@ -1,5 +1,6 @@
 package com.testaarosa.springRecallBookApp.security;
 
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 
@@ -24,11 +26,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final static String[] GET_AUTH_ALL_USERS_PATTERNS = {
             "/catalog/**",
             "/uploads/**",
-            "/authors/**"
+            "/authors/**",
     };
 
     private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
             "/orders",
+            "/login",
     };
 
     private final static String[] AUTH_DOC_SWAGGER_PATTERNS = {
@@ -56,6 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.cors();
         http
                 .authorizeRequests()
                 .mvcMatchers(AUTH_DOC_SWAGGER_PATTERNS).permitAll()
@@ -64,9 +69,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
-                .and()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .and().addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+    }
+
+    @SneakyThrows
+    private JsonUserAuthenticationFilter authenticationFilter() {
+        JsonUserAuthenticationFilter filter = new JsonUserAuthenticationFilter();
+        filter.setAuthenticationManager(super.authenticationManager());
+        return filter;
     }
 
     @Override
