@@ -1,7 +1,6 @@
 package com.testaarosa.springRecallBookApp.security;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class UserSecurity {
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-    public boolean isOwnerOrOwner(String objectOwner, User user) {
+    public boolean isOwnerOrAdmin(String objectOwner, User user) {
         return isAdmin(objectOwner, user) || isOwner(objectOwner, user);
     }
 

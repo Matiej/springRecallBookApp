@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -52,14 +54,26 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .body(exceptionResponse);
     }
 
+    @ExceptionHandler({AccessDeniedException.class})
+    public final ResponseEntity<Object> handleAccessDeniedExceptionException(RuntimeException rex, WebRequest request) {
+        Principal userPrincipal = request.getUserPrincipal();
+        String message = "Forbidden action for user:  " + (userPrincipal == null ? "Unknown user" : userPrincipal.getName());
+        log.error(message, rex);
+        HttpStatus forbidden = HttpStatus.FORBIDDEN;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, forbidden);
+        return ResponseEntity.status(forbidden)
+                .headers(getExceptionHeaders(forbidden.name(), message))
+                .body(exceptionResponse);
+    }
+
     @ExceptionHandler({ConstraintViolationException.class})
     public final ResponseEntity<Object> handleConstraintViolationException(RuntimeException rex, WebRequest request) {
         String message = "Path parameter error. ";
         log.error(message, rex);
-        HttpStatus serviceUnavailable = HttpStatus.BAD_REQUEST;
-        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
-        return ResponseEntity.status(serviceUnavailable)
-                .headers(getExceptionHeaders(serviceUnavailable.name(), message))
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, badRequest);
+        return ResponseEntity.status(badRequest)
+                .headers(getExceptionHeaders(badRequest.name(), message))
                 .body(exceptionResponse);
     }
 
@@ -96,7 +110,6 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .headers(getExceptionHeaders(HttpStatus.BAD_REQUEST.name(), message))
                 .body(exceptionHandlerResponse);
     }
-
 
     private ExceptionHandlerResponse getExceptionHandlerResponse(Exception ex, String message, HttpStatus httpStatus) {
 

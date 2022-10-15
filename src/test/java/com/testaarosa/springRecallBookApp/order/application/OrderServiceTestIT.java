@@ -7,6 +7,7 @@ import com.testaarosa.springRecallBookApp.order.OrderBaseTest;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
 import com.testaarosa.springRecallBookApp.order.application.port.QueryOrderUseCase;
 import com.testaarosa.springRecallBookApp.order.dataBase.OrderJpaRepository;
+import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -218,7 +221,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
         //when
         UpdateOrderStatusCommand command = getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
-                placeOrderCommand.getPlaceOrderRecipient().getEmail());
+                user(placeOrderCommand.getPlaceOrderRecipient().getEmail()));
         OrderResponse canceledOrderResponse = orderUseCase.updateOrderStatus(command);
 
         //then
@@ -256,7 +259,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
         //when
         UpdateOrderStatusCommand command = getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID,
-                placeOrderCommand.getPlaceOrderRecipient().getEmail());
+                user(placeOrderCommand.getPlaceOrderRecipient().getEmail()));
         orderUseCase.updateOrderStatus(command);
 
         //then
@@ -279,11 +282,13 @@ class OrderServiceTestIT extends OrderBaseTest {
         OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
 
-        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID,
+                user(placeOrderCommand.getPlaceOrderRecipient().getEmail())));
 
         //when
         Throwable throwable = catchThrowable(
-                () -> orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED, placeOrderCommand.getPlaceOrderRecipient().getEmail())));
+                () -> orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
+                        user(placeOrderCommand.getPlaceOrderRecipient().getEmail()))));
 
         //then
         then(throwable).as("An IllegalArgumentException should be thrown if more books as available")
@@ -304,13 +309,14 @@ class OrderServiceTestIT extends OrderBaseTest {
                 + "  to '" + CANCELED.name() + "' status.";
         OrderResponse orderResponse = orderUseCase.placeOrder(placeOrderCommand);
         assertTrue(orderResponse.isSuccess());
-        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
-        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), SHIPPED, placeOrderCommand.getPlaceOrderRecipient().getEmail()));
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), PAID,
+                user(placeOrderCommand.getPlaceOrderRecipient().getEmail())));
+        orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), SHIPPED,
+                user(placeOrderCommand.getPlaceOrderRecipient().getEmail())));
 
         //when
         Throwable throwable = catchThrowable(() -> orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(),
-                CANCELED,
-                placeOrderCommand.getPlaceOrderRecipient().getEmail())));
+                CANCELED, user(placeOrderCommand.getPlaceOrderRecipient().getEmail()))));
 
         //then
         then(throwable).as("An IllegalArgumentException should be thrown if more books as available")
@@ -337,7 +343,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         //when
         String updateRecipientEmail = "alienRecipient@alien.com";
         orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
-                updateRecipientEmail));
+                user(updateRecipientEmail)));
 
         //then
         Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
@@ -362,7 +368,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
         //when
         orderUseCase.updateOrderStatus(getUpdateOrderStatusCommand(orderResponse.getOrderId(), CANCELED,
-                getADMIN_USER()));
+                admin()));
 
         //then
         Order order = orderJpaRepository.getReferenceById(orderResponse.getOrderId());
@@ -398,7 +404,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         OrderResponse response = orderUseCase.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
                 .item(placeOrderCommand.getItemList().get(1))
-                .recipientEmail(preparePlaceOrderRecipient().getEmail())
+                .user(user(preparePlaceOrderRecipient().getEmail()))
                 .build());
 
         //then
@@ -442,7 +448,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         OrderResponse response = orderUseCase.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
                 .item(placeOrderCommand.getItemList().get(1))
-                .recipientEmail(getADMIN_USER())
+                .user(admin())
                 .build());
 
         //then
@@ -486,7 +492,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         //when
         OrderResponse response = orderUseCase.updateOrderItems(UpdateOrderItemsCommand.builder()
                 .orderId(orderResponse.getOrderId())
-                .recipientEmail(unauthorizedUser)
+                .user(user(unauthorizedUser))
                 .item(placeOrderCommand.getItemList().get(1))
                 .build());
 
@@ -547,7 +553,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         Book book = prepareOneBook(20, "39.99");
 
         //when
-        PlaceOrderCommand command = getPlaceOrderCommand(book, 1);
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 1, Delivery.COURIER);
         OrderResponse orderResponse = orderUseCase.placeOrder(command);
 
         //then
@@ -562,7 +568,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         Book book = prepareOneBook(20, "39.99");
 
         //when
-        PlaceOrderCommand command = getPlaceOrderCommand(book, 3);
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 3, Delivery.COURIER);
         OrderResponse orderResponse = orderUseCase.placeOrder(command);
 
         //then
@@ -576,7 +582,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         Book book = prepareOneBook(20, "39.99");
 
         //when
-        PlaceOrderCommand command = getPlaceOrderCommand(book, 6);
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 6, Delivery.COURIER);
         OrderResponse orderResponse = orderUseCase.placeOrder(command);
 
         //then
@@ -589,7 +595,7 @@ class OrderServiceTestIT extends OrderBaseTest {
         Book book = prepareOneBook(20, "41.20");
 
         //when
-        PlaceOrderCommand command = getPlaceOrderCommand(book, 10);
+        PlaceOrderCommand command = getPlaceOrderCommand(book, 10, Delivery.COURIER);
         OrderResponse orderResponse = orderUseCase.placeOrder(command);
 
         //then
@@ -606,13 +612,21 @@ class OrderServiceTestIT extends OrderBaseTest {
     }
 
     private UpdateOrderStatusCommand getUpdateOrderStatusCommand(Long orderResponse, OrderStatus orderStatus,
-                                                                 String recipientEmail) {
+                                                                 User user) {
         return UpdateOrderStatusCommand
                 .builder()
                 .orderId(orderResponse)
                 .orderStatus(orderStatus)
-                .recipientEmail(recipientEmail)
+                .user(user)
                 .build();
+    }
+
+    private User user(String email) {
+        return new User(email,"test", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+    }
+
+    private User admin() {
+        return new User(getADMIN_USER(),"test", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
     }
 
 }

@@ -87,9 +87,9 @@ class OrderController {
             @ApiResponse(responseCode = "403", description = "Unauthorized action, user has no rights to resource!"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No orders found!"),
     })
-    public ResponseEntity<RichOrder> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                                  @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                                  @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                          @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
+                                          @AuthenticationPrincipal User user) {
         return queryOrder.findOrderById(id)
                 .map(order -> authorize(order, user))
                 .orElse(ResponseEntity.notFound()
@@ -98,33 +98,23 @@ class OrderController {
                         .build());
     }
 
-    private ResponseEntity<RichOrder> authorize(RichOrder order, User user) {
-        if (userSecurity.isOwnerOrOwner(order.getRecipient().getEmail(), user)) {
-            return ResponseEntity.ok()
-                    .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
-                    .body(order);
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.FORBIDDEN.name())
-                .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), "Not authorized action for user: " + user.getUsername())
-                .build();
-    }
-
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new order", description = "Add new order using recipient ID and RestOrderItem. All fields are validated")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Order object created successful"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized action, user has no rights to resource!"),
             @ApiResponse(responseCode = "404", description = "Recipient or book for the order not found!"),
     })
     public ResponseEntity<Void> addOrder(@Valid @RequestBody RestPlaceOrderCommand command) {
         OrderResponse orderResponse = orderUseCase.placeOrder(command.toPlaceOrderCommand());
         URI savedUri = getUri(orderResponse.getOrderId());
         if (!orderResponse.isSuccess()) {
-            return ResponseEntity.notFound()
+            HttpStatus status = orderResponse.getErrorStatus().getStatus();
+            return ResponseEntity.status(status)
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.POST.name())
-                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
-                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getError().toString())
+                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), status.name())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getErrorMessage())
                     .build();
         }
         return ResponseEntity.created(savedUri)
@@ -139,19 +129,24 @@ class OrderController {
     @ApiResponses({
             @ApiResponse(responseCode = "202", description = "Order updated successful"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized action, user has no rights to resource!"),
+            @ApiResponse(responseCode = "404", description = "No order for update found"),
     })
     public ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                               @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                              @Valid @RequestBody RestUpdateOrderCommand command) {
-        OrderResponse updateOrderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id, ADMIN));
-        if (!updateOrderResponse.isSuccess()) {
-            return ResponseEntity.notFound()
+                                              @Valid @RequestBody RestUpdateOrderCommand command,
+                                              @AuthenticationPrincipal User user) {
+
+        OrderResponse orderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id, user));
+        if (!orderResponse.isSuccess()) {
+            HttpStatus status = orderResponse.getErrorStatus().getStatus();
+            return ResponseEntity.status(status)
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
-                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
-                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), updateOrderResponse.getError().toString())
+                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), status.name())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getErrorMessage())
                     .build();
         }
-        return ResponseEntity.created(getUri(updateOrderResponse.getOrderId()))
+        return ResponseEntity.created(getUri(orderResponse.getOrderId()))
                 .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PATCH))
                 .build();
     }
@@ -179,24 +174,37 @@ class OrderController {
             @ApiResponse(responseCode = "404", description = "No order for update found"),
 
     })
-    public ResponseEntity<?> updateOrderStatus(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                               @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                               @Valid @RequestBody RestUpdateOrderStatusCommand command) {
-//todo fix email when security is implement
+    public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                                           @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
+                                                           @Valid @RequestBody RestUpdateOrderStatusCommand command,
+                                                           @AuthenticationPrincipal User user) {
         OrderResponse orderResponse = orderUseCase.updateOrderStatus(UpdateOrderStatusCommand.builder()
                 .orderId(id)
                 .orderStatus(OrderStatus.valueOf(command.getOrderStatus()))
-                .recipientEmail(ADMIN)
+                .user(user)
                 .build());
         if (!orderResponse.isSuccess()) {
-            return ResponseEntity.status(404)
-                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PUT.name())
-                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
-                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getError())
+            HttpStatus status = orderResponse.getErrorStatus().getStatus();
+            return ResponseEntity.status(status)
+                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
+                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), status.name())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), orderResponse.getErrorMessage())
                     .body(orderResponse);
         }
         return ResponseEntity.created(getUri(orderResponse.getOrderId()))
                 .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PUT))
+                .build();
+    }
+
+    private ResponseEntity<Object> authorize(RichOrder order, User user) {
+        if (userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(), user)) {
+            return ResponseEntity.ok()
+                    .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
+                    .body(order);
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.FORBIDDEN.name())
+                .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), "Not authorized action for user: " + user.getUsername())
                 .build();
     }
 
