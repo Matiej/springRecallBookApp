@@ -39,6 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Catalog API", description = "API designed to manipulate the object book ")
 @SecurityRequirement(name = "springrecallbook-api_documentation")
 class CatalogController {
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private final String DEFAULT_QUERY_LIMIT = "3";
     private final CatalogUseCase catalogUseCase;
 
@@ -90,7 +91,7 @@ class CatalogController {
                         .build());
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new book, uses restBookCommand", description = "Add new book using restBookCommand. All fields are validated")
     @ApiResponses({
@@ -98,6 +99,7 @@ class CatalogController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     public ResponseEntity<Void> addBook(@Validated({CreateBookCommandGroup.class}) @RequestBody RestBookCommand command) {
+
         Book createdBook = catalogUseCase.addBook(command.toCreateBookCommand());
         URI savedUri = getUri(createdBook.getId());
         return ResponseEntity.created(savedUri)

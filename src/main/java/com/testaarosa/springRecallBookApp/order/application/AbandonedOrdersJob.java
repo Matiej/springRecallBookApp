@@ -26,7 +26,7 @@ import static com.testaarosa.springRecallBookApp.order.domain.OrderStatus.NEW;
 public class AbandonedOrdersJob {
     @Value(value = "${app.duration.to.abandon.orders:1}")
     private Duration DURATION_TO_ABANDON_ORDERS;
-    private User systemUser;
+    private final User systemUser;
     private final OrderJpaRepository repository;
     private final OrderUseCase orderUseCase;
     private final Clock clock;

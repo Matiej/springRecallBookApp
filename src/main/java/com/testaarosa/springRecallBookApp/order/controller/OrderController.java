@@ -47,8 +47,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 class OrderController {
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private static final String ROLE_USER = "ROLE_USER";
-    @Value(value = "${app.admin.email}")
-    private String ADMIN;
     private final QueryOrderUseCase queryOrder;
     private final OrderUseCase orderUseCase;
     private final UserSecurity userSecurity;

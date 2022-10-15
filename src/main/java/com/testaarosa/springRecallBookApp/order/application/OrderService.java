@@ -109,11 +109,6 @@ class OrderService implements OrderUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Can't find order with id: " + command.getOrderId()));
     }
 
-    private boolean hasUserAccess(Order order, User user) {
-        String orderEmail = order.getRecipient().getEmail();
-        return  userSecurity.isOwnerOrAdmin(orderEmail, user);
-    }
-
     @Override
     @Transactional
     public void removeOrderById(Long id) {

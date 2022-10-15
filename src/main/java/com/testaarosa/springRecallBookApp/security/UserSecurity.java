@@ -9,10 +9,10 @@ public class UserSecurity {
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     public boolean isOwnerOrAdmin(String objectOwner, User user) {
-        return isAdmin(objectOwner, user) || isOwner(objectOwner, user);
+        return isAdmin(user) || isOwner(objectOwner, user);
     }
 
-    private boolean isAdmin(String objectOwner, User user) {
+    public boolean isAdmin(User user) {
         return user.getAuthorities()
                 .stream()
                 .anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN));
