@@ -12,7 +12,6 @@ import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUs
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import com.testaarosa.springRecallBookApp.security.UserSecurity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

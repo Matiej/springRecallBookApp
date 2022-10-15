@@ -107,7 +107,7 @@ class CatalogController {
                 .build();
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @PatchMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Update book object", description = "Update existing book using ID. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating book ID")
@@ -133,7 +133,7 @@ class CatalogController {
                 .build();
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @PutMapping(value = "/{id}/cover", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "Update book object - add cover picture", description = "Update existing book using book ID. Needed jpg picture attached")
     @Parameter(name = "id", required = true, description = "Updating book ID")
@@ -158,7 +158,7 @@ class CatalogController {
 
     }
 
-    @Secured(value = {"ROLE_ADMIN"})
+    @Secured(value = {ROLE_ADMIN})
     @DeleteMapping(value = "/{id}/cover")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove cover book picture", description = "Remove book cover picture by book ID")
@@ -171,7 +171,7 @@ class CatalogController {
         catalogUseCase.removeCoverByBookId(id);
     }
 
-    @Secured(value = "ROLE_ADMIN")
+    @Secured(value = ROLE_ADMIN)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove book object by ID", description = "Remove book by data base ID")
