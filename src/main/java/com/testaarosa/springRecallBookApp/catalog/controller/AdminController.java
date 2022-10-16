@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.catalog.controller;
 
 
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogInitializer;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,12 @@ public class AdminController {
                 .status(200)
                 .headers(getSuccessfulHeaders(HttpStatus.I_AM_A_TEAPOT, HttpMethod.GET))
                 .body("ADMIN RESPONSE - OK");
+    }
 
-
+    @PostMapping("/rolesinit")
+    @Operation(summary = "Add default roles",
+            description = "Add ADMIN and USER roles to data base")
+    public void rolesInit() {
+        catalogInitializer.rolesInit();
     }
 }

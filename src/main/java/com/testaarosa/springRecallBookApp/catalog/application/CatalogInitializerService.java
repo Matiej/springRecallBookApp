@@ -18,6 +18,8 @@ import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.application.SaveRecipientCommand;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
+import com.testaarosa.springRecallBookApp.user.application.port.RoleUseCase;
+import com.testaarosa.springRecallBookApp.user.domain.RoleEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,6 +51,7 @@ class CatalogInitializerService implements CatalogInitializer {
     private final AuthorUseCase authorUseCase;
     private final CatalogUseCase catalogUseCase;
     private final OrderUseCase orderUseCase;
+    private final RoleUseCase roleUseCase;
 
     @Override
     @Transactional
@@ -56,6 +59,12 @@ class CatalogInitializerService implements CatalogInitializer {
         addBook();
         createRecipient();
         placeOrder();
+    }
+
+    @Override
+    public void rolesInit() {
+        roleUseCase.addRole(RoleEnum.ADMIN);
+        roleUseCase.addRole(RoleEnum.USER);
     }
 
     private void addBook() {
