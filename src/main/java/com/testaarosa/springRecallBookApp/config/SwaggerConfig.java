@@ -16,7 +16,8 @@ public class SwaggerConfig {
             "/uploads/**",
             "/orders/**",
             "/recipients/**",
-            "/authors/**"
+            "/authors/**",
+            "/users/**"
     };
 
     private static final String ADMIN_PATH_TO_MAP = "/admin/**";

@@ -3,6 +3,7 @@ package com.testaarosa.springRecallBookApp.user.domain;
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import java.util.HashSet;
@@ -15,8 +16,8 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 public class Role extends BaseEntity {
+    @Column(unique = true)
     private String role;
-
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @ManyToMany(mappedBy = "roles", targetEntity = UserEntity.class)

@@ -72,9 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors();
         http
                 .authorizeRequests()
-                .mvcMatchers(AUTH_DOC_SWAGGER_PATTERNS).permitAll()
                 .mvcMatchers(HttpMethod.GET, GET_AUTH_ALL_USERS_PATTERNS).permitAll()
                 .mvcMatchers(HttpMethod.POST, POST_AUTH_ALL_USERS_PATTERNS).permitAll()
+                .mvcMatchers(AUTH_DOC_SWAGGER_PATTERNS).hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
@@ -92,10 +92,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authProvider());
-//        auth.inMemoryAuthentication()
-//                .withUser("plainuser").password(passwordEncoder().encode("test123")).roles("USER")
-//                .and().withUser("kowalma@gmail.com").password(passwordEncoder().encode("test123")).roles("USER")
-//                .and().withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN");
 
     }
 
@@ -103,7 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     AuthenticationProvider authProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(new BookAppUserDetailService(userEntityJpaRepository,defaultAdmin));
+        provider.setUserDetailsService(new BookAppUserDetailService(userEntityJpaRepository, defaultAdmin));
         return provider;
     }
 
