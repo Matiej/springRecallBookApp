@@ -50,7 +50,7 @@ class OrderController {
     private final OrderUseCase orderUseCase;
     private final UserSecurity userSecurity;
 
-    @Secured(value = "ROLE_ADMIN")
+    @Secured(value = ROLE_ADMIN)
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all orders from data base",
             description = "Filtering by order status. It is enum. Limit default 3 nor required")

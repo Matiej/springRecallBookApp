@@ -34,15 +34,15 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 class AuthorController {
     private static final String DEFAULT_QUERY_LIMIT = "3";
     private final AuthorUseCase authorUseCase;
-
+//todo - dodac security tutaj. Zabezpieczyc endpoint
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all authors from data base",
-            description = "Filtering by name or/and lastName or/and yearOfBirth. Is not case sensitive. Limit default 3 nor required")
+            description = "Filtering by name or/and lastName or/and yearOfBirth. Is not case sensitive. Limit default value is 3, not required")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
     })
-    public ResponseEntity<List<Author>> findALl(@RequestParam Optional<String> name,
+    ResponseEntity<List<Author>> findALl(@RequestParam Optional<String> name,
                                                 @RequestParam Optional<String> lastName,
                                                 @RequestParam Optional<Integer> yearOfBirth,
                                                 @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
