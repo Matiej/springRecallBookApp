@@ -1,15 +1,19 @@
 package com.testaarosa.springRecallBookApp.security;
 
+import com.testaarosa.springRecallBookApp.user.dataBase.UserEntityJpaRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,8 +24,13 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableConfigurationProperties(DefaultAdmin.class)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final UserEntityJpaRepository userEntityJpaRepository;
+    private final DefaultAdmin defaultAdmin;
+
     private final String ROLE_ADMIN = "ROLE_ADMIN";
     private final static String[] GET_AUTH_ALL_USERS_PATTERNS = {
             "/catalog/**",
@@ -82,14 +91,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("plainuser").password(passwordEncoder().encode("test123")).roles("USER")
-                .and().withUser("kowalma@gmail.com").password(passwordEncoder().encode("test123")).roles("USER")
-                .and().withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN");
+        auth.authenticationProvider(authProvider());
+//        auth.inMemoryAuthentication()
+//                .withUser("plainuser").password(passwordEncoder().encode("test123")).roles("USER")
+//                .and().withUser("kowalma@gmail.com").password(passwordEncoder().encode("test123")).roles("USER")
+//                .and().withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN");
+
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    AuthenticationProvider authProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(new BookAppUserDetailService(userEntityJpaRepository,defaultAdmin));
+        return provider;
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
