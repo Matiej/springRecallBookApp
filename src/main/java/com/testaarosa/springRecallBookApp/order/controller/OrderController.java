@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -58,8 +58,8 @@ class OrderController {
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No orders found!"),
     })
-    public ResponseEntity<List<Order>> getAll(@RequestParam Optional<OrderStatus> orderStatus,
-                                              @RequestParam(value = "limit", defaultValue = "3", required = false) int limit) {
+    ResponseEntity<List<Order>> getAll(@RequestParam Optional<OrderStatus> orderStatus,
+                                       @RequestParam(value = "limit", defaultValue = "3", required = false) int limit) {
         return orderStatus
                 .map(status -> prepareResponseForGetAll(queryOrder.findAllByOrderStatus(status)))
                 .orElseGet(() -> prepareResponseForGetAll(queryOrder.findAll()
@@ -78,15 +78,15 @@ class OrderController {
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get order by ID from data base",
             description = "Find order by ID in data base")
-    @Parameter(name = "id", required = true, description = "Get recipient by ID")
+    @Parameter(name = "id", required = true, description = "Get order by ID")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "403", description = "Unauthorized action, user has no rights to resource!"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No orders found!"),
     })
-    public ResponseEntity<?> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                          @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                          @AuthenticationPrincipal User user) {
+    ResponseEntity<?> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                   @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
+                                   @Parameter(hidden = true) @AuthenticationPrincipal UserDetails user) {
         return queryOrder.findOrderById(id)
                 .map(order -> authorize(order, user))
                 .orElse(ResponseEntity.notFound()
@@ -103,7 +103,7 @@ class OrderController {
             @ApiResponse(responseCode = "403", description = "Unauthorized action, user has no rights to resource!"),
             @ApiResponse(responseCode = "404", description = "Recipient or book for the order not found!"),
     })
-    public ResponseEntity<Void> addOrder(@Valid @RequestBody RestPlaceOrderCommand command) {
+    ResponseEntity<Void> addOrder(@Valid @RequestBody RestPlaceOrderCommand command) {
         OrderResponse orderResponse = orderUseCase.placeOrder(command.toPlaceOrderCommand());
         URI savedUri = getUri(orderResponse.getOrderId());
         if (!orderResponse.isSuccess()) {
@@ -129,10 +129,10 @@ class OrderController {
             @ApiResponse(responseCode = "403", description = "Unauthorized action, user has no rights to resource!"),
             @ApiResponse(responseCode = "404", description = "No order for update found"),
     })
-    public ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                              @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                              @Valid @RequestBody RestUpdateOrderCommand command,
-                                              @AuthenticationPrincipal User user) {
+    ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                       @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
+                                       @Valid @RequestBody RestUpdateOrderCommand command,
+                                       @Parameter(hidden = true) @AuthenticationPrincipal UserDetails user) {
 
         OrderResponse orderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id, user));
         if (!orderResponse.isSuccess()) {
@@ -156,8 +156,8 @@ class OrderController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Order removed successful"),
     })
-    public void removeOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                @Min(value = 1, message = "OrderId field value must be greater than 0") Long id) {
+    void removeOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                         @Min(value = 1, message = "OrderId field value must be greater than 0") Long id) {
         orderUseCase.removeOrderById(id);
     }
 
@@ -171,10 +171,10 @@ class OrderController {
             @ApiResponse(responseCode = "404", description = "No order for update found"),
 
     })
-    public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
-                                                           @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                                           @Valid @RequestBody RestUpdateOrderStatusCommand command,
-                                                           @AuthenticationPrincipal User user) {
+    ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
+                                                    @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
+                                                    @Valid @RequestBody RestUpdateOrderStatusCommand command,
+                                                    @Parameter(hidden = true) @AuthenticationPrincipal UserDetails user) {
         OrderResponse orderResponse = orderUseCase.updateOrderStatus(UpdateOrderStatusCommand.builder()
                 .orderId(id)
                 .orderStatus(OrderStatus.valueOf(command.getOrderStatus()))
@@ -193,7 +193,7 @@ class OrderController {
                 .build();
     }
 
-    private ResponseEntity<Object> authorize(RichOrder order, User user) {
+    private ResponseEntity<Object> authorize(RichOrder order, UserDetails user) {
         if (userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(), user)) {
             return ResponseEntity.ok()
                     .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
