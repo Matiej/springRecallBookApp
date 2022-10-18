@@ -47,8 +47,8 @@ class UploadsController {
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No cover found!"),
     })
-    public ResponseEntity<?> getUploadCoverById(@PathVariable("id") @NotNull(message = "CoverId filed can't be empty or null")
-                                                @Min(value = 1, message = "CoverId field must be greater then 0") Long id) {
+    ResponseEntity<?> getUploadCoverById(@PathVariable("id") @NotNull(message = "CoverId filed can't be empty or null")
+                                         @Min(value = 1, message = "CoverId field must be greater then 0") Long id) {
         return uploadUseCase.getCoverUploadById(id)
                 .map(file -> ResponseEntity
                         .ok()
@@ -76,9 +76,9 @@ class UploadsController {
             @ApiResponse(responseCode = "204", description = "Can't update, no upload - book cover found"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
-    public ResponseEntity<?> updateUpload(@PathVariable("id") @NotNull(message = "UploadId field can't be empty or null")
-                                          @Min(value = 1, message = "UploadId field can't be lower then 1") Long id,
-                                          @RequestParam(value = "cover") MultipartFile cover) throws IOException {
+    ResponseEntity<?> updateUpload(@PathVariable("id") @NotNull(message = "UploadId field can't be empty or null")
+                                   @Min(value = 1, message = "UploadId field can't be lower then 1") Long id,
+                                   @RequestParam(value = "cover") MultipartFile cover) throws IOException {
         log.info("Received request with file: " + cover.getOriginalFilename());
         UpdateUploadResponse uploadResponse = uploadUseCase.updateById(new UpdateUploadCommand(id, cover.getOriginalFilename(),
                 cover.getBytes(), cover.getContentType()));

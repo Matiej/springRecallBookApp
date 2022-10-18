@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-class UseService implements UserUseCase {
+class UserService implements UserUseCase {
     private final UserEntityJpaRepository userEntityJpaRepository;
     private final RoleJpaRepository roleJpaRepository;
     private final PasswordEncoder encoder;
