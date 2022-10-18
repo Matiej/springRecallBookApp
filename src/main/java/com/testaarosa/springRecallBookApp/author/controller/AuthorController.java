@@ -34,7 +34,8 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 class AuthorController {
     private static final String DEFAULT_QUERY_LIMIT = "3";
     private final AuthorUseCase authorUseCase;
-//todo - dodac security tutaj. Zabezpieczyc endpoint
+
+    //todo - dodac security tutaj. Zabezpieczyc endpoint
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all authors from data base",
             description = "Filtering by name or/and lastName or/and yearOfBirth. Is not case sensitive. Limit default value is 3, not required")
@@ -43,9 +44,9 @@ class AuthorController {
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
     })
     ResponseEntity<List<Author>> findALl(@RequestParam Optional<String> name,
-                                                @RequestParam Optional<String> lastName,
-                                                @RequestParam Optional<Integer> yearOfBirth,
-                                                @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
+                                         @RequestParam Optional<String> lastName,
+                                         @RequestParam Optional<Integer> yearOfBirth,
+                                         @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
 
         return prepareResponseForGetAll(authorUseCase.findAllByParams(AuthorQueryCommand.builder()
                 .name(name.orElse(null))
@@ -61,9 +62,9 @@ class AuthorController {
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No author found!"),
     })
-    public ResponseEntity<Author> findOneById(@PathVariable("id")
-                                              @NotNull(message = "AuthorId filed can't be null")
-                                              @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
+    ResponseEntity<Author> findOneById(@PathVariable("id")
+                                       @NotNull(message = "AuthorId filed can't be null")
+                                       @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
         return authorUseCase.findById(id)
                 .map(author -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
@@ -86,8 +87,8 @@ class AuthorController {
             @ApiResponse(responseCode = "201", description = "Author object created successful"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
-    public ResponseEntity<?> addAuthor(@Validated({CreateAuthorCommandGroup.class})
-                                       @RequestBody RestAuthorCommand command) {
+    ResponseEntity<?> addAuthor(@Validated({CreateAuthorCommandGroup.class})
+                                @RequestBody RestAuthorCommand command) {
         Author author = authorUseCase.addAuthor(command.toCreateAuthorCommand());
         return ResponseEntity.created(getUri(author.getId()))
                 .headers(getSuccessfulHeaders(HttpStatus.CREATED, HttpMethod.POST))
@@ -102,10 +103,10 @@ class AuthorController {
             @ApiResponse(responseCode = "204", description = "Can't update, no author found"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
-    public ResponseEntity<Object> updateAuthor(@PathVariable("id") @NotNull(message = "AuthorId filed can't be null)")
-                                               @Min(value = 1, message = "AuthorId field value must be greater than 0") Long id,
-                                               @Validated({UpdateAuthorCommandGroup.class})
-                                               @RequestBody RestAuthorCommand command) {
+    ResponseEntity<Object> updateAuthor(@PathVariable("id") @NotNull(message = "AuthorId filed can't be null)")
+                                        @Min(value = 1, message = "AuthorId field value must be greater than 0") Long id,
+                                        @Validated({UpdateAuthorCommandGroup.class})
+                                        @RequestBody RestAuthorCommand command) {
         UpdatedAuthorResponse updatedAuthorResponse = authorUseCase.updateAuthor(command.toUpdateAuthorCommand(id));
         if (!updatedAuthorResponse.isSuccess()) {
             return ResponseEntity.noContent()

@@ -1,18 +1,18 @@
 package com.testaarosa.springRecallBookApp.user.domain;
 
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class UserEntity extends BaseEntity {
     private String username;
     private String password;
@@ -24,21 +24,34 @@ public class UserEntity extends BaseEntity {
     @JoinTable(name = "role_user",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        if (!super.equals(o)) return false;
-//        UserEntity userEntity = (UserEntity) o;
-//        return accountNonExpired == userEntity.accountNonExpired && accountNonLocked == userEntity.accountNonLocked && credentialsNonExpired ==
-//                userEntity.credentialsNonExpired && enabled == userEntity.enabled && Objects.equals(username, userEntity.username) && Objects.equals(password, userEntity.password)
-//                && Objects.equals(matchingPassword, userEntity.matchingPassword);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(super.hashCode(), username, password, matchingPassword, accountNonExpired, accountNonLocked, credentialsNonExpired, enabled);
-//    }
+    public UserEntity(String username, String password, String matchingPassword) {
+        this.username = username;
+        this.password = password;
+        this.matchingPassword = matchingPassword;
+        this.roles = roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(username, that.username) && Objects.equals(password, that.password) && Objects.equals(matchingPassword, that.matchingPassword);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), username, password, matchingPassword);
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
+    }
+
+    public void removeRole(Role role) {
+        roles.remove(role);
+    }
 }

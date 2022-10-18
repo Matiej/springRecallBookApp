@@ -3,7 +3,7 @@ package com.testaarosa.springRecallBookApp.order.application;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -13,6 +13,6 @@ public class UpdateOrderItemsCommand {
     @Singular("item")
     List<PlaceOrderItem> itemList;
     Long orderId;
-    User user;
+    UserDetails user;
 
 }

@@ -23,16 +23,16 @@ import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderF
 @RequestMapping("/admin")
 @AllArgsConstructor
 @SecurityRequirement(name = "springrecallbook-api_documentation")
-public class AdminController {
+class AdminController {
     private final CatalogInitializer catalogInitializer;
 
     @PostMapping("/initialization")
-    public void initialize() {
+    void initialize() {
         catalogInitializer.init();
     }
 
     @GetMapping("/check")
-    public ResponseEntity<Object> check() {
+    ResponseEntity<Object> check() {
         return ResponseEntity
                 .status(200)
                 .headers(getSuccessfulHeaders(HttpStatus.I_AM_A_TEAPOT, HttpMethod.GET))
@@ -42,7 +42,7 @@ public class AdminController {
     @PostMapping("/rolesinit")
     @Operation(summary = "Add default roles",
             description = "Add ADMIN and USER roles to data base")
-    public void rolesInit() {
+    void rolesInit() {
         catalogInitializer.rolesInit();
     }
 }

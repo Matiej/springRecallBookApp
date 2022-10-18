@@ -1,5 +1,7 @@
 package com.testaarosa.springRecallBookApp.user.controller;
 
+import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.user.application.RegisterUserResponse;
 import com.testaarosa.springRecallBookApp.user.application.UserQueryCommand;
 import com.testaarosa.springRecallBookApp.user.application.port.UserUseCase;
 import com.testaarosa.springRecallBookApp.user.domain.RoleEnum;
@@ -11,17 +13,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,5 +62,33 @@ public class UserController {
                 .body(users);
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Register new user", description = "Add and register new user. All fields are validated")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User object created successful"),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details.")
+    })
+    ResponseEntity<Void> register(@Valid @RequestBody RestRegisterCommand command) {
+        log.info("Received request to register user: " + command.getUsername());
+        RegisterUserResponse registerUserResponse = userUseCase.registerUser(command.toUserCommand());
+        if (!registerUserResponse.isSuccess()) {
+            return ResponseEntity.badRequest()
+                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.POST.name())
+                    .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.BAD_REQUEST.name())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), registerUserResponse.getErrorMessage())
+                    .build();
+        }
+        return ResponseEntity.created(getUri(registerUserResponse.getId()))
+                .headers(getSuccessfulHeaders(HttpStatus.CREATED, HttpMethod.POST))
+                .build();
+    }
 
+    private static URI getUri(Long id) {
+        return ServletUriComponentsBuilder
+                .fromCurrentServletMapping()
+                .path("/users")
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri();
+    }
 }

@@ -41,6 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
             "/orders",
             "/login",
+            "/users"
     };
 
     private final static String[] AUTH_DOC_SWAGGER_PATTERNS = {
