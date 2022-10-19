@@ -49,19 +49,14 @@ class OrderServiceTestIT extends OrderBaseTest {
     @Autowired
     private QueryOrderUseCase queryOrderUseCase;
 
-    @BeforeAll
-    static void init(TestInfo testInfo) {
-        log.info("Start test suite: {}.", testInfo.getTestClass());
-    }
-
     @BeforeEach
     void setup(TestInfo testInfo) {
         log.info("Starting test: {}.", testInfo.getDisplayName());
     }
 
-    @AfterAll
-    static void afterAllTests(TestInfo testInfo) {
-        log.info("Finished running the tests suit: {}." + testInfo.getDisplayName());
+    @AfterEach
+    void tier(TestInfo testInfo) {
+        log.info("Finished test:  {}", testInfo.getDisplayName());
     }
 
     @Test
@@ -548,6 +543,7 @@ class OrderServiceTestIT extends OrderBaseTest {
     }
 
     @Test
+    @DisplayName("Should be shipping cost added to total order price, method placeOrder().")
     void shouldShippingCostAddedToTotalOrderPrice() {
         //given
         Book book = prepareOneBook(20, "39.99");
@@ -563,6 +559,7 @@ class OrderServiceTestIT extends OrderBaseTest {
     }
 
     @Test
+    @DisplayName("Should be shipping cost discounted if order value over 100, method placeOrder().")
     void shouldShippingCostDiscountedOver100Value() {
         //given
         Book book = prepareOneBook(20, "39.99");
@@ -578,6 +575,7 @@ class OrderServiceTestIT extends OrderBaseTest {
     }
 
     @Test
+    @DisplayName("Should cheapest book be for half price when total over 200, method placeOrder().")
     void shouldCheapestBookIsHalfPriceWhenTotalOver200Value() {
         Book book = prepareOneBook(20, "39.99");
 
@@ -591,6 +589,7 @@ class OrderServiceTestIT extends OrderBaseTest {
     }
 
     @Test
+    @DisplayName("Should cheapest book be for free when total over 400, method placeOrder().")
     void shouldCheapestBookIsFreeWhenTotalOver400Value() {
         Book book = prepareOneBook(20, "41.20");
 

@@ -32,18 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final DefaultAdmin defaultAdmin;
 
     private final String ROLE_ADMIN = "ROLE_ADMIN";
-    private final static String[] GET_AUTH_ALL_USERS_PATTERNS = {
-            "/catalog/**",
-            "/uploads/**",
-            "/authors/**",
-    };
-
-    private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
-            "/orders",
-            "/login",
-            "/users"
-    };
-
+    
     private final static String[] AUTH_DOC_SWAGGER_PATTERNS = {
             "/swagger-ui/**",
             "/swaggeradmin-openapi/**",
@@ -66,6 +55,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/springfox-swagger-ui/**",
             "/webjars/**",
     };
+    private final static String[] GET_AUTH_ALL_USERS_PATTERNS = {
+            "/catalog/**",
+            "/uploads/**",
+            "/authors/**",
+    };
+
+    private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
+            "/orders",
+            "/login",
+            "/users"
+    };
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
