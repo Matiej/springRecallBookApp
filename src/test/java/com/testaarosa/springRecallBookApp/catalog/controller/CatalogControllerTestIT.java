@@ -10,10 +10,7 @@ import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.uploads.dataBase.UploadJpaRepository;
 import com.testaarosa.springRecallBookApp.uploads.domain.Upload;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -70,7 +67,11 @@ class CatalogControllerTestIT extends CatalogTestBase {
     @BeforeEach
     void setup(TestInfo testInfo) {
         log.info("Starting test: {}.", testInfo.getDisplayName());
+    }
 
+    @AfterEach
+    void tierDown(TestInfo testInfo) {
+        log.info("Finished test: {}", testInfo.getDisplayName());
     }
 
     @Test
