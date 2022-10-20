@@ -35,16 +35,18 @@ class RecipientService implements RecipientUseCase {
 
     @Override
     public Recipient updateRecipient(Recipient recipient) {
+        //todo Maciek - sprawdzic czy updatetowany email nie istnieje u innego recipienta + testy
         return repository.save(recipient);
     }
 
     @Override
     public RecipientResponse updateRecipient(UpdateRecipientCommand command) {
+        //todo Maciek - sprawdzic czy updatetowany email nie istnieje u innego recipienta
         return findById(command.getId())
                 .map(recipient -> {
                     Recipient update = repository.save(command.updateRecipientFields(recipient));
                     return RecipientResponse.SUCCESS(update.getId());
-                }).orElseGet(() -> RecipientResponse.FAILURE(List.of("No recipient to update found for ID: " + command.getId())));
+                }).orElseGet(() -> RecipientResponse.FAILURE("No recipient to update found for ID: " + command.getId()));
     }
 
     @Override

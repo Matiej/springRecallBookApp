@@ -2,24 +2,15 @@ package com.testaarosa.springRecallBookApp.recipient.application;
 
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import com.testaarosa.springRecallBookApp.recipient.domain.RecipientAddress;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
 
-@Value
-@Builder(builderMethodName = "hiddenBuilder")
-public class UpdateRecipientCommand {
-    Long id;
-    String name;
-    String lastName;
-    String phone;
-    String email;
-    String street;
-    String buildingNumber;
-    String apartmentNumber;
-    String district;
-    String city;
-    String zipCode;
+@ToString
+@Getter
+@SuperBuilder(builderMethodName = "hiddenBuilder")
+public class UpdateRecipientCommand extends RecipientCommand {
+    private Long id;
 
     public Recipient updateRecipientFields(Recipient recipient) {
         if (StringUtils.isNoneBlank(name)) {
