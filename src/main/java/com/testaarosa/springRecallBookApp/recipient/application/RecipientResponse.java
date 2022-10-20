@@ -11,13 +11,13 @@ import java.util.List;
 public class RecipientResponse {
     boolean success;
     Long orderId;
-    List<String> errorList;
+    String error;
 
     public static RecipientResponse SUCCESS(Long orderId) {
-        return new RecipientResponse(true, orderId, Collections.emptyList());
+        return new RecipientResponse(true, orderId, null);
     }
 
-    public static RecipientResponse FAILURE(List<String> errors) {
-        return new RecipientResponse(false, null, errors);
+    public static RecipientResponse FAILURE(String error) {
+        return new RecipientResponse(false, null, error);
     }
 }

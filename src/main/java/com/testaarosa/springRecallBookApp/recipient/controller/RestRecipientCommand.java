@@ -45,7 +45,7 @@ class RestRecipientCommand {
     }
 
     UpdateRecipientCommand toUpdateRecipientCommand(Long id) {
-        return UpdateRecipientCommand.builder(id)
+        return (UpdateRecipientCommand) UpdateRecipientCommand.builder(id)
                 .name(name)
                 .phone(phone)
                 .street(street)

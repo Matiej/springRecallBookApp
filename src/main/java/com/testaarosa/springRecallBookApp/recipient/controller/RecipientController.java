@@ -107,7 +107,7 @@ public class RecipientController {
             return ResponseEntity.notFound()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
                     .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NOT_FOUND.name())
-                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), recipientResponse.getErrorList().toString())
+                    .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), recipientResponse.getError())
                     .build();
         }
         return ResponseEntity.created(getUri(recipientResponse.getOrderId()))

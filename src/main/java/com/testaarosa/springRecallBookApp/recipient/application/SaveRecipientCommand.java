@@ -3,21 +3,13 @@ package com.testaarosa.springRecallBookApp.recipient.application;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import com.testaarosa.springRecallBookApp.recipient.domain.RecipientAddress;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-@Builder
-@Value
-public class SaveRecipientCommand {
-    String name;
-    String lastName;
-    String phone;
-    String email;
-    String street;
-    String buildingNumber;
-    String apartmentNumber;
-    String district;
-    String city;
-    String zipCode;
+@SuperBuilder
+public class SaveRecipientCommand extends RecipientCommand {
 
     public Recipient toRecipient() {
         return Recipient.builder()
