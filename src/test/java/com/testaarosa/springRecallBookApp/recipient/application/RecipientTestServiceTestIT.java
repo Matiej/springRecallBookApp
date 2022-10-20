@@ -1,13 +1,8 @@
-package com.testaarosa.springRecallBookApp.recipient.application.port;
+package com.testaarosa.springRecallBookApp.recipient.application;
 
-import com.testaarosa.springRecallBookApp.catalog.domain.Book;
-import com.testaarosa.springRecallBookApp.order.application.PlaceOrderCommand;
-import com.testaarosa.springRecallBookApp.order.application.PlaceOrderItem;
-import com.testaarosa.springRecallBookApp.order.application.PlaceOrderRecipient;
 import com.testaarosa.springRecallBookApp.order.application.port.OrderUseCase;
-import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.recipient.RecipientTestBase;
-import com.testaarosa.springRecallBookApp.recipient.application.SaveRecipientCommand;
+import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.dataBase.RecipientJpaRepository;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import com.testaarosa.springRecallBookApp.recipient.domain.RecipientAddress;
@@ -15,15 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-
-import javax.validation.ConstraintViolationException;
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -88,7 +77,47 @@ class RecipientTestServiceTestIT extends RecipientTestBase {
                 .hasMessageContaining(expectedErrorMessage);
     }
 
-    private void assertRecipientFields(Recipient recipient, SaveRecipientCommand command) {
+    @Test
+    @DisplayName("Should update recipient, method updateRecipient(Recipient recipient).")
+    void shouldUpdateRecipient() {
+        //given
+        SaveRecipientCommand saveRecipientCommand = prepareSaveRecipientCommand();
+        Recipient recipient = recipientUseCase.addRecipient(saveRecipientCommand);
+        UpdateRecipientCommand updateRecipientCommand = prepareUpdateRecipientCommand(recipient, recipient.getId());
+        //when
+
+        RecipientResponse response = recipientUseCase.updateRecipient(updateRecipientCommand);
+
+        //then
+        assertNotNull(response);
+        assertTrue(response.isSuccess());
+
+        Recipient recipientFromDb = recipientJpaRepository.findById(recipient.getId()).get();
+        assertNotNull(recipientFromDb);
+        assertRecipientFields(recipientFromDb, updateRecipientCommand);
+    }
+
+    @Test
+    @DisplayName("Should NOT update recipient, wrong ID, method updateRecipient(Recipient recipient).")
+    void shouldNotUpdateRecipientFailure() {
+        //given
+        SaveRecipientCommand saveRecipientCommand = prepareSaveRecipientCommand();
+        Recipient recipient = recipientUseCase.addRecipient(saveRecipientCommand);
+        UpdateRecipientCommand updateRecipientCommand = prepareUpdateRecipientCommand(recipient, 111L);
+        //when
+
+        RecipientResponse response = recipientUseCase.updateRecipient(updateRecipientCommand);
+
+        //then
+        assertNotNull(response);
+        assertFalse(response.isSuccess());
+        assertEquals("No recipient to update found for ID: " + 111, response.getError());
+        Recipient recipientFromDb = recipientJpaRepository.findById(recipient.getId()).get();
+        assertNotNull(recipientFromDb);
+        assertRecipientFields(recipientFromDb, saveRecipientCommand);
+    }
+
+    private void assertRecipientFields(Recipient recipient, RecipientCommand command) {
         assertAll("Assert recipient fields",
                 () -> assertEquals(recipient.getName(), command.getName()),
                 () -> assertEquals(recipient.getLastName(), command.getLastName()),
@@ -106,6 +135,26 @@ class RecipientTestServiceTestIT extends RecipientTestBase {
                 () -> assertEquals(recipientAddress.getCity(), command.getCity()),
                 () -> assertEquals(recipientAddress.getZipCode(), command.getZipCode())
         );
+    }
+
+    private UpdateRecipientCommand prepareUpdateRecipientCommand(Recipient recipient, Long id) {
+        RecipientAddress recipientAddress = recipient.getRecipientAddress();
+        return (UpdateRecipientCommand) UpdateRecipientCommand.builder(id)
+                .name(updateFiled(recipient.getName()))
+                .lastName(updateFiled(recipient.getLastName()))
+                .phone(updateFiled(recipient.getPhone()))
+                .email(updateFiled(recipient.getEmail()))
+                .street(updateFiled(recipientAddress.getStreet()))
+                .buildingNumber(updateFiled(recipientAddress.getBuildingNumber()))
+                .apartmentNumber(updateFiled(recipientAddress.getApartmentNumber()))
+                .district(updateFiled(recipientAddress.getDistrict()))
+                .city(updateFiled(recipientAddress.getCity()))
+                .zipCode(updateFiled(recipientAddress.getZipCode()))
+                .build();
+    }
+
+    private String updateFiled(String contentToUpdate) {
+        return contentToUpdate+"_updated";
     }
 
     private SaveRecipientCommand prepareSaveRecipientCommand() {
