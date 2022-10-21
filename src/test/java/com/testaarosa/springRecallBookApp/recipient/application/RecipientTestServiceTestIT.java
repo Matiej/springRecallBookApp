@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.*;
@@ -115,6 +117,40 @@ class RecipientTestServiceTestIT extends RecipientTestBase {
         Recipient recipientFromDb = recipientJpaRepository.findById(recipient.getId()).get();
         assertNotNull(recipientFromDb);
         assertRecipientFields(recipientFromDb, saveRecipientCommand);
+    }
+
+    @Test
+    @DisplayName("Should find recipient by email, method findOneByEmail(String email).")
+    void shouldFindRecipientByEmail() {
+        //given
+        SaveRecipientCommand saveRecipientCommand = prepareSaveRecipientCommand();
+        Recipient recipient = recipientUseCase.addRecipient(saveRecipientCommand);
+        //when
+
+        Optional<Recipient> response = recipientUseCase.findOneByEmail(recipient.getEmail());
+
+        //then
+        assertNotNull(response);
+        assertFalse(response.isEmpty());
+        Recipient receivedRecipient = response.get();
+        assertEquals(recipient.getId(), receivedRecipient.getId());
+        assertEquals(recipient.getUUID(), receivedRecipient.getUUID());
+        assertEquals(recipient.getEmail(), receivedRecipient.getEmail());
+    }
+
+    @Test
+    @DisplayName("Should NOT find recipient by email, method findOneByEmail(String email).")
+    void shouldNotFindRecipientByEmail() {
+        //given
+        SaveRecipientCommand saveRecipientCommand = prepareSaveRecipientCommand();
+        Recipient recipient = recipientUseCase.addRecipient(saveRecipientCommand);
+        //when
+
+        Optional<Recipient> response = recipientUseCase.findOneByEmail("anyother@email.com");
+
+        //then
+        assertNotNull(response);
+        assertTrue(response.isEmpty());
     }
 
     private void assertRecipientFields(Recipient recipient, RecipientCommand command) {
