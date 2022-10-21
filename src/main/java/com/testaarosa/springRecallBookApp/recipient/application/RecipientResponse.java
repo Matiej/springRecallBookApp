@@ -3,9 +3,6 @@ package com.testaarosa.springRecallBookApp.recipient.application;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.Collections;
-import java.util.List;
-
 @Value
 @Builder
 public class RecipientResponse {

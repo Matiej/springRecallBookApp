@@ -86,7 +86,7 @@ class OrderController {
     })
     ResponseEntity<?> getOrderById(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                    @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
-                                   @Parameter(hidden = true) @AuthenticationPrincipal UserDetails user) {
+                                   @AuthenticationPrincipal UserDetails user) {
         return queryOrder.findOrderById(id)
                 .map(order -> authorize(order, user))
                 .orElse(ResponseEntity.notFound()
@@ -132,7 +132,7 @@ class OrderController {
     ResponseEntity<?> updateOrderItems(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                        @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
                                        @Valid @RequestBody RestUpdateOrderCommand command,
-                                       @Parameter(hidden = true) @AuthenticationPrincipal UserDetails user) {
+                                       @AuthenticationPrincipal UserDetails user) {
 
         OrderResponse orderResponse = orderUseCase.updateOrderItems(command.toUpdateOrderCommand(id, user));
         if (!orderResponse.isSuccess()) {
@@ -174,7 +174,7 @@ class OrderController {
     ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable("id") @NotNull(message = "OrderId filed can't be null")
                                                     @Min(value = 1, message = "OrderId field value must be greater than 0") Long id,
                                                     @Valid @RequestBody RestUpdateOrderStatusCommand command,
-                                                    @Parameter(hidden = true) @AuthenticationPrincipal UserDetails user) {
+                                                    @AuthenticationPrincipal UserDetails user) {
         OrderResponse orderResponse = orderUseCase.updateOrderStatus(UpdateOrderStatusCommand.builder()
                 .orderId(id)
                 .orderStatus(OrderStatus.valueOf(command.getOrderStatus()))

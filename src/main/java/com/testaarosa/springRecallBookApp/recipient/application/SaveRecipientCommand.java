@@ -2,10 +2,6 @@ package com.testaarosa.springRecallBookApp.recipient.application;
 
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import com.testaarosa.springRecallBookApp.recipient.domain.RecipientAddress;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
