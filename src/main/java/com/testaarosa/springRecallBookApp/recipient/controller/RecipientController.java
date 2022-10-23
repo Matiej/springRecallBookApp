@@ -15,6 +15,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -35,8 +38,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Recipients API", description = "API designed to manipulate recipient object")
 @SecurityRequirement(name = "springrecallbook-api_documentation")
 public class RecipientController {
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_USER = "ROLE_USER";
     private final RecipientUseCase recipientUseCase;
 
+    @Secured(value = {ROLE_ADMIN})
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all recipients", description = "Get all recipients from data base by name and last name")
     @ApiResponses({
@@ -59,6 +65,7 @@ public class RecipientController {
                 .body(recipientList);
     }
 
+    @Secured(value = {ROLE_ADMIN, ROLE_USER})
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get recipient by ID", description = "Get recipient by ID from data base")
     @ApiResponses({
@@ -77,6 +84,7 @@ public class RecipientController {
                         .build());
     }
 
+    @Secured(value = {ROLE_ADMIN})
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new recipient", description = "Add new recipient. All fields are validated")
     @ApiResponses({
@@ -92,6 +100,7 @@ public class RecipientController {
                 .build();
     }
 
+    @Secured(value = {ROLE_ADMIN, ROLE_USER})
     @PatchMapping("/{id}")
     @Operation(summary = "Update recipient", description = "Update recipient. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating recipient ID")
@@ -101,8 +110,9 @@ public class RecipientController {
     })
     public ResponseEntity<?> updateRecipient(@PathVariable("id") @NotNull(message = "RecipientID filed can't be null")
                                              @Min(value = 1, message = "RecipientId field value must be greater then 0") Long id,
-                                             @RequestBody @Validated(UpdateRecipientGroup.class) RestRecipientCommand command) {
-        RecipientResponse recipientResponse = recipientUseCase.updateRecipient(command.toUpdateRecipientCommand(id));
+                                             @RequestBody @Validated(UpdateRecipientGroup.class) RestRecipientCommand command,
+                                             @AuthenticationPrincipal UserDetails user) {
+        RecipientResponse recipientResponse = recipientUseCase.updateRecipient(command.toUpdateRecipientCommand(id, user));
         if (!recipientResponse.isSuccess()) {
             return ResponseEntity.notFound()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
@@ -110,12 +120,12 @@ public class RecipientController {
                     .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), recipientResponse.getError())
                     .build();
         }
-        return ResponseEntity.created(getUri(recipientResponse.getOrderId()))
+        return ResponseEntity.created(getUri(recipientResponse.getRecipientId()))
                 .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PATCH))
                 .build();
 
     }
-
+    @Secured(value = {ROLE_ADMIN})
     @DeleteMapping("/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove recipient", description = "Remove recipient by ID")

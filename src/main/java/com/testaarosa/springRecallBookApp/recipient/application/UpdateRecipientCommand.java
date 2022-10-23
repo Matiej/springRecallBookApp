@@ -6,12 +6,14 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @ToString
 @Getter
 @SuperBuilder(builderMethodName = "hiddenBuilder")
 public class UpdateRecipientCommand extends RecipientCommand {
     private Long id;
+    private UserDetails user;
 
     public Recipient updateRecipientFields(Recipient recipient) {
         if (StringUtils.isNoneBlank(name)) {
@@ -23,9 +25,10 @@ public class UpdateRecipientCommand extends RecipientCommand {
         if (StringUtils.isNoneBlank(phone)) {
             recipient.setPhone(phone);
         }
-        if (StringUtils.isNoneBlank(email)) {
-            recipient.setEmail(email);
-        }
+        // todo Maciek - no possiblity to update email - must be the same as user email. Maybe not. Think about how it should be
+//        if (StringUtils.isNoneBlank(email)) {
+//            recipient.setEmail(email);
+//        }
 
         RecipientAddress recipientAddress = recipient.getRecipientAddress();
 
@@ -49,9 +52,5 @@ public class UpdateRecipientCommand extends RecipientCommand {
         }
         recipient.setRecipientAddress(recipientAddress);
         return recipient;
-    }
-
-    public static UpdateRecipientCommandBuilder builder(Long id) {
-        return hiddenBuilder().id(id);
     }
 }

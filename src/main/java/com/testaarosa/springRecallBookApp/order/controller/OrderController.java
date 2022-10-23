@@ -103,8 +103,9 @@ class OrderController {
             @ApiResponse(responseCode = "403", description = "Unauthorized action, user has no rights to resource!"),
             @ApiResponse(responseCode = "404", description = "Recipient or book for the order not found!"),
     })
-    ResponseEntity<Void> addOrder(@Valid @RequestBody RestPlaceOrderCommand command) {
-        OrderResponse orderResponse = orderUseCase.placeOrder(command.toPlaceOrderCommand());
+    ResponseEntity<Void> addOrder(@Valid @RequestBody RestPlaceOrderCommand command,
+                                  @AuthenticationPrincipal UserDetails user) {
+        OrderResponse orderResponse = orderUseCase.placeOrder(command.toPlaceOrderCommand(user));
         URI savedUri = getUri(orderResponse.getOrderId());
         if (!orderResponse.isSuccess()) {
             HttpStatus status = orderResponse.getErrorStatus().getStatus();

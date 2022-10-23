@@ -6,6 +6,7 @@ import com.testaarosa.springRecallBookApp.order.domain.Order;
 import lombok.*;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.HashSet;
@@ -14,8 +15,8 @@ import java.util.Set;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString(callSuper = true)
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +24,7 @@ public class Recipient extends BaseEntity {
     private String name;
     private String lastName;
     private String phone;
+    @Column(unique = true)
     private String email;
     private RecipientAddress recipientAddress;
     @OneToMany(cascade = CascadeType.ALL,

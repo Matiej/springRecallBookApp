@@ -33,17 +33,20 @@ class OrderService implements OrderUseCase {
     @Transactional
     public OrderResponse placeOrder(PlaceOrderCommand command) {
         Set<OrderItem> orderItemList = getOrderItems(command.getItemList());
+        return recipientUseCase.findOneByEmail(command.getPlaceOrderRecipient().getEmail())
+                .map(recipient -> {
+                    if (null == command.getUser()) {
+                        String errorMessage = "Unauthorized action, no user logged";
+                        return OrderResponse.failure(null, errorMessage, OrderResponse.OrderErrorStatus.FORBIDDEN);
+                    } else if (!userSecurity.isOwnerOrAdmin(recipient.getEmail(), command.getUser())) {
+                        String errorMessage = "Unauthorized action for user: " + command.getUser().getUsername();
+                        return OrderResponse.failure(null, errorMessage, OrderResponse.OrderErrorStatus.FORBIDDEN);
+                    }
+                    return getOrderResponse(command, orderItemList, recipient);
+                }).orElseGet(() -> getOrderResponse(command, orderItemList, command.getPlaceOrderRecipient().toRecipient()));
+    }
 
-        Recipient orderRecipient = command.getPlaceOrderRecipient().toRecipient();
-
-        Recipient recipient = recipientUseCase.findOneByEmail(command.getPlaceOrderRecipient().getEmail())
-                .map(foundRecipient -> {
-                    foundRecipient.updateFields(orderRecipient);
-                    recipientUseCase.updateRecipient(foundRecipient);
-                    return foundRecipient;
-                })
-                .orElse(orderRecipient);
-
+    private OrderResponse getOrderResponse(PlaceOrderCommand command, Set<OrderItem> orderItemList, Recipient recipient) {
         Order order = Order.builder()
                 .recipient(recipient)
                 .orderItems(orderItemList)
@@ -90,7 +93,7 @@ class OrderService implements OrderUseCase {
         String orderStatus = command.getOrderStatus().name();
         return repository.findById(orderId)
                 .map(order -> {
-                    if (!userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(),command.getUser())) {
+                    if (!userSecurity.isOwnerOrAdmin(order.getRecipient().getEmail(), command.getUser())) {
                         String errorMessage = "Unauthorized action for user: " + command.getUser().getUsername();
                         return OrderResponse.failure(order.getId(), errorMessage, OrderResponse.OrderErrorStatus.FORBIDDEN);
                     }

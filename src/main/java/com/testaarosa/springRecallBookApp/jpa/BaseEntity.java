@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.jpa;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,6 +16,7 @@ import static java.util.UUID.randomUUID;
 @MappedSuperclass
 @Getter
 @Setter
+@ToString
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
     @Id
@@ -33,11 +35,11 @@ public abstract class BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BaseEntity that = (BaseEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(UUID, that.UUID) && Objects.equals(createdAt, that.createdAt) && Objects.equals(lastUpdatedAt, that.lastUpdatedAt);
+        return version == that.version && Objects.equals(id, that.id) && Objects.equals(UUID, that.UUID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, UUID, createdAt, lastUpdatedAt);
+        return Objects.hash(id, UUID, version);
     }
 }

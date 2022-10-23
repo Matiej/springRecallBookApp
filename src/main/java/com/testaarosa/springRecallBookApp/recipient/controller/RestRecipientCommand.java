@@ -4,6 +4,7 @@ import com.testaarosa.springRecallBookApp.recipient.application.SaveRecipientCom
 import com.testaarosa.springRecallBookApp.recipient.application.UpdateRecipientCommand;
 import lombok.Builder;
 import lombok.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.NotBlank;
 
@@ -44,14 +45,18 @@ class RestRecipientCommand {
                 .build();
     }
 
-    UpdateRecipientCommand toUpdateRecipientCommand(Long id) {
-        return (UpdateRecipientCommand) UpdateRecipientCommand.builder(id)
+    UpdateRecipientCommand toUpdateRecipientCommand(Long id, UserDetails user) {
+        return UpdateRecipientCommand
+                .hiddenBuilder()
+                .id(id)
+                .user(user)
                 .name(name)
                 .phone(phone)
                 .street(street)
                 .city(city)
                 .zipCode(zipCode)
                 .email(email)
+                .user(user)
                 .build();
     }
 }
