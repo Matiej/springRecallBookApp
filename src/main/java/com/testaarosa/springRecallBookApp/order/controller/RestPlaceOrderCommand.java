@@ -6,6 +6,7 @@ import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import com.testaarosa.springRecallBookApp.recipient.controller.SaveRecipientGroup;
 import lombok.Data;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -33,13 +34,13 @@ class RestPlaceOrderCommand extends RestOrderCommand{
     @NotNull(message = "Delivery option cannot be empty")
     Delivery delivery;
 
-
-    PlaceOrderCommand toPlaceOrderCommand() {
+    PlaceOrderCommand toPlaceOrderCommand(UserDetails user) {
         return PlaceOrderCommand.builder()
                 .itemList(getPlaceOrderItems())
                 .orderStatus(OrderStatus.NEW)
                 .placeOrderRecipient(toPlaceOrderRecipient())
                 .delivery(delivery)
+                .user(user)
                 .build();
     }
 

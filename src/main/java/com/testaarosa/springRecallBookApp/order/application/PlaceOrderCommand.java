@@ -5,6 +5,7 @@ import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -16,4 +17,5 @@ public class PlaceOrderCommand {
     OrderStatus orderStatus;
     PlaceOrderRecipient placeOrderRecipient;
     Delivery delivery;
+    UserDetails user;
 }
