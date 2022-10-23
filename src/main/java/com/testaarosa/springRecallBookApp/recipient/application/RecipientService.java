@@ -4,9 +4,11 @@ import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUs
 import com.testaarosa.springRecallBookApp.recipient.controller.RecipientQueryCommand;
 import com.testaarosa.springRecallBookApp.recipient.dataBase.RecipientJpaRepository;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
+import com.testaarosa.springRecallBookApp.security.UserSecurity;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 class RecipientService implements RecipientUseCase {
     private final RecipientJpaRepository repository;
+    private final UserSecurity userSecurity;
 
     @Override
     public Recipient addRecipient(SaveRecipientCommand command) {
@@ -34,19 +37,17 @@ class RecipientService implements RecipientUseCase {
     }
 
     @Override
-    public Recipient updateRecipient(Recipient recipient) {
-        //todo Maciek - sprawdzic czy updatetowany email nie istnieje u innego recipienta + testy
-        return repository.save(recipient);
-    }
-
-    @Override
     public RecipientResponse updateRecipient(UpdateRecipientCommand command) {
-        //todo Maciek - sprawdzic czy updatetowany email nie istnieje u innego recipienta
         return findById(command.getId())
                 .map(recipient -> {
+                    UserDetails user = command.getUser();
+                    if (!userSecurity.isOwnerOrAdmin(recipient.getEmail(), user)) {
+                        String errorMessage = "Unauthorized action for user: " + user.getUsername();
+                        return RecipientResponse.FAILURE(errorMessage, recipient.getId(), RecipientResponse.RecipientErrorStatus.FORBIDDEN);
+                    }
                     Recipient update = repository.save(command.updateRecipientFields(recipient));
                     return RecipientResponse.SUCCESS(update.getId());
-                }).orElseGet(() -> RecipientResponse.FAILURE("No recipient to update found for ID: " + command.getId()));
+                }).orElseGet(() -> RecipientResponse.FAILURE("No recipient to update found for ID: " + command.getId(), command.getId(), RecipientResponse.RecipientErrorStatus.NOT_FOUND));
     }
 
     @Override
@@ -90,8 +91,11 @@ class RecipientService implements RecipientUseCase {
         } else if (StringUtils.isNotEmpty(zipCode)) {
             return repository.findAllByRecipientAddress_ZipCodeContainingIgnoreCase(zipCode, Pageable.ofSize(limit));
 
-        } else {
+        } else if(limit > 0) {
             return repository.findAll(Pageable.ofSize(limit)).stream().collect(Collectors.toList());
+
+        } else {
+            return repository.findAll();
         }
     }
 }

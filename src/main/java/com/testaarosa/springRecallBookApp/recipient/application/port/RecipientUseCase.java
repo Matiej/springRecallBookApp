@@ -12,18 +12,10 @@ import java.util.Optional;
 public interface RecipientUseCase {
 
      Recipient addRecipient(SaveRecipientCommand command);
-
     Optional<Recipient> findById(Long id);
-
     RecipientResponse updateRecipient(UpdateRecipientCommand command);
-
-    Recipient updateRecipient(Recipient recipient);
-
     Optional<Recipient> findOneByEmail(String email);
-
     List<Recipient> findAll();
-
     void removeRecipientById(Long id);
-
     List<Recipient> finaAllByParams(RecipientQueryCommand build);
 }
