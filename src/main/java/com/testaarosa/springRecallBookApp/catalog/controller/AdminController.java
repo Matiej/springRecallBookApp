@@ -26,17 +26,24 @@ import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderF
 class AdminController {
     private final CatalogInitializer catalogInitializer;
 
-    @PostMapping("/initialization")
-    void initialize() {
-        catalogInitializer.init();
-    }
-
     @GetMapping("/check")
     ResponseEntity<Object> check() {
         return ResponseEntity
                 .status(200)
                 .headers(getSuccessfulHeaders(HttpStatus.I_AM_A_TEAPOT, HttpMethod.GET))
                 .body("ADMIN RESPONSE - OK");
+    }
+
+    @PostMapping("/books_initialize")
+    void bookInitialize() {
+        catalogInitializer.booksInit();
+    }
+
+    @PostMapping("/orders_initialize")
+    @Operation(summary = "Add some orders",
+            description = "Add orders, but first must add books")
+    void orderInitialize() {
+        catalogInitializer.ordersInit();
     }
 
     @PostMapping("/rolesinit")
