@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.catalog.application.port;
 
 public interface CatalogInitializer {
 
-    void init();
+    void booksInit();
+    void ordersInit();
     void rolesInit();
 }

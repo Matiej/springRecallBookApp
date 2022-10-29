@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -36,10 +37,8 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -55,9 +54,14 @@ class CatalogInitializerService implements CatalogInitializer {
 
     @Override
     @Transactional
-    public void init() {
+    public void booksInit() {
         addBook();
         createRecipient();
+    }
+
+    @Override
+    @Transactional
+    public void ordersInit() {
         placeOrder();
     }
 
@@ -165,10 +169,14 @@ class CatalogInitializerService implements CatalogInitializer {
     }
 
     private void placeOrder() {
+        List<Book> books = catalogUseCase.findAll(Pageable.ofSize(200))
+                .stream()
+                .filter(book -> book.getAvailable()>0)
+                .collect(Collectors.toList());
 
-        PlaceOrderItem placeOrderItem1 = new PlaceOrderItem(2L, 2);
-        PlaceOrderItem placeOrderItem2 = new PlaceOrderItem(11L, 1);
-        PlaceOrderItem placeOrderItem3 = new PlaceOrderItem(1L, 3);
+        PlaceOrderItem placeOrderItem1 = new PlaceOrderItem(getRandomBookId(books), 2);
+        PlaceOrderItem placeOrderItem2 = new PlaceOrderItem(getRandomBookId(books), 1);
+        PlaceOrderItem placeOrderItem3 = new PlaceOrderItem(getRandomBookId(books), 1);
 
         PlaceOrderRecipient placeOrderRecipient = PlaceOrderRecipient.builder()
                 .name("Marek")
@@ -191,6 +199,14 @@ class CatalogInitializerService implements CatalogInitializer {
 
         orderUseCase.placeOrder(placeOrderCommand);
 
+    }
+
+    private Long getRandomBookId(List<Book> books) {
+        if (books == null || books.size() < 1) {
+            throw new IllegalArgumentException("Initialization data because - can't create order");
+        }
+        Random random = new Random();
+        return books.get(random.nextInt(books.size())).getId();
     }
 
     @Data
