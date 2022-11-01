@@ -38,8 +38,11 @@ class UploadsController {
     private final UploadUseCase uploadUseCase;
 
 
-    @GetMapping(value = "/{id}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE,
-            MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    @GetMapping(value = "/{id}",
+            produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE},
+            consumes = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE})
     @Operation(summary = "Get book cover by ID", description = "Get book cover by cover ID")
     @Parameter(name = "id", required = true, description = "Searching cover ID")
     @Schema(example = "picture file")
