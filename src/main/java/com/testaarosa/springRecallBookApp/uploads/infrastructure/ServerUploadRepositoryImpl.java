@@ -56,7 +56,8 @@ class ServerUploadRepositoryImpl implements ServerUploadRepository {
                 Files.createDirectories(pathToCreate);
                 log.info("Upload file directory has been created=> " + coversPath);
             } catch (IOException e) {
-                log.error("Can't create upload directory=> " + coversPath);
+                String errorMessage = "Can't create upload directory=> " + coversPath;
+                log.error(errorMessage);
             }
         }
         return pathToCreate;
@@ -96,7 +97,8 @@ class ServerUploadRepositoryImpl implements ServerUploadRepository {
                 Files.delete(coverPath);
                 log.info("File has been deleted: " + coverPath.getFileName());
             } catch (IOException e) {
-                log.error("Can't delete file in path: " + path);
+                String errorMessage = "Can't delete file in path: " + path;
+                log.error(errorMessage);
             }
         }
     }

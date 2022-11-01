@@ -37,6 +37,9 @@ public class UploadRepositoryService implements UploadRepository{
         return uploadById
                 .map(upload -> {
                     byte[] fileByPath = serverUploadRepository.getFileByPath(upload.getPath());
+                    if(fileByPath == null) {
+                        throw new IllegalArgumentException("Can't find file for uploadID: " + id);
+                    }
                     return UploadResponse
                             .builder()
                             .id(upload.getId())
