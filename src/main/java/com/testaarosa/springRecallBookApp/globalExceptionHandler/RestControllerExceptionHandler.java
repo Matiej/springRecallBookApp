@@ -3,6 +3,7 @@ package com.testaarosa.springRecallBookApp.globalExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -39,6 +40,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         HttpStatus serviceUnavailable = HttpStatus.SERVICE_UNAVAILABLE;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
         return ResponseEntity.status(serviceUnavailable)
+                .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(serviceUnavailable.name(), message))
                 .body(exceptionResponse);
     }
@@ -50,6 +52,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         HttpStatus serviceUnavailable = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
         return ResponseEntity.status(serviceUnavailable)
+                .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(serviceUnavailable.name(), message))
                 .body(exceptionResponse);
     }
@@ -62,6 +65,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         HttpStatus forbidden = HttpStatus.FORBIDDEN;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, forbidden);
         return ResponseEntity.status(forbidden)
+                .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(forbidden.name(), message))
                 .body(exceptionResponse);
     }
@@ -73,6 +77,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, badRequest);
         return ResponseEntity.status(badRequest)
+                .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(badRequest.name(), message))
                 .body(exceptionResponse);
     }
@@ -84,6 +89,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
         return ResponseEntity.status(badRequest)
+                .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(badRequest.name(), message))
                 .body(exceptionResponse);
     }
@@ -95,6 +101,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
         return ResponseEntity.status(badRequest)
+                .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(badRequest.name(), message))
                 .body(exceptionHandlerResponse);
     }
@@ -107,6 +114,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
         return ResponseEntity.status(badRequest)
+                .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(HttpStatus.BAD_REQUEST.name(), message))
                 .body(exceptionHandlerResponse);
     }
