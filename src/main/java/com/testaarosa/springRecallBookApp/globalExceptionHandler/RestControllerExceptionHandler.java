@@ -41,7 +41,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
         return ResponseEntity.status(serviceUnavailable)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(getExceptionHeaders(serviceUnavailable.name(), message))
+                .headers(getExceptionHeaders(serviceUnavailable.name(), rex.getMessage()))
                 .body(exceptionResponse);
     }
 
@@ -53,7 +53,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
         return ResponseEntity.status(serviceUnavailable)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(getExceptionHeaders(serviceUnavailable.name(), message))
+                .headers(getExceptionHeaders(serviceUnavailable.name(), rex.getMessage()))
                 .body(exceptionResponse);
     }
 
@@ -66,7 +66,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, forbidden);
         return ResponseEntity.status(forbidden)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(getExceptionHeaders(forbidden.name(), message))
+                .headers(getExceptionHeaders(forbidden.name(), rex.getMessage()))
                 .body(exceptionResponse);
     }
 
@@ -78,7 +78,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, badRequest);
         return ResponseEntity.status(badRequest)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(getExceptionHeaders(badRequest.name(), message))
+                .headers(getExceptionHeaders(badRequest.name(), rex.getMessage()))
                 .body(exceptionResponse);
     }
 
@@ -90,7 +90,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(ex, message, badRequest);
         return ResponseEntity.status(badRequest)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(getExceptionHeaders(badRequest.name(), message))
+                .headers(getExceptionHeaders(badRequest.name(), ex.getMessage()))
                 .body(exceptionResponse);
     }
 
@@ -102,7 +102,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
         return ResponseEntity.status(badRequest)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(getExceptionHeaders(badRequest.name(), message))
+                .headers(getExceptionHeaders(badRequest.name(), ex.getMessage()))
                 .body(exceptionHandlerResponse);
     }
 
@@ -115,7 +115,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
         return ResponseEntity.status(badRequest)
                 .contentType(MediaType.APPLICATION_JSON)
-                .headers(getExceptionHeaders(HttpStatus.BAD_REQUEST.name(), message))
+                .headers(getExceptionHeaders(HttpStatus.BAD_REQUEST.name(), ex.getMessage()))
                 .body(exceptionHandlerResponse);
     }
 
