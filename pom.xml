@@ -10,12 +10,12 @@
     </parent>
     <groupId>com.testaarosa</groupId>
     <artifactId>springRecallBookApp</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-AWS</version>
     <name>Spring recall course, BookApp</name>
     <description>Back to Java</description>
 
     <properties>
-        <java.version>18</java.version>
+        <java.version>17</java.version>
         <lombok.version>1.18.24</lombok.version>
         <apache.commons>3.12.0</apache.commons>
         <hibernate.validator>6.2.4.Final</hibernate.validator>
