@@ -14,8 +14,9 @@ public class UpdateUploadResponse extends UploadResponse {
 
     @Builder(builderMethodName = "UpdateUploadResponseBuilder")
     public UpdateUploadResponse(Long id, String originFileName, String serverFileName, String contentType, byte[] file,
-                                LocalDateTime createdAt, String path, boolean success, List<String> errorList, LocalDateTime lastUpdateAt) {
-        super(id, originFileName, serverFileName, contentType, file, createdAt, path);
+                                LocalDateTime createdAt, String path, boolean success, List<String> errorList,
+                                LocalDateTime lastUpdateAt, String thumbnailUri) {
+        super(id, originFileName, serverFileName, contentType, file, createdAt, path, thumbnailUri);
         this.success = success;
         this.errorList = errorList;
         this.lastUpdateAt = lastUpdateAt;

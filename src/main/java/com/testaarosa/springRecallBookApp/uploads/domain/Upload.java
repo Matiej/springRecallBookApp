@@ -4,6 +4,7 @@ import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import com.testaarosa.springRecallBookApp.uploads.application.UploadResponse;
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.util.Objects;
 
@@ -18,6 +19,8 @@ public class Upload extends BaseEntity {
     private String serverFileName;
     private String contentType;
     private String path;
+    @Column(name = "thumbnail_uri")
+    private String thumbnailUri;
 
     public void updateFields(UploadResponse uploadResponse) {
         setFileName(uploadResponse.getOriginFileName());
