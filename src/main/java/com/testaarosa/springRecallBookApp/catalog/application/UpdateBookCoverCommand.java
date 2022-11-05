@@ -10,5 +10,5 @@ public class UpdateBookCoverCommand {
     byte[] file;
     String fileName;
     String fileContentType;
-
+    String thumbnailUri;
 }

@@ -15,4 +15,6 @@ public class UploadResponse {
     private byte[] file;
     private LocalDateTime createdAt;
     private String path;
+    private String thumbnailUri;
+
 }

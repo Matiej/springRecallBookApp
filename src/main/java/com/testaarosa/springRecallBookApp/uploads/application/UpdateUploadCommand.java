@@ -8,7 +8,7 @@ public class UpdateUploadCommand extends SaveUploadCommand {
 
 
     public UpdateUploadCommand(Long uploadId, String fileName, byte[] file, String contentType) {
-        super(fileName, file, contentType);
+        super(fileName, file, contentType, null);
         this.uploadId = uploadId;
     }
 

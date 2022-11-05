@@ -137,6 +137,7 @@ class CatalogService implements CatalogUseCase {
                                     .fileName(command.getFileName())
                                     .file(command.getFile())
                                     .contentType(command.getFileContentType())
+                                    .thumbnailUri(command.getThumbnailUri())
                                     .build());
                             book.setBookCoverId(uploadResponse.getId());
                             Book savedBook = bookJpaRepository.save(book);

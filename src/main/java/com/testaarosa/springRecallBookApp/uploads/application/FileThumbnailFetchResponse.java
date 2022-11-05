@@ -5,9 +5,8 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class SaveUploadCommand {
-    private String fileName;
-    private byte[] file;
+public class FileThumbnailFetchResponse {
     private String contentType;
-    private String thumbnailUri;
+    private byte[] file;
+
 }

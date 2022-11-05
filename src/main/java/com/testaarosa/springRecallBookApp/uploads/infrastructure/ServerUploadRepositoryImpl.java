@@ -2,6 +2,7 @@ package com.testaarosa.springRecallBookApp.uploads.infrastructure;
 
 import com.testaarosa.springRecallBookApp.uploads.application.SaveUploadCommand;
 import com.testaarosa.springRecallBookApp.uploads.application.UploadResponse;
+import com.testaarosa.springRecallBookApp.uploads.domain.Upload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -13,7 +14,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @Slf4j
 @Repository
@@ -25,9 +30,10 @@ class ServerUploadRepositoryImpl implements ServerUploadRepository {
 
     public UploadResponse save(SaveUploadCommand command) {
         Path coverPath = createCoverDirectory();
+        String fileName = command.getFileName();
         String uploadFileAbsolutePath = new StringJoiner(File.separator)
                 .add(coverPath.toString())
-                .add(createFileNameToSave(command.getFileName()))
+                .add(createFileNameToSave(fileName))
                 .toString();
         File coverFile = new File(uploadFileAbsolutePath);
         try (FileOutputStream os = new FileOutputStream(coverFile)) {
@@ -37,13 +43,44 @@ class ServerUploadRepositoryImpl implements ServerUploadRepository {
             log.error("Can't save file to path: " + uploadFileAbsolutePath);
         }
         return UploadResponse.builder()
-                .originFileName(command.getFileName())
+                .originFileName(fileName)
                 .serverFileName(coverFile.getName())
                 .contentType(command.getContentType())
                 .file(command.getFile())
                 .createdAt(LocalDateTime.now())
                 .path(coverFile.getAbsolutePath())
                 .build();
+    }
+
+    @Override
+    public void deleteUselessCoverFiles(List<Upload> currentUploads) {
+        Path coverPath = Path.of(getUplaodsPath().toString());
+        if (!Files.isDirectory(coverPath)) {
+            throw new IllegalArgumentException("Cant find cover path: " + coverPath);
+        }
+        try {
+            Predicate<Path> checkIfFileIsUsed = path -> currentUploads.stream()
+                    .map(Upload::getPath)
+                    .noneMatch(p -> p.equals(path.toString()));
+
+            long count = Files.list(coverPath)
+                    .filter(checkIfFileIsUsed)
+                    .map(pathToDelete -> {
+                        Path fileName = pathToDelete.getFileName();
+                        log.info("Useless file to delete: " + fileName);
+                        try {
+                            boolean isDeleted = Files.deleteIfExists(pathToDelete);
+                            log.warn("File: '" + fileName + "' deleted = " + isDeleted);
+                            return isDeleted;
+                        } catch (IOException e) {
+                            log.error("Can't delete file: " + fileName);
+                            return false;
+                        }
+                    }).count();
+            log.info("Total " + count + " files was deleted.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Path createCoverDirectory() {
