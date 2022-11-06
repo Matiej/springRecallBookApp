@@ -2,11 +2,11 @@ version: '3.1'
 
 services:
   db:
-    container_name: springrecallbookdb
+    container_name: springrecallbookdb_m
     image: postgres:14.5
     restart: always
     environment:
-      POSTGRES_DB: springrecallbook
+      POSTGRES_DB: springrecallbook_m
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: pass123
     ports:
