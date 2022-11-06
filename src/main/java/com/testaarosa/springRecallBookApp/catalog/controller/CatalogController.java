@@ -38,6 +38,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 @Tag(name = "Catalog API", description = "API designed to manipulate the object book ")
 @SecurityRequirement(name = "springrecallbook-api_documentation")
+@CrossOrigin(origins = "${cross.origin.webui}")
 class CatalogController {
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private final String DEFAULT_QUERY_LIMIT = "3";
