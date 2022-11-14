@@ -117,7 +117,10 @@ class CatalogInitializerService implements CatalogInitializer {
 
     private String prepareFileName(String bookTitle, String contentType) {
         return new StringJoiner(".")
-                .add(StringUtils.deleteWhitespace(bookTitle).toLowerCase())
+                .add(StringUtils
+                        .deleteWhitespace(bookTitle
+                                .replaceAll("[\\/|\\\\|\\*|\\:|\\||\"|\'|\\<|\\>|\\{|\\}|\\?|\\%|,]", ""))
+                        .toLowerCase())
                 .add(MimeType.getExtensionByContentType(contentType))
                 .toString();
     }
@@ -171,7 +174,7 @@ class CatalogInitializerService implements CatalogInitializer {
     private void placeOrder() {
         List<Book> books = catalogUseCase.findAll(Pageable.ofSize(200))
                 .stream()
-                .filter(book -> book.getAvailable()>0)
+                .filter(book -> book.getAvailable() > 0)
                 .collect(Collectors.toList());
 
         PlaceOrderItem placeOrderItem1 = new PlaceOrderItem(getRandomBookId(books), 2);
