@@ -32,7 +32,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final DefaultAdmin defaultAdmin;
 
     private final String ROLE_ADMIN = "ROLE_ADMIN";
-    
     private final static String[] AUTH_DOC_SWAGGER_PATTERNS = {
             "/swagger-ui/**",
             "/swaggeradmin-openapi/**",
@@ -60,7 +59,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/uploads/**",
             "/authors/**",
     };
-
     private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
             "/orders",
             "/login",
@@ -91,7 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+    public void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authProvider());
 
     }

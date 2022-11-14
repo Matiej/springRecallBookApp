@@ -118,9 +118,10 @@ class CatalogInitializerService implements CatalogInitializer {
 
     private String prepareFileName(String bookTitle, String contentType) {
         return new StringJoiner(".")
-                .add(StringUtils.deleteWhitespace(bookTitle
-                        .replaceAll("[\\/|\\\\|\\*|\\:|\\||\"|\'|\\<|\\>|\\{|\\}|\\?|\\%|,]", "")
-                        .toLowerCase()))
+                .add(StringUtils
+                        .deleteWhitespace(bookTitle
+                                .replaceAll("[\\/|\\\\|\\*|\\:|\\||\"|\'|\\<|\\>|\\{|\\}|\\?|\\%|,]", ""))
+                        .toLowerCase())
                 .add(MimeType.getExtensionByContentType(contentType))
                 .toString();
     }
