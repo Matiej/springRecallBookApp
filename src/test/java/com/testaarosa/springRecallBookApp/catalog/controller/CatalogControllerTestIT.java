@@ -190,7 +190,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getBookById() find book in data data base. Given correct id")
-     void shouldGetBookById() {
+    void shouldGetBookById() {
         //given
         prepareAndAddBooks();
         Long givenBookId = 1L;
@@ -219,7 +219,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getBookById() not find book. Given not exist ID")
-     void shouldNotGetBookById() {
+    void shouldNotGetBookById() {
         //given
         Long givenBookId = 1111L;
         String expectedMessage = "Book with ID: " + givenBookId + " not found!";
@@ -246,7 +246,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @DisplayName("Should getBookById() throws exception. Given negative ID")
-     void shouldThrowExceptionGetBookByNegativeId() {
+    void shouldThrowExceptionGetBookByNegativeId() {
         //given
         Long givenBookId = -1111L;
         String expectedErrorMessage = "BookId field value must be greater than 0";
@@ -262,9 +262,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should addBook() create and add book into DB")
-     void shouldAddBook() {
+    void shouldAddBook() {
         //given
         RestBookCommand restBookCommand = prepareRestBookCommand();
         List<Author> authors = prepareAuthors();
@@ -280,13 +280,13 @@ class CatalogControllerTestIT extends CatalogTestBase {
                 () -> assertEquals(HttpStatus.CREATED, response.getStatusCode()),
                 () -> assertNotNull(location),
                 () -> assertTrue(location.size() > 0),
-                () -> assertEquals("http://localhost/catalog/1", location.get(0)));
+                () -> assertEquals("http://localhost/catalog/3", location.get(0)));
     }
 
     @Test
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should addBook() throws exception because no author in DB")
-     void shouldNotAddBookAndThrowsIllegalArgumentException() {
+    void shouldNotAddBookAndThrowsIllegalArgumentException() {
         //given
         RestBookCommand restBookCommand = prepareRestBookCommand();
         List<Author> authors = prepareAuthors();
@@ -304,21 +304,21 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @Transactional
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should updateBook() update book title and available.")
     void shouldUpdateBook() {
         //given
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
         RestBookCommand restBookCommand = prepareRestBookCommand();
-        catalogUseCase.addBook(restBookCommand.toCreateBookCommand());
+        Book book = catalogUseCase.addBook(restBookCommand.toCreateBookCommand());
 
         //when
         String titleToUpdate = "Updated Title 2";
         restBookCommand.setTitle(titleToUpdate);
         restBookCommand.setAvailable(100L);
-        ResponseEntity<Object> response = catalogController.updateBook(1L, restBookCommand);
-        Book updatedBook = catalogUseCase.findOne(1L);
+        ResponseEntity<Object> response = catalogController.updateBook(book.getId(), restBookCommand);
+        Book updatedBook = catalogUseCase.findOne(book.getId());
 
         //then
         assertNotNull(response);
@@ -327,7 +327,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
                 () -> assertEquals(HttpStatus.ACCEPTED, response.getStatusCode()),
                 () -> assertNotNull(location),
                 () -> assertTrue(location.size() > 0),
-                () -> assertEquals("http://localhost/catalog/1", location.get(0)));
+                () -> assertEquals("http://localhost/catalog/" + book.getId(), location.get(0)));
         assertAll("Check updated book fields",
                 () -> assertEquals(titleToUpdate, updatedBook.getTitle()),
                 () -> assertEquals(100L, updatedBook.getAvailable()));
@@ -335,9 +335,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @Transactional
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should updateBook() not update book because of wrong book ID")
-     void shouldNotUpdateBook() {
+    void shouldNotUpdateBook() {
         //given
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
@@ -355,7 +355,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
         restBookCommand.setTitle(titleToUpdate);
         restBookCommand.setAvailable(101L);
         ResponseEntity<Object> response = catalogController.updateBook(bookIdToUpdate, restBookCommand);
-        Book notUpdatedBook = catalogUseCase.findOne(1L);
+        Book notUpdatedBook = catalogUseCase.findOne(3L);
 
         //then
         assertNotNull(response);
@@ -372,19 +372,19 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @Transactional
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Non existing author. Should updateBook() throws an exception.")
-     void shouldNotUpdateBookNonExistingAuthorThrowsException() {
+    void shouldNotUpdateBookNonExistingAuthorThrowsException() {
         //given
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
 
         RestBookCommand restBookCommand = prepareRestBookCommand();
-        catalogUseCase.addBook(restBookCommand.toCreateBookCommand());
+        Book book = catalogUseCase.addBook(restBookCommand.toCreateBookCommand());
 
-        Long bookIdToUpdate = 1L;
-        Long authorIdToUpdate = 3L;
-        String expectedErrorMessage = "No author found with ID: 3";
+        Long bookIdToUpdate = book.getId();
+        Long authorIdToUpdate = 3333L;
+        String expectedErrorMessage = "No author found with ID: 3333";
 
         //when
         restBookCommand.setAuthors(Set.of(authorIdToUpdate));
@@ -399,9 +399,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @Transactional
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should addBookCover() add picture file to the test directory and create upload")
-     void shouldAddBookCover() throws URISyntaxException, IOException {
+    void shouldAddBookCover() throws URISyntaxException, IOException {
         //given
         String testFileName = "testCover.jpg";
 
@@ -413,7 +413,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
                 () -> assertNotNull(response),
                 () -> assertEquals(HttpStatus.ACCEPTED, response.getStatusCode()));
 
-        Book bookWithCover = catalogUseCase.findOne(1L);
+        Book bookWithCover = catalogUseCase.findOne(3L);
         Upload upload = uploadJpaRepository.getReferenceById(bookWithCover.getBookCoverId());
 
         assertAll("Check upload fields, and if upland is not null and if file exist in test direct",
@@ -429,9 +429,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @Transactional
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should addBookCover() throws exception, non existing book")
-     void shouldAddBookCoverThrowsException() throws URISyntaxException {
+    void shouldAddBookCoverThrowsException() throws URISyntaxException {
         //given
         Long nonExistingBookId = 99L;
         String expectedErrorMessage = "Can't find book ID:99";
@@ -451,9 +451,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
 
     @Test
     @Transactional
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should deleteBookCover() delete picture form server and remove upload")
-     void shouldDeleteBookCover() throws URISyntaxException, IOException {
+    void shouldDeleteBookCover() throws URISyntaxException, IOException {
         //given
         String testFileName = "testCoverToDelete.jpg";
         ResponseEntity<?> response = uploadBookCover(testFileName);
@@ -462,12 +462,13 @@ class CatalogControllerTestIT extends CatalogTestBase {
                 () -> assertEquals(HttpStatus.ACCEPTED, response.getStatusCode()));
 
         //when
-        Book bookWithCover = catalogUseCase.findOne(1L);
+        Book bookWithCover = catalogUseCase.findOne(3L);
         Upload upload = uploadJpaRepository.getReferenceById(bookWithCover.getBookCoverId());
-        catalogController.deleteCoverByBookId(1L);
+        Long bookCoverId = upload.getId();
+        catalogController.deleteCoverByBookId(bookWithCover.getId());
 
         //then
-        Optional<Upload> optionalUpload = uploadJpaRepository.findById(upload.getId());
+        Optional<Upload> optionalUpload = uploadJpaRepository.findById(bookCoverId);
         assertTrue(optionalUpload.isEmpty());
         Path testDir = new File(upload.getPath()).getAbsoluteFile().toPath();
         assertTrue(Files.notExists(testDir));
@@ -476,9 +477,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
     }
 
     @Test
-    @WithMockUser(username="admin",roles={"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Should deleteById() delete book by given ID")
-     void shouldDeleteById() {
+    void shouldDeleteById() {
         //given
         RestBookCommand restBookCommand = prepareRestBookCommand();
         List<Author> authors = prepareAuthors();
@@ -486,7 +487,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
         catalogController.addBook(restBookCommand);
 
         //when
-        Book book = catalogUseCase.findOne(1L);
+        Book book = catalogUseCase.findOne(3L);
         catalogUseCase.removeById(book.getId());
 
         //then
@@ -499,7 +500,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
         List<Author> authors = prepareAuthors();
         authorJpaRepository.saveAll(authors);
         catalogController.addBook(restBookCommand);
-        Book createdBook = catalogUseCase.findOne(1L);
+        Book createdBook = catalogUseCase.findOne(3L);
         MultipartFile multipartFile = prepareMultiPartFile(fileName, MediaType.IMAGE_JPEG_VALUE);
         return catalogController.addBookCover(createdBook.getId(), multipartFile);
     }
