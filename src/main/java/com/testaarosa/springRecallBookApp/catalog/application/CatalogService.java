@@ -56,7 +56,7 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findByAuthor(String authorName, Pageable pageable) {
-        return bookJpaRepository.findAllByLinkedAuthors_nameContainsIgnoreCaseOrLinkedAuthors_lastNameContainsIgnoreCase(authorName, authorName, pageable);
+        return bookJpaRepository.findAllByAuthors_nameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(authorName, authorName, pageable);
     }
 
     @Override
