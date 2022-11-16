@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -43,14 +44,15 @@ class CatalogControllerTest extends CatalogTestBase {
      void shouldGetAllBooks() {
         //todo test this method with all options and params
         //given
+        MockHttpServletRequest request = new MockHttpServletRequest();
         List<Book> givenBooks = prepareBooks();
         int limit = 10;
         when(catalogUseCase.findAllEager(Pageable.ofSize(limit)))
                 .thenReturn(givenBooks);
 
         //when
-        List<Book> resultBookList = catalogController.getAll(Optional.empty(),
-                Optional.empty(), limit).getBody();
+        List<RestBook> resultBookList = catalogController.getAll(Optional.empty(),
+                Optional.empty(), limit, request).getBody();
 
         //then
         assertNotNull(resultBookList);

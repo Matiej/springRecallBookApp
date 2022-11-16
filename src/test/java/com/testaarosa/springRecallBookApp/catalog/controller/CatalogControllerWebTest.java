@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,8 +25,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
@@ -48,9 +48,10 @@ public class CatalogControllerWebTest extends CatalogTestBase {
     @DisplayName("Should getAll() perform GET method and gives back 200code response")
      void shouldGetAllBooks() throws Exception {
         //given
+        MockHttpServletRequest request = new MockHttpServletRequest();
         int givenLimit = 3;
-        List<Book> givenBooks = prepareBooks();
-        when(catalogUseCase.findAllEager(Pageable.ofSize(givenLimit))).thenReturn(givenBooks);
+        List<RestBook> givenBooks = RestBook.toRestBook(prepareBooks(), request);
+        when(catalogUseCase.findAllEager(Pageable.ofSize(givenLimit))).thenReturn(prepareBooks());
 
         //expect
         mockMvc.perform(MockMvcRequestBuilders.get("/catalog"))

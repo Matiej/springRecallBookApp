@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.order.price;
+package com.testaarosa.springRecallBookApp.order.application.price;
 
 import lombok.Value;
 

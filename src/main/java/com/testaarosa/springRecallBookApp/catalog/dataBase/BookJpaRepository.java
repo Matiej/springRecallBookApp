@@ -11,9 +11,9 @@ import java.util.List;
 
 public interface BookJpaRepository extends JpaRepository<Book, Long>, PagingAndSortingRepository<Book, Long> {
 
-    List<Book> findAllByLinkedAuthors_nameContainsIgnoreCaseOrLinkedAuthors_lastNameContainsIgnoreCase(String name, String lastName, Pageable pageable);
+    List<Book> findAllByAuthors_nameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(String name, String lastName, Pageable pageable);
 
-    @Query("SELECT b FROM Book b JOIN b.linkedAuthors a " +
+    @Query("SELECT b FROM Book b JOIN b.authors a " +
             " WHERE upper(b.title) LIKE upper(concat('%', :title, '%')) " +
             " AND (upper(a.name) LIKE upper(concat('%', :author, '%')) " +
             " OR upper(a.lastName) LIKE upper(concat('%', :author, '%'))) ")
@@ -24,6 +24,6 @@ public interface BookJpaRepository extends JpaRepository<Book, Long>, PagingAndS
     List<Book> findAllByTitleContainsIgnoreCase(String title, Pageable pageable);
 
     //join detach -> to avoid N+1 notation
-    @Query("SELECT DISTINCT b FROM Book b JOIN FETCH b.linkedAuthors")
+    @Query("SELECT DISTINCT b FROM Book b JOIN FETCH b.authors")
     List<Book> findAllEager(Pageable pageable);
 }

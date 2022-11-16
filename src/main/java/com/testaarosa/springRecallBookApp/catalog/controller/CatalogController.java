@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -50,23 +51,24 @@ class CatalogController {
             @ApiResponse(responseCode = "200", description = "Search successful"),
             @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
     })
-    ResponseEntity<List<Book>> getAll(
+    ResponseEntity<List<RestBook>> getAll(
             @RequestParam Optional<String> title,
             @RequestParam Optional<String> author,
             @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false)
-            @Min(value = 1, message = "Page size cannot be less than one") int limit) {
+            @Min(value = 1, message = "Page size cannot be less than one") int limit,
+            HttpServletRequest request) {
         Pageable pageable = Pageable.ofSize(limit);
         if (title.isPresent() && author.isPresent()) {
-            return prepareResponseForGetAll(catalogUseCase.findByTitleAndAuthor(title.get(), author.get(), pageable));
+            return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findByTitleAndAuthor(title.get(), author.get(), pageable), request));
         } else if (title.isPresent()) {
-            return prepareResponseForGetAll(catalogUseCase.findByTitle(title.get(), pageable));
+            return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findByTitle(title.get(), pageable), request));
         } else if (author.isPresent()) {
-            return prepareResponseForGetAll(catalogUseCase.findByAuthor(author.get(), pageable));
+            return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findByAuthor(author.get(), pageable), request));
         }
-        return prepareResponseForGetAll(catalogUseCase.findAllEager(pageable));
+        return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findAllEager(pageable), request));
     }
 
-    private ResponseEntity<List<Book>> prepareResponseForGetAll(List<Book> collection) {
+    private ResponseEntity<List<RestBook>> prepareResponseForGetAll(List<RestBook> collection) {
         return ResponseEntity.ok()
                 .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
                 .body(collection);

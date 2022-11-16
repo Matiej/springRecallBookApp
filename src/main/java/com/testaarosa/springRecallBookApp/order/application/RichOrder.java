@@ -1,10 +1,10 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
+import com.testaarosa.springRecallBookApp.order.application.price.OrderPrice;
 import com.testaarosa.springRecallBookApp.order.domain.Delivery;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
-import com.testaarosa.springRecallBookApp.order.price.OrderPrice;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.Builder;
 import lombok.Value;
