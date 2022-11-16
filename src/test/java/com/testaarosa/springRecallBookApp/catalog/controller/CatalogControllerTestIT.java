@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
@@ -63,6 +64,7 @@ class CatalogControllerTestIT extends CatalogTestBase {
     private BookJpaRepository bookJpaRepository;
     @Autowired
     private UploadJpaRepository uploadJpaRepository;
+    private MockHttpServletRequest request = new MockHttpServletRequest();
 
     @BeforeEach
     void setup(TestInfo testInfo) {
@@ -79,17 +81,19 @@ class CatalogControllerTestIT extends CatalogTestBase {
     void getAllBooksTest() {
         //given
         prepareAndAddBooks();
+        MockHttpServletRequest request = new MockHttpServletRequest();
         //when
-        ResponseEntity<List<Book>> catalogControllerAll = catalogController.getAll(Optional.empty(), Optional.empty(), 10);
+        ResponseEntity<List<RestBook>> catalogControllerAll = catalogController.getAll(Optional.empty(), Optional.empty(), 10, request);
 
         //then
-        List<Book> books = catalogControllerAll.getBody();
+        List<RestBook> books = catalogControllerAll.getBody();
         assertNotNull(books);
         assertEquals(2, books.size());
 
     }
 
     @Test
+    @Transactional
     @DisplayName("Should placeOrder() will find 1 book saved in H2 database. Author name give.")
     void getAllBooksForGivenAuthorTest() {
         //given
@@ -98,9 +102,9 @@ class CatalogControllerTestIT extends CatalogTestBase {
         String expectedBookTitle = "Mama mia";
 
         //when
-        ResponseEntity<List<Book>> catalogControllerAll = catalogController.getAll(Optional.empty(),
-                Optional.of(givenAuthorName), 10);
-        List<Book> books = catalogControllerAll.getBody();
+        ResponseEntity<List<RestBook>> catalogControllerAll = catalogController.getAll(Optional.empty(),
+                Optional.of(givenAuthorName), 10, request);
+        List<RestBook> books = catalogControllerAll.getBody();
 
         //then
         assertNotNull(books);
@@ -118,15 +122,16 @@ class CatalogControllerTestIT extends CatalogTestBase {
         List<Author> givenAuthors = prepareAuthors().stream().sorted(Comparator.comparing(Author::getLastName)).toList();
 
         //when
-        ResponseEntity<List<Book>> catalogControllerAll = catalogController.getAll(
+        ResponseEntity<List<RestBook>> catalogControllerAll = catalogController.getAll(
                 Optional.of(givenBookTitle),
                 Optional.empty(),
-                10);
+                10,
+                request);
 
-        List<Book> books = catalogControllerAll.getBody();
+        List<RestBook> books = catalogControllerAll.getBody();
         //then
         assertNotNull(books);
-        List<Author> linkedAuthors = books.get(0).getLinkedAuthors().stream().sorted(Comparator.comparing(Author::getLastName)).toList();
+        List<RestBookAuthor> linkedAuthors = books.get(0).getAuthors().stream().sorted(Comparator.comparing(RestBookAuthor::getFullName)).toList();
         assertEquals(1, books.size());
         assertEquals(givenBookTitle, books.get(0).getTitle());
         assertAll("Authors properties test",
@@ -134,11 +139,12 @@ class CatalogControllerTestIT extends CatalogTestBase {
                         () -> assertNotNull(linkedAuthors),
                         () -> assertEquals(2, linkedAuthors.size())),
                 () -> assertAll("First author test",
-                        () -> assertEquals(givenAuthors.get(0).getName(), linkedAuthors.get(0).getName()),
-                        () -> assertEquals(givenAuthors.get(0).getLastName(), linkedAuthors.get(0).getLastName())),
+                        () -> assertEquals(givenAuthors.get(0).getName() + " " +
+                                givenAuthors.get(0).getLastName(), linkedAuthors.get(0).getFullName())),
                 () -> assertAll("Second author test",
-                        () -> assertEquals(givenAuthors.get(1).getName(), linkedAuthors.get(1).getName()),
-                        () -> assertEquals(givenAuthors.get(1).getLastName(), linkedAuthors.get(1).getLastName()))
+                        () -> assertEquals(givenAuthors.get(1).getName() + " " +
+                                givenAuthors.get(1).getLastName(), linkedAuthors.get(1).getFullName())
+                )
         );
     }
 
@@ -155,7 +161,8 @@ class CatalogControllerTestIT extends CatalogTestBase {
         Throwable throwable = catchThrowable(() -> catalogController.getAll(
                 Optional.of(givenBookTitle),
                 Optional.empty(),
-                givenLimit));
+                givenLimit,
+                request));
 
         //then
         then(throwable).as("An ConstraintViolationException should be thrown if limit is less then 1")
@@ -172,14 +179,15 @@ class CatalogControllerTestIT extends CatalogTestBase {
         int givenLimit = 1;
 
         //when
-        ResponseEntity<List<Book>> response = catalogController.getAll(
+        ResponseEntity<List<RestBook>> response = catalogController.getAll(
                 Optional.empty(),
                 Optional.empty(),
-                givenLimit);
+                givenLimit,
+                request);
 
         //then
         HttpStatus statusCode = response.getStatusCode();
-        List<Book> books = response.getBody();
+        List<RestBook> books = response.getBody();
         assertAll("Check if all results are not null",
                 () -> assertNotNull(response),
                 () -> assertNotNull(statusCode),
@@ -558,8 +566,8 @@ class CatalogControllerTestIT extends CatalogTestBase {
     private List<Book> prepareAndAddBooks() {
         List<Author> authors = prepareAuthors();
         List<Book> books = prepareBooks();
-        books.get(0).setLinkedAuthors(Set.of(authors.get(0)));
-        books.get(1).setLinkedAuthors(Set.of(authors.get(0), authors.get(1)));
+        books.get(0).setAuthors(Set.of(authors.get(0)));
+        books.get(1).setAuthors(Set.of(authors.get(0), authors.get(1)));
         return bookJpaRepository.saveAll(books);
     }
 
