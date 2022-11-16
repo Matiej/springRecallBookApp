@@ -32,8 +32,8 @@ public class Book extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
     @ToString.Exclude
-    @JsonIgnoreProperties(value = "linkedBooks")
-    private Set<Author> linkedAuthors = new HashSet<>();
+    @JsonIgnoreProperties(value = "books")
+    private Set<Author> authors = new HashSet<>();
 
     public Book(String title, Integer year, BigDecimal price, Long available) {
         this.title = title;
@@ -57,18 +57,18 @@ public class Book extends BaseEntity {
     }
 
     public void addAuthor(Author author) {
-        linkedAuthors.add(author);
-        author.getLinkedBooks().add(this);
+        authors.add(author);
+        author.getBooks().add(this);
     }
 
     public void removeAuthor(Author author) {
-        linkedAuthors.remove(author);
-        author.getLinkedBooks().remove(this);
+        authors.remove(author);
+        author.getBooks().remove(this);
     }
 
     public void removeAuthors() {
-        linkedAuthors.forEach(author -> author.getLinkedBooks().remove(this));
-        linkedAuthors.clear();
+        authors.forEach(author -> author.getBooks().remove(this));
+        authors.clear();
     }
 }
 

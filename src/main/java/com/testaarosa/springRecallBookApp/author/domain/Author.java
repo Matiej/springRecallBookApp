@@ -24,10 +24,10 @@ public class Author extends BaseEntity {
     private String name;
     private String lastName;
     private Integer yearOfBirth;
-    @ManyToMany(mappedBy = "linkedAuthors", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "authors", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @ToString.Exclude
-    @JsonIgnoreProperties(value = "linkedAuthors")
-    private Set<Book> linkedBooks = new HashSet<>();
+    @JsonIgnoreProperties(value = "authors")
+    private Set<Book> books = new HashSet<>();
 
     public Author(String name, String lastName, Integer yearOfBirth) {
         this.name = name;
@@ -50,17 +50,17 @@ public class Author extends BaseEntity {
     }
 
     public void addBook(Book book) {
-        linkedBooks.add(book);
-        book.getLinkedAuthors().add(this);
+        books.add(book);
+        book.getAuthors().add(this);
     }
 
     public void removeBook(Book book) {
-        linkedBooks.remove(book);
-        book.getLinkedAuthors().remove(this);
+        books.remove(book);
+        book.getAuthors().remove(this);
     }
 
     public void removeAllBooks() {
-        linkedBooks.forEach(book -> book.removeAuthor(this));
-        linkedBooks.clear();
+        books.forEach(book -> book.removeAuthor(this));
+        books.clear();
     }
 }
