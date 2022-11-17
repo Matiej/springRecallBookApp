@@ -3,6 +3,7 @@ package com.testaarosa.springRecallBookApp.catalog.controller;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,9 @@ public class RestBook {
 
     private static Set<RestBookAuthor> toRestBookAuthor(Set<Author> authors) {
         return authors.stream().map(author -> {
-            String fullName = String.join(" ", author.getName(), author.getLastName());
+            String name = StringUtils.isBlank(author.getName()) ? "" : author.getName();
+            String lastName = StringUtils.isBlank(author.getLastName()) ? "" : author.getLastName();
+            String fullName = String.join(" ", name, lastName);
             return new RestBookAuthor(fullName);
         }).collect(Collectors.toSet());
     }
