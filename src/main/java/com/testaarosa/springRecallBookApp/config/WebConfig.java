@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Value(value = "${cross.origin.webui}")
-    private String uiCors;
+    private String[] uiCors;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
