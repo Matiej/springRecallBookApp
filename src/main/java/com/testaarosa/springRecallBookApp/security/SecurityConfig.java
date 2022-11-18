@@ -58,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/catalog/**",
             "/uploads/**",
             "/authors/**",
+            "/admin/check"
     };
     private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
             "/orders",

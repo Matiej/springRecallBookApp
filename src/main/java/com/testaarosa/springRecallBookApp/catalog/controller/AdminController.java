@@ -19,7 +19,6 @@ import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderF
 
 @Slf4j
 @RestController
-@Secured(value = {"ROLE_ADMIN"})
 @RequestMapping("/admin")
 @AllArgsConstructor
 @SecurityRequirement(name = "springrecallbook-api_documentation")
@@ -34,11 +33,13 @@ class AdminController {
                 .body("ADMIN RESPONSE - OK");
     }
 
+    @Secured(value = {"ROLE_ADMIN"})
     @PostMapping("/books_initialize")
     void bookInitialize() {
         catalogInitializer.booksInit();
     }
 
+    @Secured(value = {"ROLE_ADMIN"})
     @PostMapping("/orders_initialize")
     @Operation(summary = "Add some orders",
             description = "Add orders, but first must add books")
@@ -46,6 +47,7 @@ class AdminController {
         catalogInitializer.ordersInit();
     }
 
+    @Secured(value = {"ROLE_ADMIN"})
     @PostMapping("/rolesinit")
     @Operation(summary = "Add default roles",
             description = "Add ADMIN and USER roles to data base")
