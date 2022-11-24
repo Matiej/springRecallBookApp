@@ -1,0 +1,4 @@
+ALTER TABLE recipient
+    ADD COLUMN user_id int8;
+ALTER TABLE recipient
+    ADD CONSTRAINT RECIPIENT_USER_ID_FK FOREIGN KEY (user_id) REFERENCES users;

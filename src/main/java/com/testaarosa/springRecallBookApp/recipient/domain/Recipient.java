@@ -3,12 +3,10 @@ package com.testaarosa.springRecallBookApp.recipient.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
+import com.testaarosa.springRecallBookApp.user.domain.UserEntity;
 import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -27,6 +25,7 @@ public class Recipient extends BaseEntity {
     @Column(unique = true)
     private String email;
     private RecipientAddress recipientAddress;
+
     @OneToMany(cascade = CascadeType.ALL,
             orphanRemoval = true,
             mappedBy = "recipient")
@@ -34,6 +33,12 @@ public class Recipient extends BaseEntity {
     @JsonIgnoreProperties(value = "recipient")
     @Singular
     private Set<Order> orders = new HashSet<>();
+
+    @ToString.Exclude
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties("recipients")
+    private UserEntity user;
 
     public Recipient(String name, String lastName, String phone, String email, RecipientAddress recipientAddress) {
         this.name = name;

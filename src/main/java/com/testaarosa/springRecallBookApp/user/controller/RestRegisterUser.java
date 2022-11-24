@@ -1,29 +1,31 @@
 package com.testaarosa.springRecallBookApp.user.controller;
 
-import com.testaarosa.springRecallBookApp.user.application.UserCommand;
+import com.testaarosa.springRecallBookApp.user.application.RegisterUserCommand;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class RestRegisterCommand {
+@AllArgsConstructor
+public class RestRegisterUser {
     @Email(message = "Wrong email format for 'username' filed")
-    String username;
+    private String username;
     @NotBlank(message = "Filed password cannot be empty or null")
     @Size(min = 3, max = 100)
-    String password;
+    private String password;
     @NotBlank(message = "Filed passwordMatch cannot be empty or null")
     @Size(min = 3, max = 100)
-    String passwordMatch;
+    private String passwordMatch;
 
-    public UserCommand toUserCommand() {
-        return UserCommand.builder()
+    public RegisterUserCommand toUserCommand() {
+        return RegisterUserCommand.builder()
                 .username(username)
                 .password(password)
                 .passwordMatch(passwordMatch)

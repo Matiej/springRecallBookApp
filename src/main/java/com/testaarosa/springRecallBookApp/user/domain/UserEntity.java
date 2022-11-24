@@ -1,6 +1,9 @@
 package com.testaarosa.springRecallBookApp.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.testaarosa.springRecallBookApp.jpa.BaseEntity;
+import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,12 +13,14 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Entity
+@Entity(name = "users")
 @Table(name = "users")
 @NoArgsConstructor
 public class UserEntity extends BaseEntity {
     private String username;
+    @JsonIgnore
     private String password;
+    @JsonIgnore
     private String matchingPassword;
 
     @EqualsAndHashCode.Exclude
@@ -24,13 +29,21 @@ public class UserEntity extends BaseEntity {
     @JoinTable(name = "role_user",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    @JsonIgnoreProperties("userEntities")
     private Set<Role> roles = new HashSet<>();
+
+    @ToString.Exclude
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonIgnoreProperties("user")
+    private Set<Recipient> recipients = new HashSet<>();
 
     public UserEntity(String username, String password, String matchingPassword) {
         this.username = username;
         this.password = password;
         this.matchingPassword = matchingPassword;
-        this.roles = roles;
     }
 
     @Override
@@ -54,4 +67,14 @@ public class UserEntity extends BaseEntity {
     public void removeRole(Role role) {
         roles.remove(role);
     }
+
+    public void addRecipient(Recipient recipient) {
+        this.getRecipients().add(recipient);
+    }
+
+    public void removeRecipient(Recipient recipient) {
+        this.getRecipients().remove(recipient);
+    }
+
+
 }

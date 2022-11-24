@@ -63,7 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final static String[] POST_AUTH_ALL_USERS_PATTERNS = {
             "/orders",
             "/login",
-            "/users"
+            "/users",
+            "/users/**"
     };
 
     @Override
