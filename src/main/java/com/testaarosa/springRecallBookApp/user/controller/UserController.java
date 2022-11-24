@@ -62,15 +62,31 @@ public class UserController {
                 .body(users);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/register",consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Register new user", description = "Add and register new user. All fields are validated")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User object created successful"),
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details.")
     })
-    ResponseEntity<Void> register(@Valid @RequestBody RestRegisterCommand command) {
+    ResponseEntity<Void> register(@Valid @RequestBody RestRegisterUser command) {
         log.info("Received request to register user: " + command.getUsername());
         RegisterUserResponse registerUserResponse = userUseCase.registerUser(command.toUserCommand());
+        return prepareResponse(registerUserResponse);
+    }
+
+    @PostMapping(value = "/registerfull",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Register new user+recipient", description = "Add and register new user with recipient. All fields are validated")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User and recipient object created successful"),
+            @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details.")
+    })
+    ResponseEntity<Void> registerUserRecipient(@Valid @RequestBody RestRegisterUserRecipient command) {
+        log.info("Received request to register user: " + command.getUsername());
+        RegisterUserResponse registerUserResponse = userUseCase.registerUser(command.toRegisterUserRecipientCommand());
+        return prepareResponse(registerUserResponse);
+    }
+
+    private ResponseEntity<Void> prepareResponse(RegisterUserResponse registerUserResponse) {
         if (!registerUserResponse.isSuccess()) {
             return ResponseEntity.badRequest()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.POST.name())
