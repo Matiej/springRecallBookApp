@@ -3,7 +3,10 @@ package com.testaarosa.springRecallBookApp.user.application;
 import com.testaarosa.springRecallBookApp.recipient.application.port.RecipientUseCase;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import com.testaarosa.springRecallBookApp.recipient.domain.RecipientAddress;
+import com.testaarosa.springRecallBookApp.security.AuthResponse;
+import com.testaarosa.springRecallBookApp.security.UserSecurity;
 import com.testaarosa.springRecallBookApp.user.application.port.UserUseCase;
+import com.testaarosa.springRecallBookApp.user.controller.RestLogInUser;
 import com.testaarosa.springRecallBookApp.user.dataBase.RoleJpaRepository;
 import com.testaarosa.springRecallBookApp.user.dataBase.UserEntityJpaRepository;
 import com.testaarosa.springRecallBookApp.user.domain.Role;
@@ -16,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +33,7 @@ class UserService implements UserUseCase {
     private final RoleJpaRepository roleJpaRepository;
     private final PasswordEncoder encoder;
     private final RecipientUseCase recipientUseCase;
+    private final UserSecurity userSecurity;
 
     @Override
     public List<UserEntity> getAll(UserQueryCommand command) {
@@ -84,13 +89,18 @@ class UserService implements UserUseCase {
         }
         UserEntity user = register(command);
         Recipient recipient = prepareRecipient(command);
-        Set<Recipient> recipients = new HashSet<>();
-        recipients.add(recipient);
         recipient.setUser(user);
-//        user.addRecipient(recipient);
-        user.setRecipients(recipients);
+        user.addRecipient(recipient);
         UserEntity savedUser = userEntityJpaRepository.save(user);
         return RegisterUserResponse.success(savedUser);
+    }
+
+    @Override
+    public LoginResponse logIn(RestLogInUser logInUser, HttpServletRequest request) {
+        AuthResponse authResponse = userSecurity.authorize(logInUser.getUsername(), logInUser.getPassword(), request);
+        UserEntity user = authResponse.getUser();
+        Set<String> roles = user.getRoles().stream().map(Role::getRole).collect(Collectors.toSet());
+        return new LoginResponse(user.getId(), user.getUsername(), roles, authResponse.getSessionId());
     }
 
     private UserEntity register(RegisterUserCommand command) {

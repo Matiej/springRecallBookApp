@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -63,6 +64,18 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         String message = "Forbidden action for user:  " + (userPrincipal == null ? "Unknown user" : userPrincipal.getName());
         log.error(message, rex);
         HttpStatus forbidden = HttpStatus.FORBIDDEN;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, forbidden);
+        return ResponseEntity.status(forbidden)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(getExceptionHeaders(forbidden.name(), rex.getMessage()))
+                .body(exceptionResponse);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    public final ResponseEntity<Object> badCredentialsExceptionException(BadCredentialsException rex, WebRequest request) {
+        String message = "Bad credentials";
+        log.error(message, rex);
+        HttpStatus forbidden = HttpStatus.UNAUTHORIZED;
         ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, forbidden);
         return ResponseEntity.status(forbidden)
                 .contentType(MediaType.APPLICATION_JSON)
