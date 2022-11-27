@@ -26,6 +26,7 @@
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <assertJ-core.version>3.23.1</assertJ-core.version>
         <h2.version>2.1.214</h2.version>
+        <jwt.version>0.9.1</jwt.version>
     </properties>
 
     <dependencies>
@@ -73,6 +74,11 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-security</artifactId>
             <version>${springdoc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

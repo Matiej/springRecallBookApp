@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-class UserEntityDetails implements UserDetails {
+public class UserEntityDetails implements UserDetails {
     private final UserEntity userEntity;
 
     @Override

@@ -100,7 +100,7 @@ class UserService implements UserUseCase {
         AuthResponse authResponse = userSecurity.authorize(logInUser.getUsername(), logInUser.getPassword(), request);
         UserEntity user = authResponse.getUser();
         Set<String> roles = user.getRoles().stream().map(Role::getRole).collect(Collectors.toSet());
-        return new LoginResponse(user.getId(), user.getUsername(), roles, authResponse.getSessionId());
+        return new LoginResponse(user.getId(), user.getUsername(), roles, authResponse.getCookie());
     }
 
     private UserEntity register(RegisterUserCommand command) {

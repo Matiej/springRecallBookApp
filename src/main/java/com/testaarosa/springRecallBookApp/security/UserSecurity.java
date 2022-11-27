@@ -1,16 +1,15 @@
 package com.testaarosa.springRecallBookApp.security;
 
-import com.testaarosa.springRecallBookApp.user.domain.UserEntity;
+import com.testaarosa.springRecallBookApp.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 public class UserSecurity {
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
 
     public boolean isOwnerOrAdmin(String objectOwner, UserDetails user) {
         return isAdmin(user) || isOwner(objectOwner, user);
@@ -39,10 +39,11 @@ public class UserSecurity {
                 .authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         SecurityContextHolder.getContext().setAuthentication(auth);
-        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
 
         UserEntityDetails userDetails = (UserEntityDetails) auth.getPrincipal();
-        return new AuthResponse(sessionId, userDetails.getUserEntity());
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+
+        return new AuthResponse(jwtCookie, userDetails.getUserEntity());
     }
 
 }
