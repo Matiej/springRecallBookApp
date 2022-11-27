@@ -113,11 +113,11 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details.")
     })
     public ResponseEntity<LoginResponse> logIn(@Valid @RequestBody RestLogInUser restLogInUser, HttpServletRequest request) {
-        log.info("Request login fro user: " + restLogInUser.getUsername());
+        log.info("Request login for user: " + restLogInUser.getUsername());
         LoginResponse response = userUseCase.logIn(restLogInUser, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.FOUND.name())
-                .header(HttpHeaders.SET_COOKIE, response.getSessionId())
+                .header(HttpHeaders.SET_COOKIE, response.getResponseCookie().toString())
                 .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), "User authenticated successful")
                 .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.POST.name())
                 .body(response);

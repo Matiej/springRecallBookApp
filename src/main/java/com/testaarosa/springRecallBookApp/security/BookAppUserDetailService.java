@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 
+@Component
 @AllArgsConstructor
-class BookAppUserDetailService implements UserDetailsService {
+public class BookAppUserDetailService implements UserDetailsService {
 
     private final UserEntityJpaRepository userEntityJpaRepository;
     private final DefaultAdmin defaultAdmin;
