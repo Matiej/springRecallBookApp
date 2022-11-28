@@ -15,6 +15,7 @@ import com.testaarosa.springRecallBookApp.user.domain.UserEntity;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,6 +102,11 @@ class UserService implements UserUseCase {
         UserEntity user = authResponse.getUser();
         Set<String> roles = user.getRoles().stream().map(Role::getRole).collect(Collectors.toSet());
         return new LoginResponse(user.getId(), user.getUsername(), roles, authResponse.getCookie());
+    }
+
+    @Override
+    public ResponseCookie logout() {
+        return userSecurity.clearCookie();
     }
 
     private UserEntity register(RegisterUserCommand command) {
