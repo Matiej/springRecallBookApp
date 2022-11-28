@@ -1,10 +1,8 @@
 package com.testaarosa.springRecallBookApp.user.controller;
 
 import com.testaarosa.springRecallBookApp.recipient.controller.SaveRecipientGroup;
-import com.testaarosa.springRecallBookApp.user.application.RegisterUserCommand;
 import com.testaarosa.springRecallBookApp.user.application.RegisterUserRecipientCommand;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

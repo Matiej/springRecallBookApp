@@ -23,11 +23,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.net.URI;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,11 +123,23 @@ public class UserController {
                 .body(response);
 
     }
-//todo TO DELETE AFTER FULL IMPLEMENTATION
+
+    @PostMapping("/userlogout")
+    public ResponseEntity<Void> logoutUser() {
+        ResponseCookie cookie = userUseCase.logout();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
+    //todo TO DELETE AFTER FULL IMPLEMENTATION
     @Secured(value = {ROLE_ADMIN, ROLE_USER})
     @PostMapping("/test")
     @Parameter(name = "id", required = true, description = "Updating test ID")
-    public ResponseEntity<Void> testLogin(@Valid @RequestBody RestLogInUser restLogInUser, @AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<Void> testLogin(@Valid @RequestBody RestLogInUser restLogInUser, @AuthenticationPrincipal UserDetails user, HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String authType = request.getAuthType();
+        Enumeration<String> headerNames = request.getHeaderNames();
         log.info("lllooogin: " + restLogInUser.getUsername());
         log.info("USERRR TEST TO DELETE: " + user.getUsername());
         return ResponseEntity.ok().build();
