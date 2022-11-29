@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Value(value = "${cors.origin.webui}")
-    private String uiCors;
+    private String[] uiCors;
     @Value(value = "${cors.max.age}")
     private int maxAge;
 
