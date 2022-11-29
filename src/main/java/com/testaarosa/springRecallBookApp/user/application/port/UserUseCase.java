@@ -7,6 +7,7 @@ import com.testaarosa.springRecallBookApp.user.application.RegisterUserRecipient
 import com.testaarosa.springRecallBookApp.user.application.RegisterUserResponse;
 import com.testaarosa.springRecallBookApp.user.application.UserQueryCommand;
 import com.testaarosa.springRecallBookApp.user.domain.UserEntity;
+import org.springframework.http.ResponseCookie;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -17,5 +18,6 @@ public interface UserUseCase {
     RegisterUserResponse registerUser(RegisterUserCommand command);
     RegisterUserResponse registerUser(RegisterUserRecipientCommand command);
     LoginResponse logIn(RestLogInUser logInUser, HttpServletRequest request);
+    ResponseCookie logout();
 
 }

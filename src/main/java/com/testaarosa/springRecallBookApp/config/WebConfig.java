@@ -8,15 +8,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value(value = "${cross.origin.webui}")
-    private String[] uiCors;
+    @Value(value = "${cors.origin.webui}")
+    private String uiCors;
+    @Value(value = "${cors.max.age}")
+    private int maxAge;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("*")
                 .allowedOrigins(uiCors)
-//                .allowedHeaders("Access-Control-Allow-Origin", "Set-Cookie", "Status", "Message", "CreatedAt", "UpdatedAt" )
+                .maxAge(maxAge)
                 .allowCredentials(true);
     }
 }

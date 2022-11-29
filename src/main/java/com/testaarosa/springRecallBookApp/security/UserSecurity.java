@@ -46,4 +46,8 @@ public class UserSecurity {
         return new AuthResponse(jwtCookie, userDetails.getUserEntity());
     }
 
+    public ResponseCookie clearCookie() {
+       return jwtUtils.getCleanJwtCookie();
+    }
+
 }
