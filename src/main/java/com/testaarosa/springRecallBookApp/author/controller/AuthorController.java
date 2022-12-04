@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -33,20 +36,23 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @SecurityRequirement(name = "springrecallbook-api_documentation")
 class AuthorController {
     private static final String DEFAULT_QUERY_LIMIT = "3";
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_USER = "ROLE_USER";
     private final AuthorUseCase authorUseCase;
 
-    //todo - dodac security tutaj. Zabezpieczyc endpoint
+    @Secured(value = {ROLE_ADMIN, ROLE_USER})
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Get all authors from data base",
             description = "Filtering by name or/and lastName or/and yearOfBirth. Is not case sensitive. Limit default value is 3, not required")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search successful"),
-            @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
+            @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No authors found!"),
     })
-    ResponseEntity<List<Author>> findALl(@RequestParam Optional<String> name,
-                                         @RequestParam Optional<String> lastName,
-                                         @RequestParam Optional<Integer> yearOfBirth,
-                                         @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
+    ResponseEntity<List<Author>> getAll(@RequestParam Optional<String> name,
+                                        @RequestParam Optional<String> lastName,
+                                        @RequestParam Optional<Integer> yearOfBirth,
+                                        @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit,
+                                        @AuthenticationPrincipal UserDetails user) {
 
         return prepareResponseForGetAll(authorUseCase.findAllByParams(AuthorQueryCommand.builder()
                 .name(name.orElse(null))
@@ -55,6 +61,7 @@ class AuthorController {
                 .limit(limit).build()));
     }
 
+    @Secured(value = {ROLE_ADMIN, ROLE_USER})
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get author by id from data base", description = "Search for one author by data base unique ID")
     @Parameter(name = "id", required = true, description = "Searching author ID")
@@ -64,7 +71,8 @@ class AuthorController {
     })
     ResponseEntity<Author> findOneById(@PathVariable("id")
                                        @NotNull(message = "AuthorId filed can't be null")
-                                       @Min(value = 1, message = "BookId field value must be greater than 0") Long id) {
+                                       @Min(value = 1, message = "BookId field value must be greater than 0") Long id,
+                                       @AuthenticationPrincipal UserDetails user) {
         return authorUseCase.findById(id)
                 .map(author -> ResponseEntity.ok()
                         .headers(getSuccessfulHeaders(HttpStatus.OK, HttpMethod.GET))
@@ -81,6 +89,7 @@ class AuthorController {
                 .body(authorList);
     }
 
+    @Secured(value = {ROLE_ADMIN})
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add new author", description = "Add new author using RestAuthorCommand. All fields are validated")
     @ApiResponses({
@@ -88,13 +97,15 @@ class AuthorController {
             @ApiResponse(responseCode = "400", description = "Validation failed. Some fields are wrong. Response contains all details."),
     })
     ResponseEntity<?> addAuthor(@Validated({CreateAuthorCommandGroup.class})
-                                @RequestBody RestAuthorCommand command) {
+                                @RequestBody RestAuthorCommand command,
+                                @AuthenticationPrincipal UserDetails user) {
         Author author = authorUseCase.addAuthor(command.toCreateAuthorCommand());
         return ResponseEntity.created(getUri(author.getId()))
                 .headers(getSuccessfulHeaders(HttpStatus.CREATED, HttpMethod.POST))
                 .build();
     }
 
+    @Secured(value = {ROLE_ADMIN})
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update author object", description = "Update existing author using ID. All fields are validated")
     @Parameter(name = "id", required = true, description = "Updating author ID")
@@ -106,17 +117,20 @@ class AuthorController {
     ResponseEntity<Object> updateAuthor(@PathVariable("id") @NotNull(message = "AuthorId filed can't be null)")
                                         @Min(value = 1, message = "AuthorId field value must be greater than 0") Long id,
                                         @Validated({UpdateAuthorCommandGroup.class})
-                                        @RequestBody RestAuthorCommand command) {
+                                        @RequestBody RestAuthorCommand command,
+                                        @AuthenticationPrincipal UserDetails user) {
         UpdatedAuthorResponse updatedAuthorResponse = authorUseCase.updateAuthor(command.toUpdateAuthorCommand(id));
         if (!updatedAuthorResponse.isSuccess()) {
             return ResponseEntity.noContent()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NO_CONTENT.name())
                     .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), updatedAuthorResponse.getErrorList().toString())
                     .build();
         }
-        return ResponseEntity.accepted()
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .location(getUri(id))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PATCH))
                 .build();
     }
@@ -130,6 +144,7 @@ class AuthorController {
                 .toUri();
     }
 
+    @Secured(value = {ROLE_ADMIN})
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remove author object by ID", description = "Remove author by data base ID")
@@ -140,7 +155,8 @@ class AuthorController {
     public void deleteById(@PathVariable @NotNull(message = "AuthorId filed can't be null)")
                            @Min(value = 1, message = "AuthorId field value must be greater than 0") Long id,
                            @RequestParam(value = "isForceDelete", defaultValue = "false")
-                           @NotNull(message = "UploadId field can't be empty or null") Boolean isForceDelete) {
+                           @NotNull(message = "UploadId field can't be empty or null") Boolean isForceDelete,
+                           @AuthenticationPrincipal UserDetails user) {
         authorUseCase.removeById(id, isForceDelete);
     }
 }
