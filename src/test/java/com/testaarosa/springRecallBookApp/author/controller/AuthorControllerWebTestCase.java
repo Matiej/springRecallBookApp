@@ -6,10 +6,7 @@ import com.testaarosa.springRecallBookApp.author.application.UpdatedAuthorRespon
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -44,15 +42,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthorControllerWebTestCase extends AuthorTestBase {
     private final static String AUTHORS_MAPPING = "/authors";
     private MockMvc mockMvc;
+    private final MockHttpServletRequest request = new MockHttpServletRequest();
 
-    //    @InjectMocks
     @Autowired
     private AuthorController authorController;
     @Autowired
     private WebApplicationContext context;
     @MockBean
     private AuthorUseCase authorUseCase;
-    private MockHttpServletRequest request = new MockHttpServletRequest();
 
 
     @BeforeEach
@@ -60,11 +57,16 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
     void setup(TestInfo testInfo) {
         log.info("Starting test: {}.", testInfo.getDisplayName());
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
-//                .setControllerAdvice(new RestControllerExceptionHandler())
                 .build();
     }
 
+    @AfterEach
+    void tierDown(TestInfo testInfo) {
+        log.info("Finished test: {}", testInfo.getDisplayName());
+    }
+
     @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"USER"})
     @DisplayName("Should getAll() perform GET method and gives back 200code response")
     void shouldGetAllAuthors() throws Exception {
         //given
@@ -121,6 +123,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
     }
 
     @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"USER"})
     @DisplayName("Should findOneById() perform GET method, and gives back 200code response")
     void shouldFindOneAuthorById() throws Exception {
         //given
@@ -143,6 +146,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
     }
 
     @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"USER"})
     @DisplayName("Should findOneById() perform GET method, and doesn't give back object 404code response. Optional.empty() Result")
     void shouldFindOneAuthorByIdWrongId() throws Exception {
         //given
@@ -186,6 +190,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
     }
 
     @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"ADMIN"})
     @DisplayName("Should updateAuthor() perform Patch method, and gives back 202code response")
     void shouldUpdateAuthor() throws Exception {
         //given
@@ -222,6 +227,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
     }
 
     @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"ADMIN"})
     @DisplayName("Should updateAuthor() perform Post method, and gives back 204code response")
     void shouldNotUpdateAuthor() throws Exception {
         //given
@@ -250,6 +256,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
     }
 
     @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"ADMIN"})
     @DisplayName("Should updateAuthor() perform Patch method, and gives 400code, validation ID error. ")
     void shouldNotUpdateAuthorValidationID() throws Exception {
         //given
@@ -273,6 +280,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
     }
 
     @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"ADMIN"})
     @DisplayName("Should updateAuthor() perform Patch method, and gives 400code, validation year error. ")
     void shouldNotUpdateAuthorValidationYear() throws Exception {
         //given
@@ -299,5 +307,23 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
         verifyNoInteractions(authorUseCase);
     }
 
+    @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"ADMIN"})
+    @DisplayName("Should removeById() perform Delete method, and gives back 204code response. ForceDelete is false")
+    void shouldDeleteAuthorByIdForceFalse() throws Exception {
+        //given
+        Long id = 1L;
+        boolean isForceDelete = false;
+        //when
+        //expect
+        mockMvc.perform(MockMvcRequestBuilders.delete(AUTHORS_MAPPING + "/{id}", id)
+                        .param("isForceDelete", Boolean.toString(isForceDelete)))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andReturn();
 
+        //then
+        verify(authorUseCase, times(1)).removeById(id, isForceDelete);
+        verifyNoMoreInteractions(authorUseCase);
+    }
 }

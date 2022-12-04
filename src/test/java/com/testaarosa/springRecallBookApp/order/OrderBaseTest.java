@@ -6,6 +6,10 @@ import com.testaarosa.springRecallBookApp.order.application.PlaceOrderCommand;
 import com.testaarosa.springRecallBookApp.order.application.PlaceOrderItem;
 import com.testaarosa.springRecallBookApp.order.application.PlaceOrderRecipient;
 import com.testaarosa.springRecallBookApp.order.domain.Delivery;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+
+import java.util.List;
 
 public abstract class OrderBaseTest extends BaseTest {
 
@@ -40,5 +44,13 @@ public abstract class OrderBaseTest extends BaseTest {
                 .lastName("Nowak")
                 .email(email)
                 .build();
+    }
+
+    protected User user(String email) {
+        return new User(email,"test", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+    }
+
+    protected User admin() {
+        return new User(getADMIN_USER(),"test", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
     }
 }
