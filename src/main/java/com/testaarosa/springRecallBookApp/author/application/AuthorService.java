@@ -17,11 +17,6 @@ public class AuthorService implements AuthorUseCase {
     private final AuthorJpaRepository repository;
 
     @Override
-    public List<Author> findAll() {
-        return repository.findAll();
-    }
-
-    @Override
     public Optional<Author> findById(Long id) {
         return repository.findById(id);
     }

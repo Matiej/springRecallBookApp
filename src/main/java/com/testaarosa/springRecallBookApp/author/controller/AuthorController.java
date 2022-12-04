@@ -41,9 +41,9 @@ class AuthorController {
             description = "Filtering by name or/and lastName or/and yearOfBirth. Is not case sensitive. Limit default value is 3, not required")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search successful"),
-            @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No books found!"),
+            @ApiResponse(responseCode = "404", description = "Server has not found anything matching the requested URI! No authors found!"),
     })
-    ResponseEntity<List<Author>> findALl(@RequestParam Optional<String> name,
+    ResponseEntity<List<Author>> getAll(@RequestParam Optional<String> name,
                                          @RequestParam Optional<String> lastName,
                                          @RequestParam Optional<Integer> yearOfBirth,
                                          @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit) {
@@ -111,12 +111,14 @@ class AuthorController {
         if (!updatedAuthorResponse.isSuccess()) {
             return ResponseEntity.noContent()
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.PATCH.name())
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.NO_CONTENT.name())
                     .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), updatedAuthorResponse.getErrorList().toString())
                     .build();
         }
-        return ResponseEntity.accepted()
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .location(getUri(id))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .headers(getSuccessfulHeaders(HttpStatus.ACCEPTED, HttpMethod.PATCH))
                 .build();
     }
