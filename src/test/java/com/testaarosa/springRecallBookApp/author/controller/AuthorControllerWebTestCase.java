@@ -26,12 +26,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,7 +55,6 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
 
 
     @BeforeEach
-    @DisplayName("Should getAll() perform GET method and gives back 200code response")
     void setup(TestInfo testInfo) {
         log.info("Starting test: {}.", testInfo.getDisplayName());
         mockMvc = MockMvcBuilders.webAppContextSetup(context)
@@ -92,7 +93,6 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
         //then
         verify(authorUseCase, times(1)).findAllByParams(authorQueryCommand);
         verifyNoMoreInteractions(authorUseCase);
-
     }
 
     @Test
@@ -113,12 +113,33 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
 
         //expect
         mockMvc.perform(MockMvcRequestBuilders.get(AUTHORS_MAPPING + "bad"))
-                .andDo(print())
                 .andExpect(status().is(404))
+                .andDo(print())
                 .andReturn();
 
         //then
         verify(authorUseCase, times(0)).findAllByParams(authorQueryCommand);
+        verifyNoMoreInteractions(authorUseCase);
+    }
+
+    @Test
+    @WithMockUser(username = "user", password = "pass", roles = {"USER"})
+    @DisplayName("Should getAll() NOT perform GET method and gives back 400code response")
+    void shouldNOTGetAllAuthorsWrongLimit() throws Exception {
+        //given
+        String limit = "0";
+        //expect
+        mockMvc.perform(MockMvcRequestBuilders.get(AUTHORS_MAPPING)
+                        .param("limit", limit))
+                .andDo(print())
+                .andExpect(status().is(400))
+                .andExpect(header().string("Status", HttpStatus.BAD_REQUEST.name()))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException))
+                .andExpect(result -> assertThat(result.getResolvedException().getMessage()).contains("Page size cannot be less than one"))
+                .andExpect(header().string("Message", "getAll.limit: Page size cannot be less than one"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        //then
         verifyNoMoreInteractions(authorUseCase);
     }
 
@@ -197,7 +218,6 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
         Long id = 1L;
         RestAuthorCommand command = new RestAuthorCommand("Jaro", "Skorwon", 1979);
         UpdateAuthorCommand updateAuthorCommand = command.toUpdateAuthorCommand(id);
-        HttpMethod[] allowedMethods = {HttpMethod.PATCH};
 
         URI expectedLocation = ServletUriComponentsBuilder
                 .fromContextPath(request)
@@ -217,7 +237,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
                 .andExpect(header().string(HttpHeaders.LOCATION, expectedLocation.toString()))
                 .andExpect(header().string("Status", HttpStatus.ACCEPTED.name()))
                 .andExpect(header().string("Message", "Successful"))
-                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, Arrays.toString(allowedMethods)))
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, allowedMethods(HttpMethod.PATCH)))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -257,7 +277,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
 
     @Test
     @WithMockUser(username = "user", password = "pass", roles = {"ADMIN"})
-    @DisplayName("Should updateAuthor() perform Patch method, and gives 400code, validation ID error. ")
+    @DisplayName("Should updateAuthor() perform Patch method, and gives 404code, validation ID error. ")
     void shouldNotUpdateAuthorValidationID() throws Exception {
         //given
         Long id = 0L;
@@ -293,7 +313,7 @@ class AuthorControllerWebTestCase extends AuthorTestBase {
 
         //expect
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.patch(AUTHORS_MAPPING + "/{id}", id)
-                .contentType(MediaType.APPLICATION_JSON).content(jsonInString(updateAuthorCommand)))
+                        .contentType(MediaType.APPLICATION_JSON).content(jsonInString(updateAuthorCommand)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(header().string("Status", HttpStatus.BAD_REQUEST.name()))

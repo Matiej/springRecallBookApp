@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInfo;
+import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -62,5 +63,9 @@ public abstract class BaseTest {
 
     protected String getADMIN_USER() {
         return TEST_ADMIN_USER;
+    }
+
+    protected String allowedMethods(HttpMethod... methods) {
+        return Arrays.toString(methods);
     }
 }

@@ -59,13 +59,13 @@ class CatalogController {
             HttpServletRequest request) {
         Pageable pageable = Pageable.ofSize(limit);
         if (title.isPresent() && author.isPresent()) {
-            return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findByTitleAndAuthor(title.get(), author.get(), pageable), request));
+            return prepareResponseForGetAll(RestBook.toRestBooks(catalogUseCase.findByTitleAndAuthor(title.get(), author.get(), pageable), request));
         } else if (title.isPresent()) {
-            return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findByTitle(title.get(), pageable), request));
+            return prepareResponseForGetAll(RestBook.toRestBooks(catalogUseCase.findByTitle(title.get(), pageable), request));
         } else if (author.isPresent()) {
-            return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findByAuthor(author.get(), pageable), request));
+            return prepareResponseForGetAll(RestBook.toRestBooks(catalogUseCase.findByAuthor(author.get(), pageable), request));
         }
-        return prepareResponseForGetAll(RestBook.toRestBook(catalogUseCase.findAllEager(pageable), request));
+        return prepareResponseForGetAll(RestBook.toRestBooks(catalogUseCase.findAllEager(pageable), request));
     }
 
     private ResponseEntity<List<RestBook>> prepareResponseForGetAll(List<RestBook> collection) {
