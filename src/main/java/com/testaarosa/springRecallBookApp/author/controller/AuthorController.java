@@ -51,7 +51,8 @@ class AuthorController {
     ResponseEntity<List<Author>> getAll(@RequestParam Optional<String> name,
                                         @RequestParam Optional<String> lastName,
                                         @RequestParam Optional<Integer> yearOfBirth,
-                                        @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false) int limit,
+                                        @RequestParam(value = "limit", defaultValue = DEFAULT_QUERY_LIMIT, required = false)
+                                        @Min(value = 1, message = "Page size cannot be less than one")int limit,
                                         @AuthenticationPrincipal UserDetails user) {
 
         return prepareResponseForGetAll(authorUseCase.findAllByParams(AuthorQueryCommand.builder()

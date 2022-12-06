@@ -24,18 +24,16 @@ public class RestBook {
     String bookCoverUrl;
     Set<RestBookAuthor> authors;
 
-    public static List<RestBook> toRestBook(List<Book> bookList, HttpServletRequest request) {
+    public static List<RestBook> toRestBooks(List<Book> bookList, HttpServletRequest request) {
         return bookList.stream()
-                .map(book -> {
-                    return new RestBook(
-                            book.getId(),
-                            book.getTitle(),
-                            book.getYear(),
-                            book.getPrice(),
-                            book.getAvailable(),
-                            toCoverUrl(book.getBookCoverId(), request),
-                            toRestBookAuthor(book.getAuthors()));
-                })
+                .map(book -> new RestBook(
+                        book.getId(),
+                        book.getTitle(),
+                        book.getYear(),
+                        book.getPrice(),
+                        book.getAvailable(),
+                        toCoverUrl(book.getBookCoverId(), request),
+                        toRestBookAuthor(book.getAuthors())))
                 .collect(Collectors.toList());
     }
 
