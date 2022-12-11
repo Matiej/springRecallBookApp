@@ -50,7 +50,7 @@ public abstract class BaseTest {
         Book effective_java = new Book(
                 "Effective Java",
                 2005,
-                new BigDecimal(10),
+                new BigDecimal("101.82"),
                 12L);
 
         Book mama_mia = new Book(
