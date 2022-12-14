@@ -193,7 +193,7 @@ class OrderServiceTestIT extends OrderBaseTest {
 
     @Test
     @Transactional
-    @DisplayName("Should change order status to CANCELED, method updateOrderStatus(), verify book have revoked.")
+    @DisplayName("Should change order status to CANCELED, method updateOrderStatus(), verify book has revoked.")
     void shouldChangeOrderStatusAndVerifyBookAvailable() {
         //given
         List<Book> books = prepareAndAddBooks();
@@ -618,14 +618,6 @@ class OrderServiceTestIT extends OrderBaseTest {
                 .orderStatus(orderStatus)
                 .user(user)
                 .build();
-    }
-
-    private User user(String email) {
-        return new User(email,"test", List.of(new SimpleGrantedAuthority("ROLE_USER")));
-    }
-
-    private User admin() {
-        return new User(getADMIN_USER(),"test", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
     }
 
 }
