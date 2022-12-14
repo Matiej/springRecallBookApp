@@ -16,7 +16,7 @@ class JsonUserAuthenticationFilter extends UsernamePasswordAuthenticationFilter 
 
     @SneakyThrows
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
         LoginCommand loginCommand = mapper.readValue(request.getReader(), LoginCommand.class);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
