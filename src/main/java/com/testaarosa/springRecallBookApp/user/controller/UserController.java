@@ -116,7 +116,7 @@ public class UserController {
         log.info("Request login for user: " + restLogInUser.getUsername());
         LoginResponse response = userUseCase.logIn(restLogInUser, request);
         return ResponseEntity.status(HttpStatus.OK)
-                .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.FOUND.name())
+                .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.OK.name())
                 .header(HttpHeaders.SET_COOKIE, response.getResponseCookie().toString())
                 .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), "User authenticated successful")
                 .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.POST.name())
