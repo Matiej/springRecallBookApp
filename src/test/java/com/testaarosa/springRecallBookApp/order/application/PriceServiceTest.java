@@ -1,11 +1,11 @@
 package com.testaarosa.springRecallBookApp.order.application;
 
 import com.testaarosa.springRecallBookApp.order.OrderBaseTest;
+import com.testaarosa.springRecallBookApp.order.application.price.OrderPrice;
+import com.testaarosa.springRecallBookApp.order.application.price.PriceService;
 import com.testaarosa.springRecallBookApp.order.domain.Order;
 import com.testaarosa.springRecallBookApp.order.domain.OrderItem;
 import com.testaarosa.springRecallBookApp.order.domain.OrderStatus;
-import com.testaarosa.springRecallBookApp.order.application.price.OrderPrice;
-import com.testaarosa.springRecallBookApp.order.application.price.PriceService;
 import com.testaarosa.springRecallBookApp.recipient.domain.Recipient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
