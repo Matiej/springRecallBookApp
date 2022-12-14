@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -110,6 +111,18 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         String message = "Method arguments error";
+        log.error(message, ex);
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
+        return ResponseEntity.status(badRequest)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(getExceptionHeaders(badRequest.name(), ex.getMessage()))
+                .body(exceptionHandlerResponse);
+    }
+
+    @ExceptionHandler({ValidationException.class})
+    protected ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
+        String message = "Validation error";
         log.error(message, ex);
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
         ExceptionHandlerResponse exceptionHandlerResponse = getExceptionHandlerResponse(ex, message, badRequest);
