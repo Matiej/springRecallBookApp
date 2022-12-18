@@ -1,6 +1,6 @@
 package com.testaarosa.springRecallBookApp.order.controller;
 
-import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.global.headerfactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.order.application.OrderResponse;
 import com.testaarosa.springRecallBookApp.order.application.RichOrder;
 import com.testaarosa.springRecallBookApp.order.application.UpdateOrderStatusCommand;
@@ -34,7 +34,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
+import static com.testaarosa.springRecallBookApp.global.headerfactory.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
