@@ -1,6 +1,6 @@
 package com.testaarosa.springRecallBookApp.uploads.controller;
 
-import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.global.headerfactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.uploads.application.UpdateUploadCommand;
 import com.testaarosa.springRecallBookApp.uploads.application.UpdateUploadResponse;
 import com.testaarosa.springRecallBookApp.uploads.application.port.UploadUseCase;
@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
+import static com.testaarosa.springRecallBookApp.global.headerfactory.HttpHeaderFactory.getSuccessfulHeaders;
 
 @Slf4j
 @RestController

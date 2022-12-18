@@ -6,7 +6,7 @@ import com.testaarosa.springRecallBookApp.catalog.CatalogTestBase;
 import com.testaarosa.springRecallBookApp.catalog.application.port.CatalogUseCase;
 import com.testaarosa.springRecallBookApp.catalog.dataBase.BookJpaRepository;
 import com.testaarosa.springRecallBookApp.catalog.domain.Book;
-import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.global.headerfactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.uploads.dataBase.UploadJpaRepository;
 import com.testaarosa.springRecallBookApp.uploads.domain.Upload;
 import lombok.extern.slf4j.Slf4j;

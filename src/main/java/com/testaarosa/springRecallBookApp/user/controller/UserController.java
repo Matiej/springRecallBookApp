@@ -1,6 +1,6 @@
 package com.testaarosa.springRecallBookApp.user.controller;
 
-import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.global.headerfactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.user.application.LoginResponse;
 import com.testaarosa.springRecallBookApp.user.application.RegisterUserResponse;
 import com.testaarosa.springRecallBookApp.user.application.UserQueryCommand;
@@ -31,7 +31,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
-import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
+import static com.testaarosa.springRecallBookApp.global.headerfactory.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j

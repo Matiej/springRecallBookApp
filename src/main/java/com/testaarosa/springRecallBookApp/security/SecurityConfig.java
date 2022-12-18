@@ -97,14 +97,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authProvider());
         auth.userDetailsService(userDetailService).passwordEncoder(passwordEncoder());
-
-
     }
 
     @Bean
     AuthenticationProvider authProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
+        provider.setHideUserNotFoundExceptions(false);// these exception after that setting is not wrapped by BadCredentialsException anymore
         provider.setUserDetailsService(new BookAppUserDetailService(userEntityJpaRepository, defaultAdmin));
         return provider;
     }
