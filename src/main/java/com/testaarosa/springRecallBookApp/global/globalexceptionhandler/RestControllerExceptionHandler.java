@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.globalExceptionHandler;
+package com.testaarosa.springRecallBookApp.global.globalexceptionhandler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -69,6 +70,18 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         return ResponseEntity.status(forbidden)
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(getExceptionHeaders(forbidden.name(), rex.getMessage()))
+                .body(exceptionResponse);
+    }
+
+    @ExceptionHandler({UsernameNotFoundException.class})
+    public final ResponseEntity<Object> handleUsernameNotFoundException(RuntimeException rex, WebRequest request) {
+        String message = "User not found => ";
+        log.error(message, rex);
+        HttpStatus serviceUnavailable = HttpStatus.UNAUTHORIZED;
+        ExceptionHandlerResponse exceptionResponse = getExceptionHandlerResponse(rex, message, serviceUnavailable);
+        return ResponseEntity.status(serviceUnavailable)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(getExceptionHeaders(serviceUnavailable.name(), rex.getMessage()))
                 .body(exceptionResponse);
     }
 

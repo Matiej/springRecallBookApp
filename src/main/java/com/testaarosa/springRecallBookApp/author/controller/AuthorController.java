@@ -3,7 +3,7 @@ package com.testaarosa.springRecallBookApp.author.controller;
 import com.testaarosa.springRecallBookApp.author.application.UpdatedAuthorResponse;
 import com.testaarosa.springRecallBookApp.author.application.port.AuthorUseCase;
 import com.testaarosa.springRecallBookApp.author.domain.Author;
-import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.global.headerfactory.HeaderKey;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,7 +25,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
+import static com.testaarosa.springRecallBookApp.global.headerfactory.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController

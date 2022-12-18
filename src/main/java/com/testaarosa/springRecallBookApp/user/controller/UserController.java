@@ -1,6 +1,6 @@
 package com.testaarosa.springRecallBookApp.user.controller;
 
-import com.testaarosa.springRecallBookApp.globalHeaderFactory.HeaderKey;
+import com.testaarosa.springRecallBookApp.global.headerfactory.HeaderKey;
 import com.testaarosa.springRecallBookApp.user.application.LoginResponse;
 import com.testaarosa.springRecallBookApp.user.application.RegisterUserResponse;
 import com.testaarosa.springRecallBookApp.user.application.UserQueryCommand;
@@ -31,7 +31,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
-import static com.testaarosa.springRecallBookApp.globalHeaderFactory.HttpHeaderFactory.getSuccessfulHeaders;
+import static com.testaarosa.springRecallBookApp.global.headerfactory.HttpHeaderFactory.getSuccessfulHeaders;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -116,7 +116,7 @@ public class UserController {
         log.info("Request login for user: " + restLogInUser.getUsername());
         LoginResponse response = userUseCase.logIn(restLogInUser, request);
         return ResponseEntity.status(HttpStatus.OK)
-                .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.FOUND.name())
+                .header(HeaderKey.STATUS.getHeaderKeyLabel(), HttpStatus.OK.name())
                 .header(HttpHeaders.SET_COOKIE, response.getResponseCookie().toString())
                 .header(HeaderKey.MESSAGE.getHeaderKeyLabel(), "User authenticated successful")
                 .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, HttpMethod.POST.name())

@@ -1,4 +1,4 @@
-package com.testaarosa.springRecallBookApp.globalExceptionHandler;
+package com.testaarosa.springRecallBookApp.global.globalexceptionhandler;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
