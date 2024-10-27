@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @RestControllerAdvice
-public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler{
 
     @ExceptionHandler({Exception.class})
     public final ResponseEntity<Object> handleHibernateException(RuntimeException rex, WebRequest request) {
